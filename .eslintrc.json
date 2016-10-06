@@ -1,0 +1,27 @@
+{
+  "extends": "airbnb",
+  "env": {
+    "node": true
+  },
+  "settings": {
+    "import/resolver": {
+      "webpack": {
+        "config": "webpack.config/development.js",
+        "config-index": 0
+      }
+    },
+    "import/core-modules": [ "electron" ]
+  },
+  "globals": {
+    "db": false,
+    "ROOT_DIR": false,
+    "HOST": false,
+    "PORT": false,
+    "REST_API_PATH": false,
+    "BUNDLE": false
+  },
+  "rules": {
+    "no-console": 0,
+    "import/no-extraneous-dependencies": [2, {"devDependencies": true}]
+  }
+}
