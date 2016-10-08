@@ -30,3 +30,4 @@ bundles
 public/bundles
 electron/index.html
 tmp
+server/data.db

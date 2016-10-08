@@ -1,10 +1,12 @@
+import map from 'lodash/map';
+
 export const failRequest = (code, message) => Promise.reject({ code, message });
 
 export const handleRequest = (...args) => (req, res) => {
   const o = {
-    keys: req.params,
+    keys: req.params || {},
     data: req.body,
-    options: req.query,
+    options: req.query || {},
   };
 
   const action = args[args.length - 1];
@@ -16,7 +18,7 @@ export const handleRequest = (...args) => (req, res) => {
   });
 };
 
-export const dolarizeQueryParams = (...objs) => {
+export function dolarizeQueryParams(...objs) {
   const params = {};
   objs.forEach(obj =>
     Object.keys(obj).forEach((key) => {
@@ -24,4 +26,15 @@ export const dolarizeQueryParams = (...objs) => {
     })
   );
   return params;
-};
+}
+
+export function prepareAll(stmts) {
+  const prepared = {};
+  return Promise.all(map(stmts, (sql, name) =>
+    db.prepare(sql)
+    .then((stmt) => {
+      prepared[name] = stmt;
+    })
+  ))
+  .then(() => prepared);
+}

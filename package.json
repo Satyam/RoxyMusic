@@ -13,10 +13,19 @@
     "watch": "webpack -d --config webpack.config/development.js --watch &",
     "production": "webpack -p --config webpack.config/production.js",
     "electron": "electron bundles/electron.js",
-    "updateModules": "updtr"
+    "updateModules": "updtr",
+    "qq": "audio-metadata -t id3v2 -c 100 -q 300 \"../Music/vangelis - heaven and hell.mp3\""
   },
   "author": "Daniel Barreiro",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Satyam/RoxyMusic.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Satyam/RoxyMusic/issues"
+  },
+  "homepage": "https://github.com/Satyam/RoxyMusic#readme",
   "myWebServer": {
     "port": 8080,
     "host": "http://localhost",
@@ -31,6 +40,7 @@
     "denodeify": "^1.2.1",
     "electron-prebuilt": "^1.3.5",
     "express": "^4.14.0",
+    "fluent-ffmpeg": "^2.1.0",
     "isomorphic-fetch": "^2.2.1",
     "lodash": "^4.15.0",
     "react": "^15.3.1",
@@ -39,6 +49,7 @@
     "react-redux": "^4.4.5",
     "react-router": "^2.8.0",
     "react-router-redux": "^4.0.5",
+    "recursive-readdir": "^2.1.0",
     "redux": "^3.6.0",
     "redux-thunk": "^2.1.0",
     "sqlite3": "^3.1.5"

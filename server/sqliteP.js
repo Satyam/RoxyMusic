@@ -3,6 +3,7 @@ import fs from 'fs';
 import denodeify from 'denodeify';
 import debug from 'debug';
 
+// debug.enable('RoxyMusic:sqliteP');
 const log = debug('RoxyMusic:sqliteP');
 const readFile = denodeify(fs.readFile);
 
@@ -20,7 +21,9 @@ export const OPEN_READONLY = sqlite3.OPEN_READONLY;
  */
 function denodeifyMethods(source, dest, methods) {
   methods.forEach((method) => {
+    /* eslint-disable no-param-reassign */
     dest[method] = denodeify(source[method].bind(source));
+    /* eslint-enable no-param-reassign */
   });
 }
 
@@ -33,7 +36,9 @@ function strangeDenodeify(source, method) {
     };
 
     args.push(callback);
+    /* eslint-disable prefer-spread */
     retValue = source[method].apply(source, args);
+    /* eslint-enable prefer-spread */
   });
 }
 
@@ -48,12 +53,19 @@ class ST {
 
   run(params) {
     return new Promise((resolve, reject) => {
-      this.statement.run(params, (err) => {
-        log(`Running: ${this.statement}, ${JSON.stringify(params)}`);
+      /* eslint-disable func-names */
+      // do not convert the following function callback into a fat arrow
+      // because we need the `this` of that callback to extract info from it
+      const self = this;
+      this.statement.run(params, function (err) {
+        /* eslint-enable func-names */
+        log(`Running: ${self.statement.sql}, ${JSON.stringify(params)}`);
 
         if (err) {
-          log(`SQL error: ${err} in ${this.statement}.`);
-          reject(err);
+          log(`SQL error: ${err} in ${self.statement.sql}.`);
+          reject(`${self.statement.sql}
+            ${JSON.stringify(params)}
+            ${err}`);
         } else {
           resolve({ lastID: this.lastID, changes: this.changes });
         }
@@ -62,6 +74,13 @@ class ST {
   }
 
   each(params, onRow) {
+    /* eslint-disable no-param-reassign */
+    if (typeof params === 'function') {
+      onRow = params;
+      params = {};
+    }
+    /* eslint-enable no-param-reassign */
+
     return new Promise((resolve, reject) => {
       let done = false;
 
@@ -69,9 +88,11 @@ class ST {
         if (done) return;
 
         if (err) {
-          log(`SQL error in row function: ${err} in ${this.statement}.`);
+          log(`SQL error in row function: ${err} in ${this.statement.sql}, ${JSON.stringify(params)}.`);
           done = true;
-          reject(err);
+          reject(`${this.statement.sql}
+            ${JSON.stringify(params)}
+            ${err}`);
           return;
         }
 
@@ -80,7 +101,7 @@ class ST {
 
       const completionCallback = (err, count) => {
         if (err) {
-          log(`SQL error in completion function: ${err} in ${this.statement}.`);
+          log(`SQL error in completion function: ${err} in ${this.statement}, ${JSON.stringify(params)}.`);
           reject(err);
           return;
         }
@@ -93,7 +114,7 @@ class ST {
   }
 }
 
-export class DB {
+export default class DB {
   constructor(db, options = {}) {
     this.db = db;
     this.options = options;
@@ -116,6 +137,12 @@ export class DB {
    * @returns {Promise<int>} the number of returned rows.
    */
   each(sql, params, onRow) {
+    /* eslint-disable no-param-reassign */
+    if (typeof params === 'function') {
+      onRow = params;
+      params = {};
+    }
+    /* eslint-enable no-param-reassign */
     return new Promise((resolve, reject) => {
       let done = false;
 
@@ -123,9 +150,9 @@ export class DB {
         if (done) return;
 
         if (err) {
-          log(`SQL error in row function: ${err} in ${sql}.`);
+          log(`SQL error in row function: ${err} in ${sql}, ${JSON.stringify(params)}.`);
           done = true;
-          reject(err);
+          reject(`${err} in ${sql}, ${JSON.stringify(params)}.`);
           return;
         }
 
@@ -134,7 +161,7 @@ export class DB {
 
       const completionCallback = (err, count) => {
         if (err) {
-          log(`SQL error in completion function: ${err} in ${sql}.`);
+          log(`SQL error in completion function: ${err} in ${sql}, ${JSON.stringify(params)}.`);
           reject(err);
           return;
         }
@@ -148,12 +175,18 @@ export class DB {
 
   run(sql, params) {
     return new Promise((resolve, reject) => {
-      this.db.run(sql, params, (err) => {
+      /* eslint-disable func-names */
+      // do not convert the following function callback into a fat arrow
+      // because we need the `this` of that callback to extract info from it
+      this.db.run(sql, params, function (err) {
+        /* eslint-enable func-names */
         log(`Running: ${sql}, ${JSON.stringify(params)}`);
 
         if (err) {
-          log(`SQL error: ${err} in ${sql}.`);
-          reject(err);
+          log(`SQL error: ${err} in ${sql}, ${JSON.stringify(params)}.`);
+          reject(`${sql}
+            ${JSON.stringify(params)}
+            ${err}`);
         } else {
           resolve({ lastID: this.lastID, changes: this.changes });
         }
@@ -193,7 +226,8 @@ export class DB {
   @param [options] {object} options
   @param options.mode one of the OPEN_xxx option flags, defaults to OPEN_CREATE + OPEN_READWRITE
   @param options.initSql {string} sql statements to initialize the database if found empty
-  @param options.initFileName {string} name of a file containing the sql statements to initialize the database if found empty
+  @param options.initFileName {string} name of a file containing the sql statements
+    to initialize the database if found empty
   @param options.verbose {boolean} if truish, it opens the database in verbose mode.
   @returns {Promise} a Promise that resolves to the database instance
   */
@@ -210,10 +244,10 @@ export class DB {
           }
         }
       );
-    }).then((db) => {
-      db.get('select count(*)  from sqlite_master')
+    }).then(db =>
+      db.get('select count(*) as c  from sqlite_master')
       .then((row) => {
-        if (row[0] === 0) {
+        if (row.c === 0) {
           let src;
           if (options.initSql) {
             src = Promise.resolve(options.initSql);
@@ -226,7 +260,7 @@ export class DB {
           }
         }
         return db;
-      });
-    });
+      })
+    );
   }
 }

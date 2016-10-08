@@ -1,16 +1,16 @@
 import http from 'http';
 import { join } from 'path';
+import fs from 'fs';
 import express, { Router as createRouter } from 'express';
 import bodyParser from 'body-parser';
 import denodeify from 'denodeify';
 import sqliteP from './sqliteP';
 
-// import isomorphic from '_server/isomorphic';
-
-// import projects from './projects';
+import music from './music';
 
 const absPath = relPath => join(ROOT_DIR, relPath);
 
+const unlink = denodeify(fs.unlink);
 
 const app = express();
 const server = http.createServer(app);
@@ -24,17 +24,19 @@ app.use(REST_API_PATH, bodyParser.json(), dataRouter);
 app.use('/bootstrap', express.static(absPath('node_modules/bootstrap/dist')));
 app.use(express.static(absPath('public')));
 
-// app.use(isomorphic);
-
 app.get('*', (req, res) => res.sendFile(absPath('server/index.html')));
 
 export function start() {
-  sqliteP.open(':memory:', { initFileName: absPath('server/data.sql') })
+  return unlink(absPath('server/data.db'))
+  .then(() => sqliteP.open(absPath('server/data.db'), {
+    initFileName: absPath('server/data.sql'),
+    verbose: true,
+  }))
   .then((db) => {
     global.db = db;
   })
   .then(() => Promise.all([
-    // projects().then(router => dataRouter.use('/projects', router)),
+    music().then(router => dataRouter.use('/music', router)),
   ]))
   .then(() => listen(PORT));
 }

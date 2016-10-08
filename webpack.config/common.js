@@ -8,11 +8,11 @@ const absPath = relative => join(root, relative);
 
 
 module.exports = version => [
-  'client',
+  // 'client',
   'server',
-  'electron',
-  'electronClient',
-].map(bundle => {
+  // 'electron',
+  // 'electronClient',
+].map((bundle) => {
   const aliases = {
     _store: absPath('client/store'),
     _components: absPath('client/components'),
