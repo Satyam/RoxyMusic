@@ -1,0 +1,20 @@
+.errors-list {
+  composes: global(alert);
+  composes: global(alert-warning);
+  composes: global(alert-dismissible);
+  white-space: pre;
+  font-family: monospace;
+}
+
+.closeButton {
+  composes: global(close);
+  composes: global(pull-right);
+}
+.closeButton::before {
+  content: "\00D7";
+}
+
+:global .btn {
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+}

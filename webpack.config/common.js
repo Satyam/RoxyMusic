@@ -8,7 +8,7 @@ const absPath = relative => join(root, relative);
 
 
 module.exports = version => [
-  // 'client',
+  'client',
   'server',
   // 'electron',
   // 'electronClient',

@@ -10,7 +10,7 @@ import music from './music';
 
 const absPath = relPath => join(ROOT_DIR, relPath);
 
-const unlink = denodeify(fs.unlink);
+// const unlink = denodeify(fs.unlink);
 
 const app = express();
 const server = http.createServer(app);
@@ -27,11 +27,10 @@ app.use(express.static(absPath('public')));
 app.get('*', (req, res) => res.sendFile(absPath('server/index.html')));
 
 export function start() {
-  return unlink(absPath('server/data.db'))
-  .then(() => sqliteP.open(absPath('server/data.db'), {
+  return sqliteP.open(absPath('server/data.db'), {
     initFileName: absPath('server/data.sql'),
     verbose: true,
-  }))
+  })
   .then((db) => {
     global.db = db;
   })

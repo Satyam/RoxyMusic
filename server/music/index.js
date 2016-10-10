@@ -10,9 +10,8 @@ export default () =>
     .get('/refreshDb', handleRequest(
       transactions.refreshDatabase
     ))
-    .get('/', handleRequest(
-      validators.validateOptions,
-      transactions.getAllProjects
+    .get('/albums', handleRequest(
+      transactions.getAlbums
     ))
     .get('/:pid', handleRequest(
       validators.validatePid,

@@ -37,6 +37,7 @@ export function init() {
     selectAllConfig: 'select * from config',
     selectConfigValue: 'select * from config where key=$key',
     updateConfigValue: 'replace into config (key, type, value) values ($key, $type, $value)',
+    getAlbums: 'select * from Albums limit $count offset $offset order by album',
   })
   .then((p) => {
     prepared = p;
@@ -54,6 +55,13 @@ export function refreshDatabase(o) {
     default:
       return refreshStatus();
   }
+}
+
+export function getAlbums(o) {
+  return (prepared.getAlbums.all({
+    $count: o.options.count || 20,
+    $offset: o.options.offset || 0,
+  }));
 }
 
 export function getConfig(key) {

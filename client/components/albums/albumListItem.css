@@ -1,0 +1,9 @@
+.li {
+  list-style: none;
+  composes: global(bg-info);
+  margin-bottom: 1px;
+  padding: 2px;
+}
+.li :global(.glyphicon) {
+  margin-right: 1em;
+}

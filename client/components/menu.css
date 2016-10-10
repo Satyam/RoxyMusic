@@ -1,0 +1,13 @@
+.tabs {
+  composes: global(nav);
+  composes: global(nav-tabs);
+  composes: global(navbar-static-top);
+}
+
+.active {
+  composes: global(active);
+}
+
+.tabs :global(.glyphicon) {
+  margin-right: 1em;
+}
