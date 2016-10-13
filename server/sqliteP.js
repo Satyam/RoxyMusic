@@ -11,6 +11,35 @@ export const OPEN_CREATE = sqlite3.OPEN_CREATE;
 export const OPEN_READWRITE = sqlite3.OPEN_READWRITE;
 export const OPEN_READONLY = sqlite3.OPEN_READONLY;
 
+function myDenodeify(nodeStyleFunction, context) {
+  return (...functionArguments) => {
+    const self = context || this;
+    function promiseHandler(resolve, reject) {
+      function callbackFunction(...args) {
+        const error = args[0];
+
+        if (error) {
+          log({
+            sqlError: error,
+            args: JSON.stringify(functionArguments),
+            sql: context.sql,
+          });
+          return reject({
+            sqlError: error,
+            args: JSON.stringify(functionArguments),
+            sql: context.sql,
+          });
+        }
+        return resolve(args[1]);
+      }
+
+      functionArguments.push(callbackFunction);
+      nodeStyleFunction.apply(self, functionArguments);
+    }
+
+    return new Promise(promiseHandler);
+  };
+}
 /**
  * Turn methods on `source` that return callbacks into methods on `dest` that are bound to
  * `source` as if invoked as method calls.
@@ -22,7 +51,7 @@ export const OPEN_READONLY = sqlite3.OPEN_READONLY;
 function denodeifyMethods(source, dest, methods) {
   methods.forEach((method) => {
     /* eslint-disable no-param-reassign */
-    dest[method] = denodeify(source[method].bind(source));
+    dest[method] = myDenodeify(source[method], source);
     /* eslint-enable no-param-reassign */
   });
 }
@@ -59,12 +88,12 @@ class ST {
       const self = this;
       this.statement.run(params, function (err) {
         /* eslint-enable func-names */
-        log(`Running: ${self.statement.sql}, ${JSON.stringify(params)}`);
+        log(`Running: ${self.statement.sql}, ${JSON.stringify(params, null, 2)}`);
 
         if (err) {
           log(`SQL error: ${err} in ${self.statement.sql}.`);
           reject(`${self.statement.sql}
-            ${JSON.stringify(params)}
+            ${JSON.stringify(params, null, 2)}
             ${err}`);
         } else {
           resolve({ lastID: this.lastID, changes: this.changes });
@@ -88,10 +117,10 @@ class ST {
         if (done) return;
 
         if (err) {
-          log(`SQL error in row function: ${err} in ${this.statement.sql}, ${JSON.stringify(params)}.`);
+          log(`SQL error in row function: ${err} in ${this.statement.sql}, ${JSON.stringify(params, null, 2)}.`);
           done = true;
           reject(`${this.statement.sql}
-            ${JSON.stringify(params)}
+            ${JSON.stringify(params, null, 2)}
             ${err}`);
           return;
         }
@@ -101,7 +130,7 @@ class ST {
 
       const completionCallback = (err, count) => {
         if (err) {
-          log(`SQL error in completion function: ${err} in ${this.statement}, ${JSON.stringify(params)}.`);
+          log(`SQL error in completion function: ${err} in ${this.statement}, ${JSON.stringify(params, null, 2)}.`);
           reject(err);
           return;
         }
@@ -118,7 +147,7 @@ export default class DB {
   constructor(db, options = {}) {
     this.db = db;
     this.options = options;
-    denodeifyMethods(db, this, ['close', 'get', 'all', 'exec']);
+    denodeifyMethods(db, this, ['close', 'get', 'all', 'exec', 'serialize', 'parallelize']);
     this.$prepare = strangeDenodeify(this.db, 'prepare');
   }
 
@@ -150,9 +179,9 @@ export default class DB {
         if (done) return;
 
         if (err) {
-          log(`SQL error in row function: ${err} in ${sql}, ${JSON.stringify(params)}.`);
+          log(`SQL error in row function: ${err} in ${sql}, ${JSON.stringify(params, null, 2)}.`);
           done = true;
-          reject(`${err} in ${sql}, ${JSON.stringify(params)}.`);
+          reject(`${err} in ${sql}, ${JSON.stringify(params, null, 2)}.`);
           return;
         }
 
@@ -161,7 +190,7 @@ export default class DB {
 
       const completionCallback = (err, count) => {
         if (err) {
-          log(`SQL error in completion function: ${err} in ${sql}, ${JSON.stringify(params)}.`);
+          log(`SQL error in completion function: ${err} in ${sql}, ${JSON.stringify(params, null, 2)}.`);
           reject(err);
           return;
         }
@@ -180,12 +209,12 @@ export default class DB {
       // because we need the `this` of that callback to extract info from it
       this.db.run(sql, params, function (err) {
         /* eslint-enable func-names */
-        log(`Running: ${sql}, ${JSON.stringify(params)}`);
+        log(`Running: ${sql}, ${JSON.stringify(params, null, 2)}`);
 
         if (err) {
-          log(`SQL error: ${err} in ${sql}, ${JSON.stringify(params)}.`);
+          log(`SQL error: ${err} in ${sql}, ${JSON.stringify(params, null, 2)}.`);
           reject(`${sql}
-            ${JSON.stringify(params)}
+            ${JSON.stringify(params, null, 2)}
             ${err}`);
         } else {
           resolve({ lastID: this.lastID, changes: this.changes });
