@@ -4,6 +4,14 @@
   margin-bottom: 1px;
   padding: 2px;
 }
-.li :global(.glyphicon) {
-  margin-right: 1em;
+
+.album {
+  font-weight: bold;
+  composes: global(col-md-6);
+}
+.artists {
+  composes: global(col-md-4);
+}
+.numTracks {
+  composes: global(col-md-2);
 }

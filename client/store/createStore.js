@@ -3,11 +3,19 @@ import { routerMiddleware, routerReducer } from 'react-router-redux';
 import reduxThunk from 'redux-thunk';
 
 import albums from './albums';
+import tracks from './tracks';
+import people from './people';
+import genres from './genres';
+import playing from './playing';
 import requests from './requests';
 
 const reducers = combineReducers({
   albums,
+  tracks,
+  people,
+  genres,
   requests,
+  playing,
   routing: routerReducer,
 });
 

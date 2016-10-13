@@ -9,7 +9,7 @@ import AlbumListItem from './albumListItem';
 
 export function AlbumListComponent({ children, albums }) {
   return (
-    <div className={styles.projectList}>
+    <div className={styles.albumList}>
       <h1>Albums:</h1>
       <ul>{
         albums.map(album => (

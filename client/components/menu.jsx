@@ -24,7 +24,7 @@ export const MenuComponent = ({ router, menuItems }) => (
                 <a>{caption}</a>
               </li>
             )
-            : (<li key={path}><Link to={path}>{caption}</Link></li>)
+            : (<li key={path}><Link to={`/${path}`}>{caption}</Link></li>)
           );
         }
       )
@@ -34,7 +34,13 @@ export const MenuComponent = ({ router, menuItems }) => (
 
 MenuComponent.propTypes = {
   router: routerShape,
-  menuItems: PropTypes.objectOf(PropTypes.string),
+  menuItems: PropTypes.oneOfType([
+    PropTypes.shape({
+      icon: PropTypes.string,
+      caption: PropTypes.string,
+    }),
+    PropTypes.string,
+  ]),
 };
 
 export default withRouter(MenuComponent);

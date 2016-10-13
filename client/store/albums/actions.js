@@ -13,3 +13,11 @@ export function getAlbums(offset = 0, count = 20) {
     { offset, count }
   );
 }
+
+export function getAlbum(idAlbum) {
+  return asyncActionCreator(
+    GET_ALBUM,
+    api.read(idAlbum),
+    { idAlbum }
+  );
+}

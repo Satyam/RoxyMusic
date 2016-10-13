@@ -1,4 +1,5 @@
 import update from 'react-addons-update';
+import pick from 'lodash/pick';
 
 import {
   REPLY_RECEIVED,
@@ -33,8 +34,34 @@ export default (state = [], action) => {
         ),
         {}
       ) });
-    case GET_ALBUM:
-      return state;
+    case GET_ALBUM: {
+      const firstRow = payload[0];
+      const idAlbum = firstRow.idAlbum;
+      let newState = (
+        idAlbum in state
+        ? state
+        : update(state, { $merge: {
+          [idAlbum]: pick(firstRow, [
+            'albumArtist',
+            'idAlbum',
+          ]),
+        } })
+      );
+      if (!newState[idAlbum].numTracks) {
+        newState = update(newState, { [idAlbum]: { numTracks: { $set: payload.length } } });
+      }
+      if (!newState[idAlbum].artists) {
+        newState = update(newState, { [idAlbum]: { artists:
+          { $set: payload.reduce((list, row) => (row.artist ? `${list}, ${row.artist}` : list), '') },
+        } });
+      }
+      if (!newState[idAlbum].idTracks) {
+        newState = update(newState, { [idAlbum]: { idTracks:
+          { $set: payload.map(row => row.idTrack) },
+        } });
+      }
+      return newState;
+    }
     default:
       return state;
   }

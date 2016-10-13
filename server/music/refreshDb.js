@@ -4,6 +4,7 @@ import path from 'path';
 import ffmpeg from 'fluent-ffmpeg';
 import pick from 'lodash/pick';
 import { dolarizeQueryParams, prepareAll } from '_server/utils';
+import { getConfig } from '_server/config';
 
 const readDir = denodeify(fs.readdir);
 const stat = denodeify(fs.stat);
@@ -12,9 +13,9 @@ let audioExtensions = [];
 let initialDir = '';
 let prepared = {};
 
-export default function init(config) {
-  initialDir = config.musicDir;
-  audioExtensions = config.audioExtensions.split(',').map(e => e.trim());
+export default function init() {
+  initialDir = getConfig('musicDir');
+  audioExtensions = getConfig('audioExtensions').split(',').map(e => e.trim());
   return prepareAll({
     fetchByLocation: 'select * from AllTracks where location = $location',
     selectGenreId: 'select idGenre from Genres where genre = $genre',
@@ -23,11 +24,13 @@ export default function init(config) {
     insertPerson: 'insert into People (artist) values ($artist)',
     selectAlbumId: 'select idAlbum from Albums where album = $album',
     insertAlbum: 'insert into Albums (album) values ($album)',
+    hasAlbumArtistMap: 'select count(*) as `count` from AlbumArtistMap where idAlbum = $idAlbum and idArtist = $idArtist',
+    insertAlbumArtistMap: 'insert into AlbumArtistMap (idAlbum, idArtist) values ($idAlbum, $idArtist)',
     insertTrack: `
       insert into Tracks(
-        title, idArtist, idComposer, idAlbumArtist, idAlbum, track, date, idGenre, location, fileModified, hasIssues
+        title, idArtist, idComposer, idAlbumArtist, idAlbum, track, date, idGenre, location, fileModified, size, hasIssues
       ) values (
-        $title, $idArtist, $idComposer, $idAlbumArtist, $idAlbum, $track, $date, $idGenre, $location, $fileModified, $hasIssues
+        $title, $idArtist, $idComposer, $idAlbumArtist, $idAlbum, $track, $date, $idGenre, $location, $fileModified, $size, $hasIssues
       )
     `,
   })
@@ -48,11 +51,23 @@ const useTags = [
   'genre',
 ];
 
+export function getPersonId(name) {
+  const who = { $artist: name.trim() };
+  return prepared.selectPersonId.get(who)
+  .then(row => (
+    row
+    ? row.idPerson
+    : prepared.insertPerson.run(who)
+    .then(res => res.lastID)
+  ));
+}
+
 export function insertTrack(tags) {
   const t = pick(tags, [
     'title',
     'track',
     'location',
+    'size',
     'track',
   ]);
   const loc = path.basename(t.location, path.extname(t.location)).split('-').map(s => s.trim());
@@ -69,14 +84,7 @@ export function insertTrack(tags) {
       artist = loc.length === 3 ? loc[1] : loc[0];
     }
     if (artist) {
-      const who = { $artist: artist };
-      return prepared.selectPersonId.get(who)
-      .then(row => (
-        row
-        ? row.idPerson
-        : prepared.insertPerson.run(who)
-        .then(res => res.lastID)
-      ))
+      return getPersonId(artist)
       .then((id) => {
         t.idArtist = id;
       });
@@ -85,14 +93,7 @@ export function insertTrack(tags) {
   })
   .then(() => {
     if ('album_artist' in tags) {
-      const who = { $artist: tags.artist };
-      return prepared.selectPersonId.get(who)
-      .then(row => (
-        row
-        ? row.idPerson
-        : prepared.insertPerson.run(who)
-        .then(res => res.lastID)
-      ))
+      return getPersonId(tags.album_artist)
       .then((id) => {
         t.idAlbumArtist = id;
       });
@@ -101,14 +102,7 @@ export function insertTrack(tags) {
   })
   .then(() => {
     if ('composer' in tags) {
-      const who = { $artist: tags.artist };
-      prepared.selectPersonId.get(who)
-      .then(row => (
-        row
-        ? row.idPerson
-        : prepared.insertPerson.run(who)
-        .then(res => res.lastID)
-      ))
+      return getPersonId(tags.composer)
       .then((id) => {
         t.idComposer = id;
       });
@@ -152,6 +146,21 @@ export function insertTrack(tags) {
     }
     return null;
   })
+  .then(() => {
+    if (t.idAlbumArtist && t.idAlbum) {
+      const map = {
+        $idAlbum: t.idAlbum,
+        $idArtist: t.idAlbumArtist,
+      };
+      return prepared.hasAlbumArtistMap.get(map)
+      .then(row => (
+        row.count
+        ? null
+        : prepared.insertAlbumArtistMap.run(map)
+      ));
+    }
+    return null;
+  })
   .then(() => prepared.insertTrack.run(dolarizeQueryParams(t)))
   .then(res => res.lastID);
 }
@@ -172,8 +181,10 @@ function readTags(fileName) {
 const pending = [];
 let stopRequested = false;
 const errors = [];
+let steps = 3;
 
 export function scan(dir) {
+  db.db.serialize();
   return readDir(dir)
   .then(files => Promise.all(files.map((file) => {
     const fullName = path.join(dir, file);
@@ -199,6 +210,7 @@ export function scan(dir) {
                 Object.assign(t, {
                   location: relName,
                   fileModified: st.mtime,
+                  size: st.size,
                 })
               ));
             }
@@ -210,15 +222,22 @@ export function scan(dir) {
     });
   })))
   .then(() => {
-    if (stopRequested) {
+    db.db.parallelize();
+    steps -= 1;
+    if (stopRequested || steps < 0) {
       pending.length = 0;
       stopRequested = false;
+      db.exec('vacuum');
     } else if (pending.length) {
       // console.log('next batch', pending.length);
       setImmediate(scan, pending.shift());
     }
   })
-  .catch(err => errors.push(err));
+  .catch((err) => {
+    errors.push(err);
+    pending.length = 0;
+    stopRequested = false;
+  });
 }
 
 export function refreshStatus() {
@@ -244,8 +263,7 @@ export function refreshStatus() {
 }
 
 export function startRefresh() {
-  // stopRequested = false;
-  stopRequested = true;
+  stopRequested = false;
   setImmediate(scan, initialDir);
   return refreshStatus;
 }

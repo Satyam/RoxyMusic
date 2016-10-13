@@ -3,6 +3,7 @@ import React, { PropTypes } from 'react';
 import Errors from '_components/errors';
 import Loading from '_components/loading';
 import Menu from '_components/menu';
+import Audio from '_components/audio';
 
 const App = ({ children }) => (
   <div className="app">
@@ -17,6 +18,7 @@ const App = ({ children }) => (
       }}
     />
     {children}
+    <Audio />
   </div>
 );
 

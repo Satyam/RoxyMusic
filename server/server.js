@@ -1,12 +1,12 @@
 import http from 'http';
 import { join } from 'path';
-import fs from 'fs';
 import express, { Router as createRouter } from 'express';
 import bodyParser from 'body-parser';
 import denodeify from 'denodeify';
 import sqliteP from './sqliteP';
 
 import music from './music';
+import { initConfig, getConfig } from './config';
 
 const absPath = relPath => join(ROOT_DIR, relPath);
 
@@ -23,6 +23,12 @@ app.use(REST_API_PATH, bodyParser.json(), dataRouter);
 
 app.use('/bootstrap', express.static(absPath('node_modules/bootstrap/dist')));
 app.use(express.static(absPath('public')));
+const musicRegExp = /^\/music\/(.+)$/;
+app.get(musicRegExp, (req, res) => {
+  const filename = decodeURI(musicRegExp.exec(req.path)[1]);
+  console.log(filename);
+  res.sendFile(join(getConfig('musicDir'), filename));
+});
 
 app.get('*', (req, res) => res.sendFile(absPath('server/index.html')));
 
@@ -34,6 +40,7 @@ export function start() {
   .then((db) => {
     global.db = db;
   })
+  .then(initConfig)
   .then(() => Promise.all([
     music().then(router => dataRouter.use('/music', router)),
   ]))
