@@ -3,10 +3,15 @@ import denodeify from 'denodeify';
 import path from 'path';
 import ffmpeg from 'fluent-ffmpeg';
 import pick from 'lodash/pick';
-import { dolarizeQueryParams, prepareAll } from '_server/utils';
+import { dolarizeQueryParams, prepareAll, choke, releaseChoke } from '_server/utils';
 import { getConfig } from '_server/config';
 
+import ID3 from 'id3-parser';
+import union from 'lodash/union';
+
 const readDir = denodeify(fs.readdir);
+const readFile = denodeify(fs.readFile);
+
 const stat = denodeify(fs.stat);
 
 let audioExtensions = [];
@@ -28,9 +33,9 @@ export default function init() {
     insertAlbumArtistMap: 'insert into AlbumArtistMap (idAlbum, idArtist) values ($idAlbum, $idArtist)',
     insertTrack: `
       insert into Tracks(
-        title, idArtist, idComposer, idAlbumArtist, idAlbum, track, date, idGenre, location, fileModified, size, hasIssues
+        title, idArtist, idComposer, idAlbumArtist, idAlbum, track, date, length, idGenre, location, fileModified, size, hasIssues
       ) values (
-        $title, $idArtist, $idComposer, $idAlbumArtist, $idAlbum, $track, $date, $idGenre, $location, $fileModified, $size, $hasIssues
+        $title, $idArtist, $idComposer, $idAlbumArtist, $idAlbum, $track, $date, $length, $idGenre, $location, $fileModified, $size, $hasIssues
       )
     `,
   })
@@ -49,32 +54,42 @@ const useTags = [
   'composer',
   'date',
   'genre',
+  'TLEN',
 ];
+
+const genreRxp = /\((\d+)\)/;
 
 export function getPersonId(name) {
   const who = { $artist: name.trim() };
-  return prepared.selectPersonId.get(who)
+  const resId = `artist:${name}`;
+  return choke(resId)
+  .then(() => prepared.selectPersonId.get(who))
   .then(row => (
     row
     ? row.idPerson
     : prepared.insertPerson.run(who)
     .then(res => res.lastID)
-  ));
+  ))
+  .then(id => releaseChoke(resId, id));
 }
 
 export function insertTrack(tags) {
   const t = pick(tags, [
     'title',
-    'track',
     'location',
     'size',
-    'track',
+    'date',
   ]);
   const loc = path.basename(t.location, path.extname(t.location)).split('-').map(s => s.trim());
   if (!t.title) {
     t.hasIssues = 1;
     t.title = loc[loc.length - 1];
   }
+  if (tags.track) t.track = parseInt(tags.track, 10);
+  if (t.track <= 0) t.track = null;
+  if (t.date <= 0) t.date = null;
+  if (tags.TLEN) t.length = parseInt(tags.TLEN, 10);
+  if (t.length <= 0) t.length = null;
   t.fileModified = tags.fileModified.toISOString();
   return Promise.resolve()
   .then(() => {
@@ -111,8 +126,12 @@ export function insertTrack(tags) {
   })
   .then(() => {
     if ('genre' in tags) {
+      const m = genreRxp.exec(tags.genre);
+      if (m) return parseInt(m[1], 10);
       const which = { $genre: tags.genre };
-      return prepared.selectGenreId.get(which)
+      const resId = `genre:${tags.genre}`;
+      return choke(resId)
+      .then(() => prepared.selectGenreId.get(which))
       .then(row => (
         row
         ? row.idGenre
@@ -121,7 +140,8 @@ export function insertTrack(tags) {
       ))
       .then((id) => {
         t.idGenre = id;
-      });
+      })
+      .then(() => releaseChoke(resId));
     }
     return null;
   })
@@ -133,7 +153,9 @@ export function insertTrack(tags) {
     }
     if (album) {
       const which = { $album: album };
-      return prepared.selectAlbumId.get(which)
+      const resId = `album:${album}`;
+      return choke(resId)
+      .then(() => prepared.selectAlbumId.get(which))
       .then(row => (
         row
         ? row.idAlbum
@@ -142,7 +164,8 @@ export function insertTrack(tags) {
       ))
       .then((id) => {
         t.idAlbum = id;
-      });
+      })
+      .then(() => releaseChoke(resId));
     }
     return null;
   })
@@ -172,7 +195,38 @@ function readTags(fileName) {
       if (err) {
         reject(err);
       } else {
-        resolve(pick(data.format && data.format.tags, useTags));
+        const ts = data.format.tags;
+        readFile(fileName)
+        .then(fileBuffer => ID3.parse(fileBuffer))
+        .then((tags) => {
+          // /* eslint-disable */
+          // tags.date = tags.year;
+          // delete tags.year;
+          // tags.album_artist = tags.band;
+          // delete tags.band;
+          // tags.length = tags.TLEN;
+          // delete tags.TLEN;
+          // delete tags.version;
+          // /* eslint-enable */
+          // console.log('-------------\n', fileName);
+          // if (data.format && typeof data.format.tags !== 'object') {
+          //   console.log('********** data format with no tags', data.format);
+          // }
+          // const mixed = union(
+          //   Object.keys(ts),
+          //   Object.keys(tags)
+          // );
+          // mixed.forEach((tag) => {
+          //   const tagFF = ts[tag];
+          //   const tagID3 = tags[tag];
+          //   if ((tagFF || tagID3) && tagFF !== tagID3) {
+          //     console.log(tag);
+          //     console.log('    ', tagFF);
+          //     console.log('    ', tagID3);
+          //   }
+          // });
+          resolve(pick(ts, useTags));
+        });
       }
     });
   });
@@ -181,10 +235,9 @@ function readTags(fileName) {
 const pending = [];
 let stopRequested = false;
 const errors = [];
-let steps = 3;
+let steps = 100;
 
 export function scan(dir) {
-  db.db.serialize();
   return readDir(dir)
   .then(files => Promise.all(files.map((file) => {
     const fullName = path.join(dir, file);
@@ -203,7 +256,6 @@ export function scan(dir) {
               if (rows.length > 1) {
                 return Promise.reject(`refreshDb: Multiple entries for ${file}, idTracks: ${rows.map(row => row.idTrack).join(',')}`);
               }
-              // console.log('found', relName);
             } else {
               return readTags(fullName)
               .then(t => insertTrack(
@@ -222,18 +274,17 @@ export function scan(dir) {
     });
   })))
   .then(() => {
-    db.db.parallelize();
     steps -= 1;
     if (stopRequested || steps < 0) {
       pending.length = 0;
       stopRequested = false;
       db.exec('vacuum');
     } else if (pending.length) {
-      // console.log('next batch', pending.length);
       setImmediate(scan, pending.shift());
     }
   })
   .catch((err) => {
+    console.error(err);
     errors.push(err);
     pending.length = 0;
     stopRequested = false;
