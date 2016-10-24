@@ -56,6 +56,6 @@ export function choke(resourceId, args) {
 }
 
 export function releaseChoke(resourceId, args) {
-  taken[resourceId] = false;
+  delete taken[resourceId];
   return args;
 }
