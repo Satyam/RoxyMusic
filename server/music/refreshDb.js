@@ -1,13 +1,10 @@
 import fs from 'fs';
 import denodeify from 'denodeify';
 import path from 'path';
-import ffmpeg from 'fluent-ffmpeg';
-import pick from 'lodash/pick';
 import { dolarizeQueryParams, prepareAll, choke, releaseChoke } from '_server/utils';
 import { getConfig } from '_server/config';
 
 import ID3 from 'id3-parser';
-import union from 'lodash/union';
 
 const readDir = denodeify(fs.readdir);
 const readFile = denodeify(fs.readFile);
@@ -31,11 +28,51 @@ export default function init() {
     insertAlbum: 'insert into Albums (album) values ($album)',
     hasAlbumArtistMap: 'select count(*) as `count` from AlbumArtistMap where idAlbum = $idAlbum and idArtist = $idArtist',
     insertAlbumArtistMap: 'insert into AlbumArtistMap (idAlbum, idArtist) values ($idAlbum, $idArtist)',
+    /*
+    `idTrack` INTEGER PRIMARY KEY AUTOINCREMENT,
+    `title` TEXT,
+    `idArtist` INTEGER,
+    `idComposer` INTEGER,
+    `idAlbumArtist` INTEGER,
+    `idAlbum` INTEGER,
+    `track` INTEGER,
+    `year` INTEGER,
+    `length` INTEGER,
+    `idGenre` INTEGER,
+    `location` TEXT,
+    `fileModified` TEXT,
+    `size` INTEGER,
+    `hasIssues` INTEGER,
+    */
     insertTrack: `
       insert into Tracks(
-        title, idArtist, idComposer, idAlbumArtist, idAlbum, track, date, length, idGenre, location, fileModified, size, hasIssues
+        "title",
+        "idArtist",
+        "idComposer",
+        "idAlbumArtist",
+        "idAlbum",
+        "track",
+        "year",
+        "length",
+        "idGenre",
+        "location",
+        "fileModified",
+        "size",
+        "hasIssues"
       ) values (
-        $title, $idArtist, $idComposer, $idAlbumArtist, $idAlbum, $track, $date, $length, $idGenre, $location, $fileModified, $size, $hasIssues
+        $title,
+        $idArtist,
+        $idComposer,
+        $idAlbumArtist,
+        $idAlbum,
+        $track,
+        $year,
+        $length,
+        $idGenre,
+        $location,
+        $fileModified,
+        $size,
+        $hasIssues
       )
     `,
   })
@@ -44,18 +81,6 @@ export default function init() {
   });
 }
 
-const useTags = [
-  'album',
-  'title',
-  'track',
-  'artist',
-  'album',
-  'album_artist',
-  'composer',
-  'date',
-  'genre',
-  'TLEN',
-];
 
 const genreRxp = /\((\d+)\)/;
 
@@ -74,60 +99,45 @@ export function getPersonId(name) {
 }
 
 export function insertTrack(tags) {
-  const t = pick(tags, [
-    'title',
-    'location',
-    'size',
-    'date',
-  ]);
-  const loc = path.basename(t.location, path.extname(t.location)).split('-').map(s => s.trim());
-  if (!t.title) {
-    t.hasIssues = 1;
-    t.title = loc[loc.length - 1];
-  }
-  if (tags.track) t.track = parseInt(tags.track, 10);
-  if (t.track <= 0) t.track = null;
-  if (t.date <= 0) t.date = null;
-  if (tags.TLEN) t.length = parseInt(tags.TLEN, 10);
-  if (t.length <= 0) t.length = null;
-  t.fileModified = tags.fileModified.toISOString();
   return Promise.resolve()
   .then(() => {
-    let artist = tags.artist;
-    if (!artist) {
-      t.hasIssues = 1;
-      artist = loc.length === 3 ? loc[1] : loc[0];
-    }
+    const artist = tags.artist;
     if (artist) {
       return getPersonId(artist)
       .then((id) => {
-        t.idArtist = id;
+        delete tags.artist;
+        tags.idArtist = id;
       });
     }
     return null;
   })
   .then(() => {
-    if ('album_artist' in tags) {
+    if (tags.album_artist) {
       return getPersonId(tags.album_artist)
       .then((id) => {
-        t.idAlbumArtist = id;
+        delete tags.album_artist;
+        tags.idAlbumArtist = id;
       });
     }
     return null;
   })
   .then(() => {
-    if ('composer' in tags) {
+    if (tags.composer) {
       return getPersonId(tags.composer)
       .then((id) => {
-        t.idComposer = id;
+        delete tags.composer;
+        tags.idComposer = id;
       });
     }
     return null;
   })
   .then(() => {
-    if ('genre' in tags) {
+    if (tags.genre) {
       const m = genreRxp.exec(tags.genre);
-      if (m) return parseInt(m[1], 10);
+      if (m) {
+        delete tags.genre;
+        return (tags.idGenre = parseInt(m[1], 10));
+      }
       const which = { $genre: tags.genre };
       const resId = `genre:${tags.genre}`;
       return choke(resId)
@@ -139,18 +149,15 @@ export function insertTrack(tags) {
         .then(res => res.lastID)
       ))
       .then((id) => {
-        t.idGenre = id;
+        delete tags.genre;
+        tags.idGenre = id;
       })
       .then(() => releaseChoke(resId));
     }
     return null;
   })
   .then(() => {
-    let album = tags.album;
-    if (!album && loc.length === 3) {
-      t.hasIssues = 1;
-      album = loc[0];
-    }
+    const album = tags.album;
     if (album) {
       const which = { $album: album };
       const resId = `album:${album}`;
@@ -163,17 +170,18 @@ export function insertTrack(tags) {
         .then(res => res.lastID)
       ))
       .then((id) => {
-        t.idAlbum = id;
+        delete tags.album;
+        tags.idAlbum = id;
       })
       .then(() => releaseChoke(resId));
     }
     return null;
   })
   .then(() => {
-    if (t.idAlbumArtist && t.idAlbum) {
+    if (tags.idAlbumArtist && tags.idAlbum) {
       const map = {
-        $idAlbum: t.idAlbum,
-        $idArtist: t.idAlbumArtist,
+        $idAlbum: tags.idAlbum,
+        $idArtist: tags.idAlbumArtist,
       };
       return prepared.hasAlbumArtistMap.get(map)
       .then(row => (
@@ -184,52 +192,51 @@ export function insertTrack(tags) {
     }
     return null;
   })
-  .then(() => prepared.insertTrack.run(dolarizeQueryParams(t)))
-  .then(res => res.lastID);
+  .then(() => prepared.insertTrack.run(dolarizeQueryParams(tags)))
+  .then(res => res.lastID)
+  .catch(console.error);
 }
 
 function readTags(fileName) {
-  return new Promise((resolve, reject) => {
-    ffmpeg(fileName)
-    .ffprobe((err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        const ts = data.format.tags;
-        readFile(fileName)
-        .then(fileBuffer => ID3.parse(fileBuffer))
-        .then((tags) => {
-          // /* eslint-disable */
-          // tags.date = tags.year;
-          // delete tags.year;
-          // tags.album_artist = tags.band;
-          // delete tags.band;
-          // tags.length = tags.TLEN;
-          // delete tags.TLEN;
-          // delete tags.version;
-          // /* eslint-enable */
-          // console.log('-------------\n', fileName);
-          // if (data.format && typeof data.format.tags !== 'object') {
-          //   console.log('********** data format with no tags', data.format);
-          // }
-          // const mixed = union(
-          //   Object.keys(ts),
-          //   Object.keys(tags)
-          // );
-          // mixed.forEach((tag) => {
-          //   const tagFF = ts[tag];
-          //   const tagID3 = tags[tag];
-          //   if ((tagFF || tagID3) && tagFF !== tagID3) {
-          //     console.log(tag);
-          //     console.log('    ', tagFF);
-          //     console.log('    ', tagID3);
-          //   }
-          // });
-          resolve(pick(ts, useTags));
-        });
+  // https://github.com/ddsol/mp3-duration
+  // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/duration
+  return readFile(fileName)
+    .then(fileBuffer => ID3.parse(fileBuffer))
+    .then((tags) => {
+      const t = {};
+      [
+        'album',
+        'title',
+        'artist',
+        'composer',
+        'genre',
+      ].forEach((key) => {
+        const val = tags[key];
+        if (val && val.trim().length) t[key] = val;
+      });
+      t.year = parseInt(tags.year, 10);
+      if (t.year <= 0) t.year = null;
+      t.album_artist = (tags.band && tags.band.trim().length ? tags.band : undefined);
+      const loc = path.basename(fileName, path.extname(fileName)).split('-').map(s => s.trim());
+      if (!t.title) {
+        t.hasIssues = 1;
+        t.title = loc[loc.length - 1];
       }
+      if (!t.artist) {
+        t.hasIssues = 1;
+        t.artist = loc.length === 3 ? loc[1] : loc[0];
+      }
+      if (!t.album && loc.length === 3) {
+        t.hasIssues = 1;
+        t.album = loc[0];
+      }
+
+      if (tags.track) t.track = parseInt(tags.track, 10);
+      if (t.track <= 0) t.track = null;
+      if (tags.length) t.length = parseInt(tags.length, 10);
+      if (t.length <= 0) t.length = null;
+      return t;
     });
-  });
 }
 
 const pending = [];
@@ -261,7 +268,7 @@ export function scan(dir) {
               .then(t => insertTrack(
                 Object.assign(t, {
                   location: relName,
-                  fileModified: st.mtime,
+                  fileModified: st.mtime.toISOString(),
                   size: st.size,
                 })
               ));
