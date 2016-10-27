@@ -20,7 +20,7 @@ CREATE TABLE `Tracks` (
 	`idAlbum`	INTEGER,
 	`track` INTEGER,
 	`year`	INTEGER,
-	`length` INTEGER,
+	`duration` INTEGER,
 	`idGenre`	INTEGER,
   `location` TEXT,
   `fileModified` TEXT,
