@@ -7,6 +7,7 @@ let prepared = {};
 export function init() {
   return prepareAll({
     getAlbums: 'select * from AllAlbums limit $count offset $offset',
+    searchAlbums: 'select * from AllAlbums where album like $search limit $count offset $offset',
     getAlbum: 'select * from AllAlbums where idAlbum = $idAlbum',
     getTracksForAlbum: 'select * from AllTracks where idAlbum = $idAlbum',
   })
@@ -28,10 +29,18 @@ export function refreshDatabase(o) {
 }
 
 export function getAlbums(o) {
-  return prepared.getAlbums.all({
-    $count: o.options.count || 20,
-    $offset: o.options.offset || 0,
-  });
+  return (
+    o.options.search
+    ? prepared.searchAlbums.all({
+      $count: o.options.count || 20,
+      $offset: o.options.offset || 0,
+      $search: `%${o.options.search}%`,
+    })
+    : prepared.getAlbums.all({
+      $count: o.options.count || 20,
+      $offset: o.options.offset || 0,
+    })
+  );
 }
 
 export function getAlbum(o) {
