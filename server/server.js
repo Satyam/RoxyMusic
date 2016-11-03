@@ -3,6 +3,7 @@ import { join } from 'path';
 import express, { Router as createRouter } from 'express';
 import bodyParser from 'body-parser';
 import denodeify from 'denodeify';
+import fs from 'fs';
 import sqliteP from './sqliteP';
 
 import music from './music';
@@ -10,7 +11,7 @@ import { initConfig, getConfig } from './config';
 
 const absPath = relPath => join(ROOT_DIR, relPath);
 
-// const unlink = denodeify(fs.unlink);
+const unlink = denodeify(fs.unlink);
 
 const app = express();
 const server = http.createServer(app);
@@ -32,11 +33,14 @@ app.get(musicRegExp, (req, res) => {
 
 app.get('*', (req, res) => res.sendFile(absPath('server/index.html')));
 
+const DELDB = false;
+
 export function start() {
-  return sqliteP.open(absPath('server/data.db'), {
+  return (DELDB ? unlink('server/data.db') : Promise.resolve())
+  .then(() => sqliteP.open(absPath('server/data.db'), {
     initFileName: absPath('server/data.sql'),
     verbose: true,
-  })
+  }))
   .then((db) => {
     global.db = db;
   })
