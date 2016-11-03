@@ -3,18 +3,20 @@ import { connect } from 'react-redux';
 import { compose, withHandlers } from 'recompose';
 import isPlainClick from '_utils/isPlainClick';
 import { getTrack, playNow } from '_store/actions';
-import initialDispatcher from '_utils/initialDispatcher';
+import initStore from '_utils/initStore';
+import Icon from '_utils/icon';
 import styles from './track.css';
 
 export const TrackComponent = ({ idTrack, title, artist, track, onPlayClick }) =>
   (idTrack || null) && (
-    <div className={styles.track}>
-      <h1>{idTrack}</h1>
-      <p>Title {title}</p>
-      <button className="glyphicon glyphicon-play" onClick={onPlayClick} />
-      <p>Artists {artist}</p>
-      <p>Tracks {track}</p>
-    </div>
+    <li className={styles.track}>
+      <div className={styles.trackNum}>{track}</div>
+      <div className={styles.title}>{title}</div>
+      <button className={styles.playButton} onClick={onPlayClick} >
+        <Icon type="play" />
+      </button>
+      <div className={styles.artist}>{artist}</div>
+    </li>
   );
 
 TrackComponent.propTypes = {
@@ -29,7 +31,7 @@ const handlers = withHandlers({
   onPlayClick: props => ev => isPlainClick(ev) && props.onPlay(props.idTrack),
 });
 
-export const initialDispatch = (dispatch, state, props) => {
+export const storeInitializer = (dispatch, state, props) => {
   const idTrack = props.idTrack || props.params.idTrack;
   if (!state.tracks[idTrack]) {
     return dispatch(getTrack(idTrack));
@@ -45,7 +47,7 @@ export const mapDispatchToProps = dispatch => ({
 });
 
 export default compose(
-  initialDispatcher(initialDispatch),
+  initStore(storeInitializer),
   connect(
     mapStateToProps,
     mapDispatchToProps

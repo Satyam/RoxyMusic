@@ -13,8 +13,3 @@
 .closeButton::before {
   content: "\00D7";
 }
-
-:global .btn {
-  margin-left: 0.5em;
-  margin-right: 0.5em;
-}

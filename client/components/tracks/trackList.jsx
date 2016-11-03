@@ -3,9 +3,8 @@ import styles from './trackList.css';
 import Track from './track';
 
 export default function TrackList({ idTracks }) {
-  return (
-    <div className={styles.tracktList}>
-      <h1>Tracks:</h1>
+  return (idTracks || null) && (
+    <div className={styles.trackList}>
       <ul>{
         idTracks.map(idTrack => (
           <Track

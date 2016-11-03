@@ -1,32 +1,32 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Link, routerShape, withRouter } from 'react-router';
+import { Link } from 'react-router';
+import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
+import FoldingToolbar from '_utils/foldingToolbar';
+import Icon from '_utils/icon';
+import Button from 'react-bootstrap/lib/Button';
 import styles from './albumListItem.css';
 
-export const AlbumListItemComponent = ({ idAlbum, album, artists, numTracks, router }) => (
-  <li className={styles.li}>
-    <div className="row">
+export const AlbumListItemComponent = ({ idAlbum, album, artists }) => (
+  <ListGroupItem className={styles.li}>
+    <div className={styles.left}>
       <div className={styles.album}>
-        <Link
-          to={`/albums/${idAlbum}`}
-          activeClassName={styles.disguiseLink}
-          onClick={(ev) => {
-            if (router.isActive(`/albums/${idAlbum}`, true)) {
-              ev.preventDefault();
-            }
-          }}
-        >
+        <Link to={`/albums/${idAlbum}`}>
           {album}
         </Link>
       </div>
       <div className={styles.artists}>
         {artists}
       </div>
-      <div className={styles.numTracks}>
-        Tracks: {numTracks}
-      </div>
     </div>
-  </li>
+    <div className={styles.right}>
+      <FoldingToolbar>
+        <Button onClick={console.log.bind(console, 'play')}><Icon type="play" /></Button>
+        <Button onClick={console.log.bind(console, 'up')}><Icon type="arrow-up" /></Button>
+        <Button onClick={console.log.bind(console, 'otro')}>otro</Button>
+      </FoldingToolbar>
+    </div>
+  </ListGroupItem>
 );
 
 
@@ -34,12 +34,10 @@ AlbumListItemComponent.propTypes = {
   idAlbum: PropTypes.number.isRequired,
   album: PropTypes.string,
   artists: PropTypes.string,
-  numTracks: PropTypes.number,
-  router: routerShape,
 };
 
 export const mapStateToProps = (state, props) => state.albums[props.idAlbum] || {};
 
-export default withRouter(connect(
+export default connect(
   mapStateToProps
-)(AlbumListItemComponent));
+)(AlbumListItemComponent);

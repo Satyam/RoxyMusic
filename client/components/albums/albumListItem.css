@@ -1,17 +1,15 @@
 .li {
-  list-style: none;
-  composes: global(bg-info);
-  margin-bottom: 1px;
-  padding: 2px;
+  overflow: hidden;
 }
-
 .album {
   font-weight: bold;
-  composes: global(col-md-6);
 }
-.artists {
-  composes: global(col-md-4);
+.left {
+  float:left;
+  width: 90%;
 }
-.numTracks {
-  composes: global(col-md-2);
+.right {
+  float:right;
+  width: 10%;
+  text-align: right;
 }
