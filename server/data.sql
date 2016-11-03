@@ -15,7 +15,6 @@ CREATE TABLE `Tracks` (
 	`idTrack`	INTEGER PRIMARY KEY AUTOINCREMENT,
 	`title`	TEXT,
 	`idArtist`	INTEGER,
-	`idComposer`	INTEGER,
 	`idAlbumArtist` INTEGER,
 	`idAlbum`	INTEGER,
 	`track` INTEGER,
@@ -27,7 +26,6 @@ CREATE TABLE `Tracks` (
 	`size` INTEGER,
 	`hasIssues` INTEGER,
   	FOREIGN KEY(`idArtist`) REFERENCES People(idPerson),
-    FOREIGN KEY(`idComposer`) REFERENCES People(idPerson),
 		FOREIGN KEY(`idAlbumArtist`) REFERENCES People(idPerson),
     FOREIGN KEY(`idAlbum`) REFERENCES Albums(idAlbum),
     FOREIGN KEY(`idGenre`) REFERENCES Genres(idGenre)
@@ -69,17 +67,18 @@ CREATE VIEW `AllTracks` AS
 	select *
 		from Tracks
 		left join Albums using(idAlbum)
-		left join (select artist as composer, idPerson as idComposer from People) using (idComposer)
 		left join (select artist as albumArtist, idPerson as idAlbumArtist from People) using (idAlbumArtist)
 		left join People on idArtist = idPerson
 		left join Genres using (idGenre);
 
 CREATE VIEW `AllAlbums` AS
-	select idAlbum,  album, group_concat(artist) as artists, count(idTrack) as numTracks
+	select idAlbum,  album, group_concat(artist) as artists, numTracks
 		from Albums
 		left join AlbumArtistMap using(idAlbum)
 		left join People on People.idPerson = AlbumArtistMap.idArtist
-		left join Tracks using(idAlbum)
+		left join (
+			select idAlbum, count(*) as numTracks from Tracks group by idAlbum
+		) using(idAlbum)
 		group by album
 		order by album;
 
