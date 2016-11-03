@@ -5,12 +5,12 @@ import { dolarizeQueryParams, prepareAll, choke, releaseChoke } from '_server/ut
 import { getConfig } from '_server/config';
 import omit from 'lodash/omit';
 
-import ID3 from 'id3-parser';
 import mp3Duration from 'mp3-duration';
+import mm from 'musicmetadata';
 
 const readDir = denodeify(fs.readdir);
-const readFile = denodeify(fs.readFile);
 const getDuration = denodeify(mp3Duration);
+const mediaData = denodeify(mm);
 
 const stat = denodeify(fs.stat);
 
@@ -35,7 +35,6 @@ export default function init() {
     `idTrack` INTEGER PRIMARY KEY AUTOINCREMENT,
     `title` TEXT,
     `idArtist` INTEGER,
-    `idComposer` INTEGER,
     `idAlbumArtist` INTEGER,
     `idAlbum` INTEGER,
     `track` INTEGER,
@@ -51,7 +50,6 @@ export default function init() {
       insert into Tracks(
         "title",
         "idArtist",
-        "idComposer",
         "idAlbumArtist",
         "idAlbum",
         "track",
@@ -65,7 +63,6 @@ export default function init() {
       ) values (
         $title,
         $idArtist,
-        $idComposer,
         $idAlbumArtist,
         $idAlbum,
         $track,
@@ -98,14 +95,14 @@ export function getPersonId(name) {
     : prepared.insertPerson.run(who)
     .then(res => res.lastID)
   ))
-  .then(id => releaseChoke(resId, id));
+  .then(id => releaseChoke(resId, id))
+  .catch(err => console.trace('getPersonId', err));
 }
 
 export function insertTrack(tags) {
   const t = omit(tags, [
     'artist',
     'album_artist',
-    'composer',
     'genre',
     'album',
   ]);
@@ -125,15 +122,6 @@ export function insertTrack(tags) {
       return getPersonId(tags.album_artist)
       .then((id) => {
         t.idAlbumArtist = id;
-      });
-    }
-    return null;
-  })
-  .then(() => {
-    if (tags.composer) {
-      return getPersonId(tags.composer)
-      .then((id) => {
-        t.idComposer = id;
       });
     }
     return null;
@@ -198,26 +186,29 @@ export function insertTrack(tags) {
   })
   .then(() => prepared.insertTrack.run(dolarizeQueryParams(t)))
   .then(res => res.lastID)
-  .catch(console.error);
+  .catch(err => console.trace('insertTrack', err));
 }
 
 function readTags(fileName) {
   // https://github.com/ddsol/mp3-duration
   // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/duration
-  return readFile(fileName)
-    .then(fileBuffer => ID3.parse(fileBuffer))
+  const readableStream = fs.createReadStream(fileName);
+  return mediaData(readableStream, { duration: true })
+    .catch(() => ({
+      hasIssues: true,
+      artist: [],
+      albumartist: [],
+      genre: [],
+    }))
     .then((tags) => {
-      const t = {};
-      [
-        'album',
-        'title',
-        'artist',
-        'composer',
-        'genre',
-      ].forEach((key) => {
-        const val = tags[key];
-        if (val && val.trim().length) t[key] = val;
-      });
+      readableStream.close();
+      const t = {
+        artist: tags.artist.join(', '),
+        album_artist: tags.albumartist.join(', '),
+        genre: tags.genre.join(', '),
+        album: tags.album,
+        title: tags.title,
+      };
       const loc = path.basename(fileName, path.extname(fileName)).split('-').map(s => s.trim());
       if (!t.title) {
         t.hasIssues = 1;
@@ -232,21 +223,24 @@ function readTags(fileName) {
         t.album = loc[0];
       }
 
-      if (tags.band) t.album_artist = tags.band;
       if (tags.year) t.year = parseInt(tags.year, 10);
       if (t.year <= 0) t.year = null;
-      if (tags.track) t.track = parseInt(tags.track, 10);
+      if (tags.track && tags.track.no) t.track = parseInt(tags.track.no, 10);
       if (t.track <= 0) t.track = null;
-      if (tags.length) t.duration = Math.round(parseInt(tags.length, 10) / 1000);
+      if (tags.duration) t.duration = Math.round(tags.duration);
       if (t.duration <= 0) t.duration = null;
       return (
-        t.duration || !tags.version
+        t.duration
         ? t
         : getDuration(fileName)
         .then(duration => Object.assign(t, { duration: Math.round(duration) }))
-        .catch(() => t)
+        .catch((err) => {
+          console.trace('getDuration', err);
+          return t;
+        })
       );
-    });
+    })
+    .catch(err => console.trace('readTags', fileName, err));
 }
 
 const pending = [];
@@ -301,7 +295,7 @@ export function scan(dir) {
     }
   })
   .catch((err) => {
-    console.error(err);
+    console.trace('scan', err);
     errors.push(err);
     pending.length = 0;
     stopRequested = false;
