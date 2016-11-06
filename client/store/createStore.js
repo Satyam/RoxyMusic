@@ -6,7 +6,8 @@ import albums from './albums';
 import tracks from './tracks';
 import people from './people';
 import genres from './genres';
-import playing from './playing';
+import playLists from './playLists';
+import nowPlaying from './nowPlaying';
 import requests from './requests';
 
 const reducers = combineReducers({
@@ -15,7 +16,8 @@ const reducers = combineReducers({
   people,
   genres,
   requests,
-  playing,
+  playLists,
+  nowPlaying,
   routing: routerReducer,
 });
 

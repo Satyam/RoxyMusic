@@ -1,22 +1,36 @@
 import update from 'react-addons-update';
-import pick from 'lodash/pick';
 
 import {
   REPLY_RECEIVED,
 } from '_store/requests/actions';
 
 import {
-  GET_ALBUM,
+  GET_ALBUM_TRACKS,
 } from '_store/albums/actions';
 
-export default (state = [], action) => {
+import {
+  GET_TRACK,
+} from './actions';
+
+const indexTracks = (payload, oldIndex = {}) => payload.reduce(
+  (tracks, item) => Object.assign(tracks, { [item.idTrack]: item }),
+  oldIndex
+);
+
+export default (
+  state = {
+    trackList: [],
+    trackHash: {},
+  },
+  action
+) => {
   const payload = action.payload;
   if (action.error) {
-    if (action.type === GET_ALBUM) {
-      const idAlbum = payload.originalPayload.idAlbum;
+    if (action.type === GET_TRACK) {
+      const idTrack = payload.originalPayload.idTrack;
       return update(state, { $merge: {
-        [idAlbum]: {
-          idAlbum,
+        [idTrack]: {
+          idTrack,
           error: 404,
         },
       } });
@@ -24,29 +38,12 @@ export default (state = [], action) => {
     return state;
   } else if (action.meta && action.meta.asyncAction !== REPLY_RECEIVED) return state;
   switch (action.type) {
-    case GET_ALBUM:
-      return update(state, { $merge: payload.reduce(
-        (newTracks, track) => (
-          track.idTrack in state
-          ? newTracks
-          : Object.assign(newTracks, { [track.idTrack]: pick(track, [
-            'idTrack',
-            'title',
-            'idArtist',
-            'idComposer',
-            'idAlbumArtist',
-            'idAlbum',
-            'track',
-            'date',
-            'idGenre',
-            'location',
-            'fileModified',
-            'size',
-            'hasIssues',
-          ]) })
-        ),
-        {}
-      ) });
+    case GET_ALBUM_TRACKS:
+      return update(state, {
+        trackList: { $push: payload },
+        trackHash: { $set: indexTracks(payload, state.trackHash) },
+      });
+
     default:
       return state;
   }

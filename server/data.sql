@@ -55,6 +55,25 @@ CREATE TABLE `AlbumArtistMap` (
 	FOREIGN KEY(`idArtist`) REFERENCES People(idPerson)
 );
 
+DROP TABLE IF EXISTS `PlayLists`;
+CREATE TABLE `PlayLists` (
+	`idPlayList`	INTEGER PRIMARY KEY AUTOINCREMENT,
+	`name`	TEXT,
+	`lastPlayed`	INTEGER
+);
+
+INSERT INTO `PlayLists` (`idPlayList`,`name`, `lastPlayed`)
+	VALUES (0, ' Now playing', null);
+
+DROP TABLE IF EXISTS `PlayListTracks`;
+CREATE TABLE `PlayListTracks` (
+	`idPlayListTrack`	INTEGER PRIMARY KEY AUTOINCREMENT,
+	`idPlayList`	INTEGER,
+	`idTrack`	INTEGER,
+	FOREIGN KEY(`idPlayList`) REFERENCES PlayLists(idPlayList),
+	FOREIGN KEY(`idTrack`) REFERENCES Tracks(idTrack)
+);
+
 CREATE INDEX `track_title` ON `Tracks` (`title` ASC);
 CREATE INDEX `track_album` ON `Tracks` (`idAlbum` ASC);
 CREATE INDEX `artist_name` ON `People` (`artist` ASC);
@@ -62,6 +81,7 @@ CREATE INDEX `album_name` ON `Albums` (`album` ASC);
 CREATE INDEX `genre_name` ON `Genres` (`genre` ASC);
 CREATE INDEX `track_location` ON `Tracks` (`location` ASC);
 CREATE INDEX `album_artists` ON `AlbumArtistMap` (`idAlbum` ASC);
+CREATE INDEX `play_list_tracks` ON `PlayListTracks` (`idPlayList` ASC);
 
 CREATE VIEW `AllTracks` AS
 	select *
@@ -81,6 +101,11 @@ CREATE VIEW `AllAlbums` AS
 		) using(idAlbum)
 		group by album
 		order by album;
+
+CREATE VIEW `AllPlayLists` AS
+	select * from PlayLists left join (
+		select idPlayList, count(*) as numTracks from PlayListTracks group by idPlayList
+	) using (idPlayList);
 
 COMMIT;
 

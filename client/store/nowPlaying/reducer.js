@@ -12,6 +12,7 @@ export default (
   state = {
     nowPlaying: -1,
     playNowList: [],
+    loaded: false,
   },
   action
 ) => {

@@ -13,7 +13,22 @@ export default () =>
     .get('/albums', handleRequest(
       transactions.getAlbums
     ))
+    .get('/albums/:idAlbum/tracks', handleRequest(
+      transactions.getAlbumTracks
+    ))
     .get('/albums/:idAlbum', handleRequest(
       transactions.getAlbum
+    ))
+    .get('/tracks/:idTrack', handleRequest(
+      transactions.getTrack
+    ))
+    .get('/playLists', handleRequest(
+      transactions.getPlayLists
+    ))
+    .get('/playLists/:idPlayList', handleRequest(
+      transactions.getPlayListTracks
+    ))
+    .post('/playLists/:idPlayList', handleRequest(
+      transactions.replacePlayListTracks
     ))
   );

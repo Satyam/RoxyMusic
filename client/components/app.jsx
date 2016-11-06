@@ -21,6 +21,7 @@ const App = ({ children }) => (
                 <ul className={styles.mainMenu}>
                   <li className={styles.menuItem}><Link to="/albums">Albums</Link></li>
                   <li className={styles.menuItem}><Link to="/artists">Artists</Link></li>
+                  <li className={styles.menuItem}><Link to="/playLists">Play Lists</Link></li>
                 </ul>
               )}
             </div>

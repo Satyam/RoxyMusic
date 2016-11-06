@@ -3,43 +3,41 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 import FoldingToolbar from '_utils/foldingToolbar';
-import Icon from '_utils/icon';
-import Button from 'react-bootstrap/lib/Button';
-import styles from './albumListItem.css';
+// import Icon from '_utils/icon';
+// import Button from 'react-bootstrap/lib/Button';
+import styles from './playListItem.css';
 
-export const AlbumListItemComponent = ({ idAlbum, album, artists }) => (
+export const PlayListItemComponent = ({ idPlayList, name, numTracks }) => (
   <ListGroupItem className={styles.li}>
     <div className={styles.left}>
-      <div className={styles.album}>
-        <Link to={`/albums/${idAlbum}`}>
-          {album}
+      <div className={styles.name}>
+        <Link to={`/playLists/${idPlayList}`}>
+          {name}
         </Link>
       </div>
-      <div className={styles.artists}>
-        {artists}
+      <div className={styles.tracks}>
+        {numTracks}
       </div>
     </div>
     <div className={styles.right}>
-      <FoldingToolbar>
-        {/*
+      <FoldingToolbar>{/*
         <Button onClick={console.log.bind(console, 'play')}><Icon type="play" /></Button>
         <Button onClick={console.log.bind(console, 'up')}><Icon type="arrow-up" /></Button>
         <Button onClick={console.log.bind(console, 'otro')}>otro</Button>
-        */}
-      </FoldingToolbar>
+      */ }</FoldingToolbar>
     </div>
   </ListGroupItem>
 );
 
 
-AlbumListItemComponent.propTypes = {
-  idAlbum: PropTypes.number.isRequired,
-  album: PropTypes.string,
-  artists: PropTypes.string,
+PlayListItemComponent.propTypes = {
+  idPlayList: PropTypes.number.isRequired,
+  name: PropTypes.string,
+  numTracks: PropTypes.number,
 };
 
-export const mapStateToProps = (state, props) => state.albums.albumHash[props.idAlbum] || {};
+export const mapStateToProps = (state, props) => state.playLists[props.idPlayList] || {};
 
 export default connect(
   mapStateToProps
-)(AlbumListItemComponent);
+)(PlayListItemComponent);

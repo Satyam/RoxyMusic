@@ -3,7 +3,7 @@ import fs from 'fs';
 import denodeify from 'denodeify';
 import debug from 'debug';
 
-// debug.enable('RoxyMusic:sqliteP');
+debug.enable('RoxyMusic:sqliteP');
 const log = debug('RoxyMusic:sqliteP');
 const readFile = denodeify(fs.readFile);
 

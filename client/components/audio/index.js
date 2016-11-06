@@ -4,15 +4,15 @@ import path from 'path';
 
 import {
   playNextTrack,
-} from '_store/playing/actions';
+} from '_store/nowPlaying/actions';
 
 export const mapStateToProps = state => ({
   src: (
-    state.playing.nowPlaying === -1
+    state.nowPlaying.nowPlaying === -1
     ? ''
-    : path.join('/music', state.tracks[state.playing.playNowList[state.playing.nowPlaying]].location)
+    : path.join('/music', state.tracks[state.nowPlaying.playNowList[state.nowPlaying.nowPlaying]].location)
   ),
-  autoPlay: (state.playing.nowPlaying !== -1 ? 'true' : 'false'),
+  autoPlay: (state.nowPlaying.nowPlaying !== -1 ? 'true' : 'false'),
 });
 
 export const mapDispatchToProps = dispatch => ({

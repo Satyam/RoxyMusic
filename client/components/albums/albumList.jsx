@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
-import { compose, withHandlers } from 'recompose';
+import { compose } from 'recompose';
 
 import Navbar from 'react-bootstrap/lib/Navbar';
 import Button from 'react-bootstrap/lib/Button';
@@ -10,15 +10,21 @@ import FormControl from 'react-bootstrap/lib/FormControl';
 import ListGroup from 'react-bootstrap/lib/ListGroup';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 
-import size from 'lodash/size';
-
 import initStore from '_utils/initStore';
+import isPlainClick from '_utils/isPlainClick';
 import Icon from '_utils/icon';
-import { getAlbums } from '_store/actions';
+import { getAlbums, getMoreAlbums } from '_store/actions';
 import styles from './albumList.css';
 import AlbumListItem from './albumListItem';
 
-export function AlbumListComponent({ albums, onChangeHandler }) {
+export function AlbumListComponent({
+  albumList,
+  search,
+  nextOffset,
+  onSearchChangeHandler,
+  onSearchClearHandler,
+  onMoreAlbumsHandler,
+ }) {
   return (
     <div className={styles.albumList}>
       <Navbar>
@@ -32,16 +38,26 @@ export function AlbumListComponent({ albums, onChangeHandler }) {
           <Navbar.Form pullLeft>
             <FormGroup className="input-group">
               <span className="input-group-addon"><Icon type="search" /></span>
-              <FormControl type="text" placeholder="Search" onChange={onChangeHandler} />
-              <span className="input-group-addon" style={{ color: 'silver' }}><Icon type="remove-circle" /></span>
+              <FormControl
+                type="text"
+                value={search || ''}
+                placeholder="Search"
+                onChange={onSearchChangeHandler}
+              />
+              <button
+                className="input-group-addon"
+                style={{ color: (search ? 'black' : 'silver') }}
+                onClick={onSearchClearHandler}
+              >
+                <Icon type="remove-circle" />
+              </button>
             </FormGroup>
           </Navbar.Form>
         </Navbar.Collapse>
       </Navbar>
       <ListGroup>
-        <ListGroupItem><Button block><Icon type="menu-up" /> More</Button></ListGroupItem>
         {
-          albums.map(album => (
+          albumList.map(album => (
             album.error
             ? null
             : (<AlbumListItem
@@ -50,39 +66,49 @@ export function AlbumListComponent({ albums, onChangeHandler }) {
             />)
           ))
         }
-        <ListGroupItem><Button block><Icon type="menu-down" /> More</Button></ListGroupItem>
+        <ListGroupItem>
+          <Button
+            onClick={ev => isPlainClick(ev) && onMoreAlbumsHandler(search, nextOffset)}
+            block
+          ><Icon type="menu-down" /> More</Button>
+        </ListGroupItem>
       </ListGroup>
     </div>
   );
 }
 
 AlbumListComponent.propTypes = {
-  albums: PropTypes.array,
-  onChangeHandler: PropTypes.func,
+  albumList: PropTypes.array,
+  search: PropTypes.string,
+  nextOffset: PropTypes.number,
+  onSearchChangeHandler: PropTypes.func,
+  onSearchClearHandler: PropTypes.func,
+  onMoreAlbumsHandler: PropTypes.func,
 };
 
 
 export const storeInitializer = (dispatch, state) => {
-  if (size(state.albums) < 20) {
+  if (state.albums.nextOffset === 0) {
     return dispatch(getAlbums());
   }
   return undefined;
 };
 
-export const mapStateToProps = state => ({
-  albums: state.albums,
-});
+export const mapStateToProps = state => state.albums;
 
-const handlers = withHandlers({
-  onChangeHandler: props => ev => console.log(ev.target.value),
+export const mapDispatchToProps = dispatch => ({
+  onSearchChangeHandler: ev => dispatch(getAlbums(ev.target.value)),
+  onSearchClearHandler: ev => isPlainClick(ev) && dispatch(getAlbums()),
+  onMoreAlbumsHandler:
+    (search, nextOffset) => dispatch(getMoreAlbums(search, nextOffset)),
 });
 
 const enhance = compose(
-  connect(
-    mapStateToProps
-  ),
   initStore(storeInitializer),
-  handlers
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )
 );
 
 export default enhance(AlbumListComponent);

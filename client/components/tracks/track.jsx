@@ -1,22 +1,27 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { compose, withHandlers } from 'recompose';
+import { compose } from 'recompose';
 import isPlainClick from '_utils/isPlainClick';
 import { getTrack, playNow } from '_store/actions';
 import initStore from '_utils/initStore';
 import Icon from '_utils/icon';
+import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 import styles from './track.css';
 
 export const TrackComponent = ({ idTrack, title, artist, track, onPlayClick }) =>
   (idTrack || null) && (
-    <li className={styles.track}>
+    <ListGroupItem className={styles.track}>
       <div className={styles.trackNum}>{track}</div>
-      <div className={styles.title}>{title}</div>
-      <button className={styles.playButton} onClick={onPlayClick} >
-        <Icon type="play" />
-      </button>
-      <div className={styles.artist}>{artist}</div>
-    </li>
+      <div className={styles.left}>
+        <div className={styles.title}>{title}</div>
+        <div className={styles.artist}>{artist}</div>
+      </div>
+      <div className={styles.right}>
+        <button className={styles.playButton} onClick={onPlayClick} >
+          <Icon type="play" />
+        </button>
+      </div>
+    </ListGroupItem>
   );
 
 TrackComponent.propTypes = {
@@ -27,23 +32,16 @@ TrackComponent.propTypes = {
   onPlayClick: PropTypes.func,
 };
 
-const handlers = withHandlers({
-  onPlayClick: props => ev => isPlainClick(ev) && props.onPlay(props.idTrack),
-});
-
 export const storeInitializer = (dispatch, state, props) => {
   const idTrack = props.idTrack || props.params.idTrack;
-  if (!state.tracks[idTrack]) {
-    return dispatch(getTrack(idTrack));
-  }
-  return undefined;
+  return state.tracks.trackHash[idTrack] || dispatch(getTrack(idTrack));
 };
 
 export const mapStateToProps = (state, props) =>
-  state.tracks[props.idTrack || props.params.idTrack] || {};
+  state.tracks.trackHash[props.idTrack || props.params.idTrack] || {};
 
-export const mapDispatchToProps = dispatch => ({
-  onPlay: idTrack => dispatch(playNow(idTrack)),
+export const mapDispatchToProps = (dispatch, props) => ({
+  onPlayClick: ev => isPlainClick(ev) && dispatch(playNow(props.idTrack)),
 });
 
 export default compose(
@@ -52,5 +50,4 @@ export default compose(
     mapStateToProps,
     mapDispatchToProps
   ),
-  handlers
 )(TrackComponent);

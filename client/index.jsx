@@ -6,7 +6,7 @@ import { Provider } from 'react-redux';
 
 import createStore from '_store/createStore';
 
-import components from '_components';
+import routes from '_components/routes';
 
 if (process.env.NODE_ENV !== 'production') {
   /* eslint-disable import/no-extraneous-dependencies, global-require */
@@ -23,7 +23,7 @@ const dest = document.getElementById('contents');
 export default render((
   <Provider store={store}>
     <Router history={history}>
-      {components('/')}
+      {routes('/')}
     </Router>
   </Provider>
 ), dest);

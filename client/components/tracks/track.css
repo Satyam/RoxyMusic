@@ -1,22 +1,21 @@
 .track {
-  width: 100%;
-}
-.track:after {
-  clear: both;
+    overflow: hidden;
 }
 .trackNum {
   float: left;
+  width: 2em;
+  text-align: right;
+  margin-right: 1em;
+}
+.left {
+  float:left;
 }
 .title {
-  float:left;
   font-weight: bold;
   font-size: large;
 }
-.play-button {
-  composes: global(btn);
-  composes: global(btn-default);
+.right {
   float:right;
-}
-.artist::before {
-  content: "Artist ";
+  width: 10%;
+  text-align: right;
 }

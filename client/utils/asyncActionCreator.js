@@ -14,8 +14,11 @@ export default (type, asyncRequest, payload = {}) =>
     return asyncRequest.then(
       response => dispatch({
         type,
-        payload: Object.assign(response, payload),
-        meta: { asyncAction: REPLY_RECEIVED },
+        payload: response,
+        meta: {
+          asyncAction: REPLY_RECEIVED,
+          originalPayload: payload,
+        },
       }),
       (error) => {
         const err = {
