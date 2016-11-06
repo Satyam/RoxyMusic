@@ -1,16 +1,6 @@
 .album-info {
-  composes: global(row);
+  padding-top: 1em;
 }
-.album-artist {
-  composes: global(col-md-10);
-}
-.album-artist::before {
-  content: "Artist: ";
-}
-
 .album-num-tracks {
-  composes: global(col-md-2);
-}
-.album-num-tracks::before {
-  content: "Number of tracks: ";
+  font-size: small;
 }
