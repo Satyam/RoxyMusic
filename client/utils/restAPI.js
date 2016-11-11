@@ -33,7 +33,7 @@ export default (base) => {
     });
   } else {
     restClient = method => (path, body) => fetch(
-      `${HOST}:${PORT}${join(REST_API_PATH, base, path)}`,
+      `${HOST}:${PORT}${join(REST_API_PATH, base, String(path))}`,
       {
         method,
         headers: {
