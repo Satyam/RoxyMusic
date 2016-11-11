@@ -8,6 +8,8 @@ const INTEGER = 1;
 const NUMBER = 2;
 const DATE = 3;
 const BOOL = 4;
+const OBJECT = 5;
+const NULL = 6;
 
 export function loadConfig() {
   return prepared.selectAllConfig.each((row) => {
@@ -24,7 +26,13 @@ export function loadConfig() {
       case BOOL:
         config[row.key] = row.value === 'true';
         break;
-      default:
+      case OBJECT:
+        config[row.key] = JSON.parse(row.value);
+        break;
+      case NULL:
+        config[row.key] = null;
+        break;
+      default: // TEXT
         config[row.key] = row.value;
         break;
     }
@@ -56,15 +64,25 @@ export function setConfig(key, newValue) {
       if (newValue instanceof Date) {
         type = DATE;
         value = newValue.toISOString();
+      } else if (newValue === null) {
+        type = NULL;
+        value = newValue;
+      } else {
+        type = OBJECT;
+        value = JSON.stringify(newValue);
       }
       break;
+    case 'undefined':
+      delete config[key];
+      return prepared.deleteConfig.run({ $key: key })
+      .then(() => undefined);
     default: break;
   }
   if (type === null) {
     return Promise.reject(`setConfig: Invalid type for ${key}: ${newValue}`);
   }
 
-  return prepared.updateConfigValue.run(dolarizeQueryParams(key, type, value))
+  return prepared.updateConfigValue.run(dolarizeQueryParams({ key, type, value }))
   .then(() => {
     config[key] = newValue;
     return newValue;
@@ -76,6 +94,7 @@ export function initConfig() {
     selectAllConfig: 'select * from config',
     selectConfigValue: 'select * from config where key=$key',
     updateConfigValue: 'replace into config (key, type, value) values ($key, $type, $value)',
+    deleteConfig: 'delete from config where key=$key',
   })
   .then((p) => {
     prepared = p;

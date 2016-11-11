@@ -6,7 +6,6 @@ const api = restAPI('music/albums');
 export const GET_ALBUMS = 'albums/get albums';
 export const GET_MORE_ALBUMS = 'albums/get more albums';
 export const GET_ALBUM = 'albums/get album';
-export const GET_ALBUM_TRACKS = 'albums/get album tracks';
 
 export function getAlbums(search) {
   return asyncActionCreator(
@@ -28,13 +27,6 @@ export function getAlbum(idAlbum) {
   return asyncActionCreator(
     GET_ALBUM,
     api.read(idAlbum),
-    { idAlbum }
-  );
-}
-export function getAlbumTracks(idAlbum) {
-  return asyncActionCreator(
-    GET_ALBUM_TRACKS,
-    api.read(`${idAlbum}/tracks`),
     { idAlbum }
   );
 }

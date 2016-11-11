@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 import Navbar from 'react-bootstrap/lib/Navbar';
 import Icon from '_utils/icon';
 import compose from 'recompose/compose';
-import { getAlbum, getAlbumTracks } from '_store/actions';
+import { getAlbum } from '_store/actions';
 import initStore from '_utils/initStore';
 import TrackList from '_components/tracks/trackList';
 import styles from './album.css';
@@ -50,20 +50,14 @@ AlbumComponent.propTypes = {
 
 export const storeInitializer = (dispatch, state, props) => {
   const idAlbum = props.params.idAlbum;
-  const album = state.albums.albumHash[idAlbum];
-  return Promise.all([
-    album || dispatch(getAlbum(idAlbum)),
-    (album && album.idTracks) || dispatch(getAlbumTracks(idAlbum)),
-  ]);
+  return state.albums.albumHash[idAlbum] || dispatch(getAlbum(idAlbum));
 };
 
 export const mapStateToProps = (state, props) => state.albums.albumHash[props.params.idAlbum] || {};
 
-const enhance = compose(
+export default compose(
   initStore(storeInitializer),
   connect(
     mapStateToProps
   )
-);
-
-export default enhance(AlbumComponent);
+)(AlbumComponent);

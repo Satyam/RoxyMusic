@@ -26,8 +26,8 @@ const App = ({ children }) => (
               )}
             </div>
             <div className={styles.rightPanel}>
-              <NowPlaying />
               <Audio />
+              <NowPlaying />
             </div>
           </div>
         )

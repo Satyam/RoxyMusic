@@ -8,7 +8,6 @@ import {
   GET_ALBUMS,
   GET_MORE_ALBUMS,
   GET_ALBUM,
-  GET_ALBUM_TRACKS,
 } from './actions';
 
 const indexAlbums = (payload, oldIndex = {}) => payload.reduce(
@@ -59,21 +58,9 @@ export default (
       return {
         search: '',
         nextOffset: 0,
-        albumList: payload,
-        albumHash: indexAlbums(payload),
+        albumList: [payload],
+        albumHash: indexAlbums([payload]),
       };
-    }
-
-    case GET_ALBUM_TRACKS: {
-      return update(state, {
-        albumHash: {
-          [originalPayload.idAlbum]: {
-            idTracks: {
-              $set: payload.map(track => track.idTrack),
-            },
-          },
-        },
-      });
     }
     default:
       return state;

@@ -1,4 +1,8 @@
-import update from 'react-addons-update';
+// import update from 'react-addons-update';
+
+import {
+  REPLY_RECEIVED,
+} from '_store/requests/actions';
 
 import {
   PLAY_NEXT_TRACK,
@@ -6,41 +10,29 @@ import {
   ADD_TO_NOW_PLAYING,
   CLEAR_NOW_PLAYING,
   REPLACE_NOW_PLAYING,
+  LOAD_NOW_PLAYING,
 } from './actions';
 
 export default (
   state = {
-    nowPlaying: -1,
-    playNowList: [],
+    current: -1,
+    idTracks: [],
     loaded: false,
   },
   action
 ) => {
-  const idTrack = action.idTrack;
+  if (action.meta && action.meta.asyncAction !== REPLY_RECEIVED) return state;
+  const payload = action.payload;
+  const original = action.meta && action.meta.originalPayload;
   switch (action.type) {
     case PLAY_NEXT_TRACK:
-      return update(state, { nowPlaying: { $apply: n => (
-        state.nowPlaying === state.playNowList.length - 1
-        ? -1
-        : n + 1
-    ) } });
     case PLAY_NOW:
-      return update(state, {
-        nowPlaying: { $set: state.playNowList.length },
-        playNowList: { $push: [idTrack] },
-      });
     case ADD_TO_NOW_PLAYING:
-      return update(state, { playNowList: { $push: [idTrack] } });
     case CLEAR_NOW_PLAYING:
-      return update(state, {
-        nowPlaying: { $set: -1 },
-        playNowList: { $set: [] },
-      });
     case REPLACE_NOW_PLAYING:
-      return update(state, {
-        nowPlaying: { $set: 0 },
-        playNowList: { $set: [idTrack] },
-      });
+      return original;
+    case LOAD_NOW_PLAYING:
+      return Object.assign(payload, { loaded: true });
     default:
       return state;
   }

@@ -103,12 +103,10 @@ export const mapDispatchToProps = dispatch => ({
     (search, nextOffset) => dispatch(getMoreAlbums(search, nextOffset)),
 });
 
-const enhance = compose(
+export default compose(
   initStore(storeInitializer),
   connect(
     mapStateToProps,
     mapDispatchToProps
   )
-);
-
-export default enhance(AlbumListComponent);
+)(AlbumListComponent);

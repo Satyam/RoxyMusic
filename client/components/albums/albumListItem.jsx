@@ -3,8 +3,8 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 import FoldingToolbar from '_utils/foldingToolbar';
-import Icon from '_utils/icon';
-import Button from 'react-bootstrap/lib/Button';
+// import Icon from '_utils/icon';
+// import Button from 'react-bootstrap/lib/Button';
 import styles from './albumListItem.css';
 
 export const AlbumListItemComponent = ({ idAlbum, album, artists }) => (

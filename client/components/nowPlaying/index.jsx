@@ -5,7 +5,7 @@ import initStore from '_utils/initStore';
 
 import TrackList from '_components/tracks/trackList';
 
-import { getPlayList, getPlayLists } from '_store/actions';
+import { loadPlayingList } from '_store/actions';
 
 export const NowPlayingComponent = ({ idTracks }) =>
   (idTracks || null) && (
@@ -18,18 +18,14 @@ NowPlayingComponent.propTypes = {
   ),
 };
 export const storeInitializer = (dispatch, state) => (
-    state.playLists.length
-    ? Promise.resolve()
-    : dispatch(getPlayLists())
-  ).then(() => (state.playLists[0] && state.playLists[0].idTracks) || dispatch(getPlayList('0')));
+  state.nowPlaying.loaded || dispatch(loadPlayingList())
+);
 
-export const mapStateToProps = state => state.playLists[0] || {};
+export const mapStateToProps = state => state.nowPlaying || {};
 
-const enhance = compose(
+export default compose(
   initStore(storeInitializer),
   connect(
     mapStateToProps
   )
-);
-
-export default enhance(NowPlayingComponent);
+)(NowPlayingComponent);

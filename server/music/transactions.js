@@ -1,4 +1,5 @@
 import { prepareAll } from '_server/utils';
+import { getConfig as getCfg, setConfig as setCfg } from '_server/config';
 
 import initRefresh, { startRefresh, refreshStatus, stopRefresh } from './refreshDb';
 
@@ -9,12 +10,13 @@ export function init() {
     getAlbums: 'select * from AllAlbums limit $count offset $offset',
     searchAlbums: 'select * from AllAlbums where album like $search limit $count offset $offset',
     getAlbum: 'select * from AllAlbums where idAlbum = $idAlbum',
-    getAlbumTracks: 'select * from AllTracks where idAlbum = $idAlbum',
-    getTrack: 'select * from AllTracks where idTrack = $idTrack',
-    getPlayLists: 'select * from AllPlayLists order by name',
-    getPlayListTracks: 'select idTrack from PlayListTracks where idPlayList = $idPlayList order by `idPlayListTrack`',
-    deletePlayListTracks: 'delete from PlayListTracks where idPlayList = $idPlayList',
-    addPlayListTrack: 'insert into PlayListTracks (idPlayList, idTrack) values ($idPlayList, $idTrack)',
+    // getTracks: 'select * from AllTracks where idTrack in ($idTracks)',
+    getPlayLists: 'select * from PlayLists',
+    getPlayList: 'select* from PlayLists where idPlayList = $idPlayList',
+    addPlayList: 'insert into PlayLists (name) values ($name)',
+    updatePlayList: 'update PlayLists set lastPlayed = $lastPlayed, idTracks = $idTracks where idPlayList = $idPlayList',
+    renamePlayList: 'update PlayLists set name = $name where idPlayList = $idPlayList',
+    deletePlayList: 'delete from PlayLists  where idPlayList = $idPlayList',
   })
   .then((p) => {
     prepared = p;
@@ -33,6 +35,8 @@ export function refreshDatabase(o) {
   }
 }
 
+// getAlbums: 'select * from AllAlbums limit $count offset $offset',
+// searchAlbums: 'select * from AllAlbums where album like $search limit $count offset $offset',
 export function getAlbums(o) {
   return (
     o.options.search
@@ -48,41 +52,80 @@ export function getAlbums(o) {
   );
 }
 
+// getAlbum: 'select * from AllAlbums where idAlbum = $idAlbum',
 export function getAlbum(o) {
-  return prepared.getAlbum.all({
+  return prepared.getAlbum.get({
     $idAlbum: o.keys.idAlbum,
+  })
+  .then(album => Object.assign(
+    album,
+    { idTracks: album.idTracks.split(',').map(idTrack => parseInt(idTrack, 10)),
+  }));
+}
+
+// getTracks: 'select * from AllTracks where idTrack in ($idTracks)',
+export function getTracks(o) {
+  return db.all(`select * from AllTracks where idTrack in (${o.keys.idTracks})`);
+}
+
+function splitIdTracks(playList) {
+  return Object.assign(playList, {
+    idTracks: (
+      playList.idTracks
+      ? playList.idTracks.split(',').map(idTrack => parseInt(idTrack, 10))
+      : null
+    ),
   });
 }
 
-export function getTrack(o) {
-  return prepared.getTrack.all({
-    $idTrack: o.keys.idTrack,
-  });
-}
-
-export function getAlbumTracks(o) {
-  return prepared.getAlbumTracks.all({
-    $idAlbum: o.keys.idAlbum,
-  });
-}
-
+// getPlayLists: 'select * from PlayLists order by name',
 export function getPlayLists() {
-  return prepared.getPlayLists.all();
+  return prepared.getPlayLists.all()
+  .then(playLists => playLists.map(splitIdTracks));
 }
 
-export function getPlayListTracks(o) {
-  return prepared.getPlayListTracks.all({
-    $idPlayList: o.keys.idPlayList || 0, // 0 ==> Now
+// getPlayList: 'select* from PlayLists where idPlayList = $idPlayList',
+export function getPlayList(o) {
+  return prepared.getPlayList.get({
+    $idPlayList: o.keys.idPlayList,
+  })
+  .then(splitIdTracks);
+}
+
+// addPlayList: 'insert into PlayLists (name) values ($name)',
+export function addPlayList(o) {
+  return prepared.addPlayList.run({ $name: o.data.name });
+}
+
+// updatePlayList: 'update PlayLists
+// set lastPlayed = $lastPlayed, idTracks = $idTracks where idPlayList = $idPlayList',
+export function updatePlayList(o) {
+  return prepared.updatePlayList.run({
+    $idPlayList: o.keys.idPlayList,
+    $lastPlayed: o.data.lastPlayed,
+    $idTracks: o.data.idTracks.join(','),
   });
 }
 
-export function replacePlayListTracks(o) {
-  const idPlayList = o.keys.idPlayList;
-  return prepared.deletePlayListTracks.run(idPlayList)
-  .then(Promise.all(o.data.map(idTrack =>
-    prepared.addPlayListTrack({
-      $idPlayList: idPlayList,
-      $idTrack: idTrack,
-    })
-  )));
+// renamePlayList: 'update PlayLists set name = $name where idPlayList = $idPlayList',
+
+export function renamePlayList(o) {
+  return prepared.renamePlayList.run({
+    $idPlayList: o.keys.idPlayList,
+    $name: o.data.name,
+  });
+}
+// deletePlayList: 'delete from PlayLists  where idPlayList = $idPlayList',
+export function deletePlayList(o) {
+  return prepared.deletePlayList.run({
+    $idPlayList: o.keys.idPlayList,
+  });
+}
+
+export function getConfig(o) {
+  return getCfg(o.keys.key);
+}
+
+export function setConfig(o) {
+  return setCfg(o.keys.key, o.data);
 }

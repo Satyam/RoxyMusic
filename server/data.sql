@@ -8,7 +8,8 @@ CREATE TABLE `config` (
 
 INSERT INTO `config` (key, value, type) values
  ('musicDir', '/home/satyam/Music', 0),
- ('audioExtensions', 'mp3,mp4,m4a,wav,wma,flac', 0);
+ ('audioExtensions', 'mp3,mp4,m4a,wav,wma,flac', 0),
+ ('nowPlaying', '{current: -1, idTracks: []}', 5);
 
 DROP TABLE IF EXISTS `Tracks`;
 CREATE TABLE `Tracks` (
@@ -59,20 +60,12 @@ DROP TABLE IF EXISTS `PlayLists`;
 CREATE TABLE `PlayLists` (
 	`idPlayList`	INTEGER PRIMARY KEY AUTOINCREMENT,
 	`name`	TEXT,
-	`lastPlayed`	INTEGER
+	`lastPlayed`	INTEGER,
+	`idTracks` TEXT
 );
 
 INSERT INTO `PlayLists` (`idPlayList`,`name`, `lastPlayed`)
 	VALUES (0, ' Now playing', null);
-
-DROP TABLE IF EXISTS `PlayListTracks`;
-CREATE TABLE `PlayListTracks` (
-	`idPlayListTrack`	INTEGER PRIMARY KEY AUTOINCREMENT,
-	`idPlayList`	INTEGER,
-	`idTrack`	INTEGER,
-	FOREIGN KEY(`idPlayList`) REFERENCES PlayLists(idPlayList),
-	FOREIGN KEY(`idTrack`) REFERENCES Tracks(idTrack)
-);
 
 CREATE INDEX `track_title` ON `Tracks` (`title` ASC);
 CREATE INDEX `track_album` ON `Tracks` (`idAlbum` ASC);
@@ -81,7 +74,6 @@ CREATE INDEX `album_name` ON `Albums` (`album` ASC);
 CREATE INDEX `genre_name` ON `Genres` (`genre` ASC);
 CREATE INDEX `track_location` ON `Tracks` (`location` ASC);
 CREATE INDEX `album_artists` ON `AlbumArtistMap` (`idAlbum` ASC);
-CREATE INDEX `play_list_tracks` ON `PlayListTracks` (`idPlayList` ASC);
 
 CREATE VIEW `AllTracks` AS
 	select *
@@ -92,20 +84,16 @@ CREATE VIEW `AllTracks` AS
 		left join Genres using (idGenre);
 
 CREATE VIEW `AllAlbums` AS
-	select idAlbum,  album, group_concat(artist) as artists, numTracks
-		from Albums
-		left join AlbumArtistMap using(idAlbum)
-		left join People on People.idPerson = AlbumArtistMap.idArtist
-		left join (
-			select idAlbum, count(*) as numTracks from Tracks group by idAlbum
-		) using(idAlbum)
-		group by album
-		order by album;
-
-CREATE VIEW `AllPlayLists` AS
-	select * from PlayLists left join (
-		select idPlayList, count(*) as numTracks from PlayListTracks group by idPlayList
-	) using (idPlayList);
+select idAlbum,  album, group_concat(artist) as artists, numTracks, idTracks
+	from Albums
+	left join AlbumArtistMap using(idAlbum)
+	left join People on People.idPerson = AlbumArtistMap.idArtist
+	left join (
+		select idAlbum, count(*) as numTracks, group_concat(idTrack) as idTracks
+		from Tracks group by idAlbum
+	) using(idAlbum)
+	group by album
+	order by album
 
 COMMIT;
 
