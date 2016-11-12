@@ -2,8 +2,8 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
-import FoldingToolbar from '_utils/foldingToolbar';
-// import Icon from '_utils/icon';
+import FoldingToolbar from '_components/misc/foldingToolbar';
+// import Icon from '_components/misc/icon';
 // import Button from 'react-bootstrap/lib/Button';
 import styles from './playListItem.css';
 

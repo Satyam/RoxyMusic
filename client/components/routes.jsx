@@ -2,7 +2,7 @@ import React from 'react';
 import { Route } from 'react-router';
 
 import App from './app';
-import NotFound from './notFound';
+import NotFound from './misc/notFound';
 
 import albums from './albums/routes';
 import artists from './artists/routes';

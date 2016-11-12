@@ -4,9 +4,9 @@ import { compose } from 'recompose';
 import isPlainClick from '_utils/isPlainClick';
 import { getTracks, playNow } from '_store/actions';
 import initStore from '_utils/initStore';
-import Icon from '_utils/icon';
+import Icon from '_components/misc/icon';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
-import FoldingToolbar from '_utils/foldingToolbar';
+import FoldingToolbar from '_components/misc/foldingToolbar';
 import styles from './track.css';
 
 export const TrackComponent = ({ idTrack, title, artist, track, error, onPlayClick }) =>

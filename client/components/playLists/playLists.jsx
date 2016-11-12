@@ -8,7 +8,7 @@ import Navbar from 'react-bootstrap/lib/Navbar';
 import ListGroup from 'react-bootstrap/lib/ListGroup';
 
 import initStore from '_utils/initStore';
-import Icon from '_utils/icon';
+import Icon from '_components/misc/icon';
 import { getPlayLists } from '_store/actions';
 import styles from './playLists.css';
 import PlayListItem from './playListItem';

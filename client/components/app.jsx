@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 
-import Errors from '_components/errors';
-import Loading from '_components/loading';
+import Errors from '_components/misc/errors';
+import Loading from '_components/misc/loading';
 import Audio from '_components/audio';
 import NowPlaying from '_components/nowPlaying';
 import { Link } from 'react-router';

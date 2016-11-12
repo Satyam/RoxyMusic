@@ -12,7 +12,7 @@ import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 
 import initStore from '_utils/initStore';
 import isPlainClick from '_utils/isPlainClick';
-import Icon from '_utils/icon';
+import Icon from '_components/misc/icon';
 import { getAlbums, getMoreAlbums } from '_store/actions';
 import styles from './albumList.css';
 import AlbumListItem from './albumListItem';

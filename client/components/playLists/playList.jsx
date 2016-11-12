@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
 import Navbar from 'react-bootstrap/lib/Navbar';
-import Icon from '_utils/icon';
+import Icon from '_components/misc/icon';
 import TrackList from '_components/tracks/trackList';
 import compose from 'recompose/compose';
 import { getPlayList, getPlayLists } from '_store/actions';
