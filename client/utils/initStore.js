@@ -26,6 +26,7 @@ const initStore = initializer => (BaseComponent) => {
         this.shouldUpdate = false;
         initRet.then(() => {
           this.shouldUpdate = true;
+          this.forceUpdate();
         });
       }
     }
