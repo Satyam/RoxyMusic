@@ -4,8 +4,7 @@ import reduxThunk from 'redux-thunk';
 
 import albums from './albums';
 import tracks from './tracks';
-import people from './people';
-import genres from './genres';
+import artists from './artists';
 import playLists from './playLists';
 import nowPlaying from './nowPlaying';
 import requests from './requests';
@@ -13,8 +12,7 @@ import requests from './requests';
 const reducers = combineReducers({
   albums,
   tracks,
-  people,
-  genres,
+  artists,
   requests,
   playLists,
   nowPlaying,

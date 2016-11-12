@@ -64,9 +64,6 @@ CREATE TABLE `PlayLists` (
 	`idTracks` TEXT
 );
 
-INSERT INTO `PlayLists` (`idPlayList`,`name`, `lastPlayed`)
-	VALUES (0, ' Now playing', null);
-
 CREATE INDEX `track_title` ON `Tracks` (`title` ASC);
 CREATE INDEX `track_album` ON `Tracks` (`idAlbum` ASC);
 CREATE INDEX `artist_name` ON `People` (`artist` ASC);
@@ -93,9 +90,20 @@ select idAlbum,  album, group_concat(artist) as artists, numTracks, idTracks
 		from Tracks group by idAlbum
 	) using(idAlbum)
 	group by album
-	order by album
+	order by album;
 
-COMMIT;
+	CREATE VIEW `AllArtists` as
+	select idArtist, artist, numTracks, idTracks from people
+		left join (
+			select idArtist, count(*) as numTracks, group_concat(idTrack) as idTracks from (
+				select idArtist, idTrack from Tracks group by idArtist
+				union
+				select AlbumArtistMap.idArtist as idArtist, idTrack
+				from Tracks
+				left join AlbumArtistMap using(idAlbum)
+			) group by idArtist
+		)  on idPerson = idArtist
+		order by artist;
 
 INSERT INTO `Genres` (idGenre, genre) VALUES
  (0, 'Blues'),
@@ -224,3 +232,5 @@ INSERT INTO `Genres` (idGenre, genre) VALUES
 (123, 'A capella'),
 (124, 'Euro-House'),
 (125, 'Dance Hall');
+
+COMMIT;

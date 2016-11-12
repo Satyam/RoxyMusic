@@ -10,7 +10,11 @@ export function init() {
     getAlbums: 'select * from AllAlbums limit $count offset $offset',
     searchAlbums: 'select * from AllAlbums where album like $search limit $count offset $offset',
     getAlbum: 'select * from AllAlbums where idAlbum = $idAlbum',
-    // getTracks: 'select * from AllTracks where idTrack in ($idTracks)',
+
+    getArtists: 'select * from AllArtists limit $count offset $offset',
+    searchArtists: 'select * from AllArtists where artist like $search limit $count offset $offset',
+    getArtist: 'select * from AllArtists where idArtist = $idArtist',
+
     getPlayLists: 'select * from PlayLists',
     getPlayList: 'select* from PlayLists where idPlayList = $idPlayList',
     addPlayList: 'insert into PlayLists (name) values ($name)',
@@ -62,6 +66,35 @@ export function getAlbum(o) {
     { idTracks: album.idTracks.split(',').map(idTrack => parseInt(idTrack, 10)),
   }));
 }
+
+// getArtists: 'select * from AllArtists limit $count offset $offset',
+// searchArtists: 'select * from AllArtists where artist like $search limit $count offset $offset',
+export function getArtists(o) {
+  return (
+    o.options.search
+    ? prepared.searchArtists.all({
+      $count: o.options.count || 20,
+      $offset: o.options.offset || 0,
+      $search: `%${o.options.search}%`,
+    })
+    : prepared.getArtists.all({
+      $count: o.options.count || 20,
+      $offset: o.options.offset || 0,
+    })
+  );
+}
+
+// getArtist: 'select * from AllArtists where idArtist = $idArtist',
+export function getArtist(o) {
+  return prepared.getArtist.get({
+    $idArtist: o.keys.idArtist,
+  })
+  .then(album => Object.assign(
+    album,
+    { idTracks: album.idTracks.split(',').map(idTrack => parseInt(idTrack, 10)),
+  }));
+}
+
 
 // getTracks: 'select * from AllTracks where idTrack in ($idTracks)',
 export function getTracks(o) {

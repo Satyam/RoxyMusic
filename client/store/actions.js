@@ -1,4 +1,5 @@
 export * from './albums/actions';
+export * from './artists/actions';
 export * from './playLists/actions';
 export * from './requests/actions';
 export * from './tracks/actions';

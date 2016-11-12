@@ -17,6 +17,13 @@ export default () =>
       validators.validateIdAlbum,
       transactions.getAlbum
     ))
+    .get('/artists', handleRequest(
+      transactions.getArtists
+    ))
+    .get('/artists/:idArtist', handleRequest(
+      validators.validateIdArtist,
+      transactions.getArtist
+    ))
     .get('/tracks/:idTracks', handleRequest(
       validators.validateIdTracks,
       transactions.getTracks

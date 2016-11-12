@@ -18,6 +18,13 @@ export function validateIdAlbum(o) {
   }
 }
 
+export function validateIdArtist(o) {
+  const idArtist = o.keys.idArtist;
+  if (idArtist && !testInteger.test(idArtist)) {
+    return failRequest(400, 'Bad Request');
+  }
+}
+
 export function validateIdPlayList(o) {
   const idPlayList = o.keys.idPlayList;
   if (idPlayList && !testInteger.test(idPlayList)) {
