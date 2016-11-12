@@ -1,7 +1,7 @@
 import fs from 'fs';
 import denodeify from 'denodeify';
 import path from 'path';
-import { dolarizeQueryParams, prepareAll, choke, releaseChoke } from '_server/utils';
+import { choke, releaseChoke } from '_server/utils/choke';
 import { getConfig } from '_server/config';
 import omit from 'lodash/omit';
 
@@ -21,7 +21,7 @@ let prepared = {};
 export default function init() {
   initialDir = getConfig('musicDir');
   audioExtensions = getConfig('audioExtensions').split(',').map(e => e.trim());
-  return prepareAll({
+  return db.prepareAll({
     fetchByLocation: 'select * from AllTracks where location = $location',
     selectGenreId: 'select idGenre from Genres where genre = $genre',
     insertGenre: 'insert into Genres (genre) values ($genre)',
@@ -184,7 +184,7 @@ export function insertTrack(tags) {
     }
     return null;
   })
-  .then(() => prepared.insertTrack.run(dolarizeQueryParams(t)))
+  .then(() => prepared.insertTrack.run(db.dolarizeQueryParams(t)))
   .then(res => res.lastID)
   .catch(err => console.trace('insertTrack', err));
 }

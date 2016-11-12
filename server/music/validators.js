@@ -1,4 +1,4 @@
-import { failRequest } from '_server/utils';
+import { failRequest } from '_server/utils/handleRequest';
 
 const testIdTracks = /^\d+(,\d+)*$/;
 const testInteger = /^\d+$/;

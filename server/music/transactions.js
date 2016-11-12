@@ -1,4 +1,3 @@
-import { prepareAll } from '_server/utils';
 import { getConfig as getCfg, setConfig as setCfg } from '_server/config';
 
 import initRefresh, { startRefresh, refreshStatus, stopRefresh } from './refreshDb';
@@ -6,7 +5,7 @@ import initRefresh, { startRefresh, refreshStatus, stopRefresh } from './refresh
 let prepared = {};
 
 export function init() {
-  return prepareAll({
+  return db.prepareAll({
     getAlbums: 'select * from AllAlbums limit $count offset $offset',
     searchAlbums: 'select * from AllAlbums where album like $search limit $count offset $offset',
     getAlbum: 'select * from AllAlbums where idAlbum = $idAlbum',

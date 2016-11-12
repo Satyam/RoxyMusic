@@ -2,6 +2,7 @@ import sqlite3 from 'sqlite3';
 import fs from 'fs';
 import denodeify from 'denodeify';
 import debug from 'debug';
+import map from 'lodash/map';
 
 debug.enable('RoxyMusic:sqliteP');
 const log = debug('RoxyMusic:sqliteP');
@@ -156,6 +157,28 @@ export default class DB {
       .then(statement => new ST(statement, this.options));
   }
 
+  prepareAll(stmts) {
+    const prepared = {};
+    return Promise.all(map(stmts, (sql, name) =>
+      this.prepare(sql)
+      .then((stmt) => {
+        prepared[name] = stmt;
+      })
+    ))
+    .then(() => prepared);
+  }
+
+/* eslint-disable class-methods-use-this */
+  dolarizeQueryParams(...objs) {
+    const params = {};
+    objs.forEach(obj =>
+      Object.keys(obj).forEach((key) => {
+        params[`$${key}`] = obj[key];
+      })
+    );
+    return params;
+  }
+  /* eslint-enable class-methods-use-this */
   /**
    * Invokes the provided `onRow` callback with each result row.
    * Returns a promise that resolves to the number of returned rows.

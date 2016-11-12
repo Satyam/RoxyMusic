@@ -4,7 +4,7 @@ import express, { Router as createRouter } from 'express';
 import bodyParser from 'body-parser';
 import denodeify from 'denodeify';
 import fs from 'fs';
-import sqliteP from './sqliteP';
+import sqliteP from './utils/sqliteP';
 
 import music from './music';
 import { initConfig, getConfig } from './config';

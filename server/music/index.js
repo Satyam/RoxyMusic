@@ -1,5 +1,5 @@
 import { Router as createRouter } from 'express';
-import { handleRequest } from '_server/utils';
+import { handleRequest } from '_server/utils/handleRequest';
 import * as transactions from './transactions';
 import * as validators from './validators';
 

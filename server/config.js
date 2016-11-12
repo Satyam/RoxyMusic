@@ -1,5 +1,3 @@
-import { prepareAll, dolarizeQueryParams } from '_server/utils';
-
 let prepared = {};
 const config = {};
 
@@ -82,7 +80,7 @@ export function setConfig(key, newValue) {
     return Promise.reject(`setConfig: Invalid type for ${key}: ${newValue}`);
   }
 
-  return prepared.updateConfigValue.run(dolarizeQueryParams({ key, type, value }))
+  return prepared.updateConfigValue.run(db.dolarizeQueryParams({ key, type, value }))
   .then(() => {
     config[key] = newValue;
     return newValue;
@@ -90,7 +88,7 @@ export function setConfig(key, newValue) {
 }
 
 export function initConfig() {
-  return prepareAll({
+  return db.prepareAll({
     selectAllConfig: 'select * from config',
     selectConfigValue: 'select * from config where key=$key',
     updateConfigValue: 'replace into config (key, type, value) values ($key, $type, $value)',
