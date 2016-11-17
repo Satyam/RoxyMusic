@@ -28,7 +28,7 @@ export function AlbumListComponent({
       <Navbar>
         <Navbar.Header>
           <Navbar.Brand>
-            <Icon type="arrow-up" href="/">Albums</Icon>
+            <Icon type="arrow-up" href="/" label="Albums" />
           </Navbar.Brand>
         </Navbar.Header>
         <Navbar.Toggle />
@@ -57,7 +57,7 @@ export function AlbumListComponent({
           <Button
             onClick={ev => isPlainClick(ev) && onMoreAlbumsHandler(search, nextOffset)}
             block
-          ><Icon type="menu-down" /> More</Button>
+          ><Icon type="menu-down" label="More" /></Button>
         </ListGroupItem>
       </ListGroup>
     </div>

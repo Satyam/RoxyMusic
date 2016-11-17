@@ -20,7 +20,7 @@ export function PlayListsComponent({
       <Navbar>
         <Navbar.Header>
           <Navbar.Brand>
-            <Icon type="arrow-up" href="/">Play Lists</Icon>
+            <Icon type="arrow-up" href="/" label="Play Lists" />
           </Navbar.Brand>
         </Navbar.Header>
         <Navbar.Toggle />

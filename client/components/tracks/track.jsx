@@ -30,10 +30,10 @@ export const TrackComponent = ({
         <div className={styles.left}>
           <div className={styles.title}>{title}</div>
           <div className={styles.album}>
-            <Icon type="cd" href={`/albums/${idAlbum}`}>{album}</Icon>
+            <Icon type="cd" href={`/albums/${idAlbum}`} label={album} />
           </div>
           <div className={styles.artist}>
-            <Icon type="user" href={`/artists/${idArtist}`}>{artist}</Icon>
+            <Icon type="user" href={`/artists/${idArtist}`} label={artist} />
           </div>
         </div>
         {renderAttr(Toolbar, { idTrack })}

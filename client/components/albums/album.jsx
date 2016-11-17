@@ -18,7 +18,7 @@ export const AlbumComponent = ({ idAlbum, album, artists, numTracks, idTracks, e
         <Navbar>
           <Navbar.Header>
             <Navbar.Brand>
-              <Icon type="arrow-up" href="/">{album}</Icon>
+              <Icon type="arrow-up" href="/" label={album} />
             </Navbar.Brand>
           </Navbar.Header>
           <Navbar.Toggle />

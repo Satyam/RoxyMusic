@@ -28,7 +28,7 @@ export function SongListComponent({
       <Navbar>
         <Navbar.Header>
           <Navbar.Brand>
-            <Icon type="arrow-up" href="/">Songs</Icon>
+            <Icon type="arrow-up" href="/" label="Songs" />
           </Navbar.Brand>
         </Navbar.Header>
         <Navbar.Toggle />
@@ -49,7 +49,7 @@ export function SongListComponent({
             <Button
               onClick={ev => isPlainClick(ev) && onMoreSongsHandler(search, nextOffset)}
               block
-            ><Icon type="menu-down" /> More</Button>
+            ><Icon type="menu-down" label="More" /></Button>
           </ListGroupItem>
         )}
       />

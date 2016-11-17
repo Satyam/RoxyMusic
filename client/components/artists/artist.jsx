@@ -17,7 +17,7 @@ export const ArtistComponent = ({ idArtist, artist, numTracks, idTracks, error }
         <Navbar>
           <Navbar.Header>
             <Navbar.Brand>
-              <Icon type="arrow-up" href="/">{artist}</Icon>
+              <Icon type="arrow-up" href="/" label={artist} />
             </Navbar.Brand>
           </Navbar.Header>
           <Navbar.Toggle />
