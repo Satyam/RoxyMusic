@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router';
 import Navbar from 'react-bootstrap/lib/Navbar';
 import Icon from '_components/misc/icon';
 import compose from 'recompose/compose';
@@ -18,7 +17,7 @@ export const ArtistComponent = ({ idArtist, artist, numTracks, idTracks, error }
         <Navbar>
           <Navbar.Header>
             <Navbar.Brand>
-              <Link href="/"><Icon type="arrow-up" /> {artist}</Link>
+              <Icon type="arrow-up" href="/">{artist}</Icon>
             </Navbar.Brand>
           </Navbar.Header>
           <Navbar.Toggle />

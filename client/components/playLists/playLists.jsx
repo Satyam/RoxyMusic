@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router';
 import { compose } from 'recompose';
 import sortBy from 'lodash/sortBy';
 
@@ -21,7 +20,7 @@ export function PlayListsComponent({
       <Navbar>
         <Navbar.Header>
           <Navbar.Brand>
-            <Link href="/"><Icon type="arrow-up" /> Play Lists</Link>
+            <Icon type="arrow-up" href="/">Play Lists</Icon>
           </Navbar.Brand>
         </Navbar.Header>
         <Navbar.Toggle />

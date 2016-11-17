@@ -52,7 +52,7 @@ export function playNextTrack() {
       ? nowPlaying.current + 1
       : -1
     );
-    return update(PLAY_NOW, nowPlaying.idTracks, next)(dispatch);
+    return update(PLAY_NEXT_TRACK, nowPlaying.idTracks, next)(dispatch);
   };
 }
 

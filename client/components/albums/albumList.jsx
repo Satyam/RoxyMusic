@@ -1,18 +1,16 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router';
 import { compose } from 'recompose';
 
 import Navbar from 'react-bootstrap/lib/Navbar';
 import Button from 'react-bootstrap/lib/Button';
-import FormGroup from 'react-bootstrap/lib/FormGroup';
-import FormControl from 'react-bootstrap/lib/FormControl';
 import ListGroup from 'react-bootstrap/lib/ListGroup';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 
 import initStore from '_utils/initStore';
 import isPlainClick from '_utils/isPlainClick';
 import Icon from '_components/misc/icon';
+import SearchField from '_components/misc/searchField';
 import { getAlbums, getMoreAlbums } from '_store/actions';
 import styles from './albumList.css';
 import AlbumListItem from './albumListItem';
@@ -30,28 +28,17 @@ export function AlbumListComponent({
       <Navbar>
         <Navbar.Header>
           <Navbar.Brand>
-            <Link href="/"><Icon type="arrow-up" /> Albums</Link>
+            <Icon type="arrow-up" href="/">Albums</Icon>
           </Navbar.Brand>
         </Navbar.Header>
         <Navbar.Toggle />
         <Navbar.Collapse>
           <Navbar.Form pullLeft>
-            <FormGroup className="input-group">
-              <span className="input-group-addon"><Icon type="search" /></span>
-              <FormControl
-                type="text"
-                value={search || ''}
-                placeholder="Search"
-                onChange={onSearchChangeHandler}
-              />
-              <button
-                className="input-group-addon"
-                style={{ color: (search ? 'black' : 'silver') }}
-                onClick={onSearchClearHandler}
-              >
-                <Icon type="remove-circle" />
-              </button>
-            </FormGroup>
+            <SearchField
+              search={search}
+              onChangeHandler={onSearchChangeHandler}
+              onClearHandler={onSearchClearHandler}
+            />
           </Navbar.Form>
         </Navbar.Collapse>
       </Navbar>

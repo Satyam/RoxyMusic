@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router';
 import Navbar from 'react-bootstrap/lib/Navbar';
 import Icon from '_components/misc/icon';
 import TrackList from '_components/tracks/trackList';
@@ -15,7 +14,7 @@ export const PlayListComponent = ({ idPlayList, name, numTracks, idTracks }) =>
       <Navbar>
         <Navbar.Header>
           <Navbar.Brand>
-            <Link href="/"><Icon type="arrow-up" /> {name}</Link>
+            <Icon type="arrow-up" href="/">{name}</Icon>
           </Navbar.Brand>
         </Navbar.Header>
         <Navbar.Toggle />

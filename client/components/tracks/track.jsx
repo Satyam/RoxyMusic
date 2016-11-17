@@ -6,27 +6,37 @@ import { getTracks, playNow } from '_store/actions';
 import initStore from '_utils/initStore';
 import Icon from '_components/misc/icon';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
-import FoldingToolbar from '_components/misc/foldingToolbar';
+import renderAttr from '_components/misc/renderAttr';
 import styles from './track.css';
 
-export const TrackComponent = ({ idTrack, title, artist, track, error, onPlayClick }) =>
+export const TrackComponent = ({
+  idTrack,
+  title,
+  artist,
+  idArtist,
+  album,
+  idAlbum,
+  track,
+  error,
+  Toolbar,
+  background,
+}) =>
   (idTrack || null) && (
     error === 404
     ? (<div className={styles.notFound}>Track for that URL no longer exists</div>)
     : (
-      <ListGroupItem className={styles.track}>
+      <ListGroupItem className={styles.track} bsStyle={background}>
         <div className={styles.trackNum}>{track || '_'}</div>
         <div className={styles.left}>
           <div className={styles.title}>{title}</div>
-          <div className={styles.artist}>{artist}</div>
+          <div className={styles.album}>
+            <Icon type="cd" href={`/albums/${idAlbum}`}>{album}</Icon>
+          </div>
+          <div className={styles.artist}>
+            <Icon type="user" href={`/artists/${idArtist}`}>{artist}</Icon>
+          </div>
         </div>
-        <div className={styles.right}>
-          <FoldingToolbar>
-            <button onClick={onPlayClick} >
-              <Icon type="play" />
-            </button>
-          </FoldingToolbar>
-        </div>
+        {renderAttr(Toolbar, { idTrack })}
       </ListGroupItem>
     )
   );
@@ -35,17 +45,20 @@ TrackComponent.propTypes = {
   idTrack: PropTypes.number,
   title: PropTypes.string,
   artist: PropTypes.string,
+  idArtist: PropTypes.number,
+  album: PropTypes.string,
+  idAlbum: PropTypes.number,
   track: PropTypes.number,
-  onPlayClick: PropTypes.func,
+  Toolbar: PropTypes.func,
+  background: PropTypes.string,
 };
 
 export const storeInitializer = (dispatch, state, props) => {
-  const idTrack = props.idTrack || props.params.idTrack;
+  const idTrack = props.idTrack;
   return state.tracks[idTrack] || dispatch(getTracks(idTrack));
 };
 
-export const mapStateToProps = (state, props) =>
-  state.tracks[props.idTrack || props.params.idTrack] || {};
+export const mapStateToProps = (state, props) => state.tracks[props.idTrack] || {};
 
 export const mapDispatchToProps = (dispatch, props) => ({
   onPlayClick: ev => isPlainClick(ev) && dispatch(playNow(props.idTrack)),

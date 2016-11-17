@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router';
 import Navbar from 'react-bootstrap/lib/Navbar';
 import Icon from '_components/misc/icon';
 import compose from 'recompose/compose';
@@ -8,6 +7,7 @@ import { getAlbum } from '_store/actions';
 import initStore from '_utils/initStore';
 import TrackList from '_components/tracks/trackList';
 import styles from './album.css';
+import Toolbar from './albumTracksToolbar';
 
 export const AlbumComponent = ({ idAlbum, album, artists, numTracks, idTracks, error }) =>
   (idAlbum || null) && (
@@ -18,7 +18,7 @@ export const AlbumComponent = ({ idAlbum, album, artists, numTracks, idTracks, e
         <Navbar>
           <Navbar.Header>
             <Navbar.Brand>
-              <Link href="/"><Icon type="arrow-up" /> {album}</Link>
+              <Icon type="arrow-up" href="/">{album}</Icon>
             </Navbar.Brand>
           </Navbar.Header>
           <Navbar.Toggle />
@@ -31,7 +31,7 @@ export const AlbumComponent = ({ idAlbum, album, artists, numTracks, idTracks, e
             </div>
           </Navbar.Collapse>
         </Navbar>
-        <TrackList idTracks={idTracks} />
+        <TrackList idTracks={idTracks} Toolbar={Toolbar} />
       </div>
     )
   );

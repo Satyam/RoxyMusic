@@ -21,6 +21,7 @@ const App = ({ children }) => (
                 <ul className={styles.mainMenu}>
                   <li className={styles.menuItem}><Link to="/albums">Albums</Link></li>
                   <li className={styles.menuItem}><Link to="/artists">Artists</Link></li>
+                  <li className={styles.menuItem}><Link to="/songs">Songs</Link></li>
                   <li className={styles.menuItem}><Link to="/playLists">Play Lists</Link></li>
                 </ul>
               )}
@@ -37,6 +38,7 @@ const App = ({ children }) => (
               <ul className={styles.tabletMain}>
                 <li className={styles.menuItem}><Link to="/albums">Albums</Link></li>
                 <li className={styles.menuItem}><Link to="/artists">Artists</Link></li>
+                <li className={styles.menuItem}><Link to="/songs">Songs</Link></li>
                 <li className={styles.menuItem}><Link to="/now">Now Playing</Link></li>
               </ul>
             )}
