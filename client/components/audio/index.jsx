@@ -1,3 +1,4 @@
+import React, { PropTypes } from 'react';
 import ReactAudioPlayer from 'react-audio-player';
 import { connect } from 'react-redux';
 import compose from 'recompose/compose';
@@ -9,6 +10,18 @@ import {
   getTrack,
 } from '_store/actions';
 
+export function AudioComponent({ src, autoPlay, onEnded }) {
+  return (
+    <ReactAudioPlayer src={src} autoPlay={autoPlay} onEnded={onEnded} />
+  );
+}
+
+AudioComponent.propTypes = {
+  // idTrack: PropTypes.number,
+  src: PropTypes.string,
+  autoPlay: PropTypes.string,
+  onEnded: PropTypes.func,
+};
 
 export function storeInitializer(dispatch, state) {
   if (state.nowPlaying.loaded) {
@@ -30,6 +43,7 @@ export function mapStateToProps(state) {
       const idTrack = nowPlaying.idTracks[current];
       if (state.tracks[idTrack]) {
         return {
+          idTrack,
           src: path.join('/music', state.tracks[idTrack].location),
           autoPlay: 'true',
         };
@@ -52,4 +66,4 @@ export default compose(
     mapStateToProps,
     mapDispatchToProps
   )
-)(ReactAudioPlayer);
+)(AudioComponent);
