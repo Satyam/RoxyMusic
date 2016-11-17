@@ -24,6 +24,9 @@ export default () =>
       validators.validateIdArtist,
       transactions.getArtist
     ))
+    .get('/songs', handleRequest(
+      transactions.getSongs
+    ))
     .get('/tracks/:idTracks', handleRequest(
       validators.validateIdTracks,
       transactions.getTracks

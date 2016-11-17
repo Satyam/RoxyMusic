@@ -14,6 +14,9 @@ export function init() {
     searchArtists: 'select * from AllArtists where artist like $search limit $count offset $offset',
     getArtist: 'select * from AllArtists where idArtist = $idArtist',
 
+    getSongs: 'select idTrack, title from Tracks order by title limit $count offset $offset',
+    searchSongs: 'select idTrack, title from Tracks where title like $search order by title limit $count offset $offset',
+
     getPlayLists: 'select * from PlayLists',
     getPlayList: 'select* from PlayLists where idPlayList = $idPlayList',
     addPlayList: 'insert into PlayLists (name) values ($name)',
@@ -25,6 +28,16 @@ export function init() {
     prepared = p;
   })
   .then(() => initRefresh());
+}
+
+function splitIdTracks(record) {
+  return Object.assign(record, {
+    idTracks: (
+      record.idTracks
+      ? record.idTracks.split(',').map(idTrack => parseInt(idTrack, 10))
+      : null
+    ),
+  });
 }
 
 export function refreshDatabase(o) {
@@ -52,7 +65,9 @@ export function getAlbums(o) {
       $count: o.options.count || 20,
       $offset: o.options.offset || 0,
     })
-  );
+  )
+  .then(albums => albums.map(splitIdTracks))
+  ;
 }
 
 // getAlbum: 'select * from AllAlbums where idAlbum = $idAlbum',
@@ -60,10 +75,7 @@ export function getAlbum(o) {
   return prepared.getAlbum.get({
     $idAlbum: o.keys.idAlbum,
   })
-  .then(album => Object.assign(
-    album,
-    { idTracks: album.idTracks.split(',').map(idTrack => parseInt(idTrack, 10)),
-  }));
+  .then(splitIdTracks);
 }
 
 // getArtists: 'select * from AllArtists limit $count offset $offset',
@@ -80,7 +92,7 @@ export function getArtists(o) {
       $count: o.options.count || 20,
       $offset: o.options.offset || 0,
     })
-  );
+  ).then(artists => artists.map(splitIdTracks));
 }
 
 // getArtist: 'select * from AllArtists where idArtist = $idArtist',
@@ -88,26 +100,30 @@ export function getArtist(o) {
   return prepared.getArtist.get({
     $idArtist: o.keys.idArtist,
   })
-  .then(album => Object.assign(
-    album,
-    { idTracks: album.idTracks.split(',').map(idTrack => parseInt(idTrack, 10)),
-  }));
+  .then(splitIdTracks);
 }
 
+// getSongs: 'select idTrack, title from Tracks order by title limit $count offset $offset',
+// searchSongs: 'select idTrack, title from Tracks
+// where artist like $search order by title limit $count offset $offset',
+export function getSongs(o) {
+  return (
+    o.options.search
+    ? prepared.searchSongs.all({
+      $count: o.options.count || 20,
+      $offset: o.options.offset || 0,
+      $search: `%${o.options.search}%`,
+    })
+    : prepared.getSongs.all({
+      $count: o.options.count || 20,
+      $offset: o.options.offset || 0,
+    })
+  );
+}
 
 // getTracks: 'select * from AllTracks where idTrack in ($idTracks)',
 export function getTracks(o) {
   return db.all(`select * from AllTracks where idTrack in (${o.keys.idTracks})`);
-}
-
-function splitIdTracks(playList) {
-  return Object.assign(playList, {
-    idTracks: (
-      playList.idTracks
-      ? playList.idTracks.split(',').map(idTrack => parseInt(idTrack, 10))
-      : null
-    ),
-  });
 }
 
 // getPlayLists: 'select * from PlayLists order by name',
