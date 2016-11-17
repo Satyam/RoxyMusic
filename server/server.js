@@ -30,7 +30,11 @@ app.get(musicRegExp, (req, res) => {
   console.log(filename);
   res.sendFile(join(getConfig('musicDir'), filename));
 });
-
+app.get('/kill', (req, res) => {
+  res.send('I am dead');
+  close();
+  process.exit();
+});
 app.get('*', (req, res) => res.sendFile(absPath('server/index.html')));
 
 const DELDB = false;
