@@ -8,6 +8,7 @@ import Icon from '_components/misc/icon';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 import renderAttr from '_components/misc/renderAttr';
 import styles from './track.css';
+import DefaultToolbar from './defaultTracksToolbar';
 
 export const TrackComponent = ({
   idTrack,
@@ -30,13 +31,13 @@ export const TrackComponent = ({
         <div className={styles.left}>
           <div className={styles.title}>{title}</div>
           <div className={styles.album}>
-            <Icon type="cd" href={`/albums/${idAlbum}`} label={album} />
+            <Icon type="cd" href={idAlbum && `/albums/${idAlbum}`} label={album || '--'} />
           </div>
           <div className={styles.artist}>
-            <Icon type="user" href={`/artists/${idArtist}`} label={artist} />
+            <Icon type="user" href={idArtist && `/artists/${idArtist}`} label={artist || '--'} />
           </div>
         </div>
-        {renderAttr(Toolbar, { idTrack })}
+        {renderAttr(Toolbar === 'default' ? DefaultToolbar : Toolbar, { idTrack })}
       </ListGroupItem>
     )
   );
@@ -49,7 +50,7 @@ TrackComponent.propTypes = {
   album: PropTypes.string,
   idAlbum: PropTypes.number,
   track: PropTypes.number,
-  Toolbar: PropTypes.func,
+  Toolbar: PropTypes.element,
   background: PropTypes.string,
 };
 

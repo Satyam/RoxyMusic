@@ -44,6 +44,7 @@ export function SongListComponent({
       </Navbar>
       <TrackList
         idTracks={songList.map(song => song.idTrack)}
+        Toolbar="default"
         After={(
           <ListGroupItem>
             <Button

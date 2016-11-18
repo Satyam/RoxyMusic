@@ -7,7 +7,6 @@ import { getAlbum } from '_store/actions';
 import initStore from '_utils/initStore';
 import TrackList from '_components/tracks/trackList';
 import styles from './album.css';
-import Toolbar from './albumTracksToolbar';
 
 export const AlbumComponent = ({ idAlbum, album, artists, numTracks, idTracks, error }) =>
   (idAlbum || null) && (
@@ -31,7 +30,7 @@ export const AlbumComponent = ({ idAlbum, album, artists, numTracks, idTracks, e
             </div>
           </Navbar.Collapse>
         </Navbar>
-        <TrackList idTracks={idTracks} Toolbar={Toolbar} />
+        <TrackList idTracks={idTracks} Toolbar="default" />
       </div>
     )
   );
