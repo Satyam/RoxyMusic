@@ -7,9 +7,9 @@ import isPlainClick from '_utils/isPlainClick';
 import {
   playNow,
 } from '_store/actions';
-import styles from './albumTracksToolbar.css';
+import styles from './defaultTracksToolbar.css';
 
-export const AlbumTracksToolbarComponent = ({ onPlayClick }) => (
+export const TracksToolbarComponent = ({ onPlayClick }) => (
   <div className={styles.right}>
     <FoldingToolbar>
       <button onClick={onPlayClick} >
@@ -19,7 +19,7 @@ export const AlbumTracksToolbarComponent = ({ onPlayClick }) => (
   </div>
 );
 
-AlbumTracksToolbarComponent.propTypes = {
+TracksToolbarComponent.propTypes = {
   // idTrack: PropTypes.number,
   onPlayClick: PropTypes.func,
 };
@@ -36,4 +36,4 @@ export default compose(
     mapStateToProps,
     mapDispatchToProps
   ),
-)(AlbumTracksToolbarComponent);
+)(TracksToolbarComponent);
