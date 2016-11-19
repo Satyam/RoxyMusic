@@ -26,27 +26,29 @@ class FoldingToolbar extends Component {
     this.timer = null;
   }
   render() {
-    return (
-      this.state.open
-      ? (
-        <ButtonGroup
-          style={{
-            position: 'absolute',
-            right: '1em',
-          }}
-          onClick={this.onClickHandler}
-        >
-          {this.props.children}
-        </ButtonGroup>
-      )
-      : (
-        <Button
-          onClick={this.onOpenHandler}
-        >
-          <Icon type="menu-hamburger" />
-        </Button>
-      )
-    );
+    return (<div>
+      {
+        this.state.open
+        ? (
+          <ButtonGroup
+            style={{
+              position: 'absolute',
+              right: '1em',
+            }}
+            onClick={this.onClickHandler}
+          >
+            {this.props.children}
+          </ButtonGroup>
+        )
+        : null
+      }
+      <Button
+        onClick={this.onOpenHandler}
+        style={{ visibility: (this.state.open ? 'hidden' : 'visible') }}
+      >
+        <Icon type="menu-hamburger" />
+      </Button>
+    </div>);
   }
 }
 
