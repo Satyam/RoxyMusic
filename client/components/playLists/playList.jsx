@@ -8,19 +8,20 @@ import { getPlayList, getPlayLists } from '_store/actions';
 import initStore from '_utils/initStore';
 import styles from './playList.css';
 
-export const PlayListComponent = ({ idPlayList, name, numTracks, idTracks }) =>
-  (idPlayList || null) && (
+export const PlayListComponent = ({ idPlayList, name, idTracks }) =>
+  (typeof idPlayList !== 'undefined' || null) && (
     <div className={styles.playList}>
       <Navbar>
         <Navbar.Header>
           <Navbar.Brand>
-            <Icon type="arrow-up" href="/" label={name} />
+            <Icon type="arrow-up" href="/" label="  " />
+            <Icon type="tasks" label={name} />
           </Navbar.Brand>
         </Navbar.Header>
         <Navbar.Toggle />
         <Navbar.Collapse>
           <div className={styles.playListnumTracks}>
-            {numTracks} {numTracks === 1 ? 'track' : 'tracks'}
+            {idTracks.length} {idTracks.length === 1 ? 'track' : 'tracks'}
           </div>
         </Navbar.Collapse>
       </Navbar>
@@ -32,7 +33,6 @@ export const PlayListComponent = ({ idPlayList, name, numTracks, idTracks }) =>
 PlayListComponent.propTypes = {
   idPlayList: PropTypes.number,
   name: PropTypes.string,
-  numTracks: PropTypes.number,
   idTracks: PropTypes.arrayOf(
     PropTypes.number
   ),
@@ -42,16 +42,16 @@ PlayListComponent.propTypes = {
 export const storeInitializer = (dispatch, state, props) => {
   const idPlayList = props.params.idPlayList || 0;
   return (
-    state.playLists.length
+    state.playLists.hash.loaded
     ? Promise.resolve()
     : dispatch(getPlayLists())
   ).then(() =>
-    (state.playLists[idPlayList] && state.playLists[idPlayList].idTracks)
+    (state.playLists.hash[idPlayList] && state.playLists.hash[idPlayList].idTracks)
     || dispatch(getPlayList(idPlayList)));
 };
 
 export const mapStateToProps =
-  (state, props) => state.playLists[props.params.idPlayList || 0] || {};
+  (state, props) => state.playLists.hash[props.params.idPlayList || 0] || {};
 
 const enhance = compose(
   initStore(storeInitializer),

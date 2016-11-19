@@ -17,7 +17,8 @@ export const ArtistComponent = ({ idArtist, artist, numTracks, idTracks, error }
         <Navbar>
           <Navbar.Header>
             <Navbar.Brand>
-              <Icon type="arrow-up" href="/" label={artist} />
+              <Icon type="arrow-up" href="/" label="  " />
+              <Icon type="user" label={artist} />
             </Navbar.Brand>
           </Navbar.Header>
           <Navbar.Toggle />
@@ -29,7 +30,7 @@ export const ArtistComponent = ({ idArtist, artist, numTracks, idTracks, error }
             </div>
           </Navbar.Collapse>
         </Navbar>
-        <TrackList idTracks={idTracks}  Toolbar="default" />
+        <TrackList idTracks={idTracks} Toolbar="default" />
       </div>
     )
   );

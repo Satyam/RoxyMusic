@@ -17,13 +17,14 @@ export const AlbumComponent = ({ idAlbum, album, artists, numTracks, idTracks, e
         <Navbar>
           <Navbar.Header>
             <Navbar.Brand>
-              <Icon type="arrow-up" href="/" label={album} />
+              <Icon type="arrow-up" href="/" label=" " />
+              <Icon type="cd" label={album} />
             </Navbar.Brand>
           </Navbar.Header>
           <Navbar.Toggle />
           <Navbar.Collapse>
             <div className={styles.albumInfo}>
-              <div className={styles.albumArtist}>{artists}</div>
+              <div className={styles.albumArtist}><Icon type="user" label={artists} /></div>
               <div className={styles.albumNumTracks}>
                 {numTracks} {numTracks === 1 ? 'track' : 'tracks'}
               </div>
