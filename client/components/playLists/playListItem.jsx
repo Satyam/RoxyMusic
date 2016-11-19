@@ -2,12 +2,18 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
+import Button from 'react-bootstrap/lib/Button';
 import FoldingToolbar from '_components/misc/foldingToolbar';
-// import Icon from '_components/misc/icon';
-// import Button from 'react-bootstrap/lib/Button';
+import Icon from '_components/misc/icon';
+
+import isPlainClick from '_utils/isPlainClick';
+import {
+  deletePlayList,
+} from '_store/actions';
+
 import styles from './playListItem.css';
 
-export const PlayListItemComponent = ({ idPlayList, name, numTracks }) => (
+export const PlayListItemComponent = ({ idPlayList, name, numTracks, onDeleteClick }) => (
   <ListGroupItem className={styles.li}>
     <div className={styles.left}>
       <div className={styles.name}>
@@ -20,11 +26,11 @@ export const PlayListItemComponent = ({ idPlayList, name, numTracks }) => (
       </div>
     </div>
     <div className={styles.right}>
-      <FoldingToolbar>{/*
-        <Button onClick={console.log.bind(console, 'play')}><Icon type="play" /></Button>
-        <Button onClick={console.log.bind(console, 'up')}><Icon type="arrow-up" /></Button>
-        <Button onClick={console.log.bind(console, 'otro')}>otro</Button>
-      */ }</FoldingToolbar>
+      <FoldingToolbar>
+        <Button onClick={onDeleteClick} >
+          <Icon type="trash" title="delete" />
+        </Button>
+      </FoldingToolbar>
     </div>
   </ListGroupItem>
 );
@@ -34,10 +40,16 @@ PlayListItemComponent.propTypes = {
   idPlayList: PropTypes.number.isRequired,
   name: PropTypes.string,
   numTracks: PropTypes.number,
+  onDeleteClick: PropTypes.func,
 };
 
-export const mapStateToProps = (state, props) => state.playLists[props.idPlayList] || {};
+export const mapStateToProps = (state, props) => state.playLists.hash[props.idPlayList] || {};
+
+export const mapDispatchToProps = (dispatch, props) => ({
+  onDeleteClick: ev => isPlainClick(ev) && dispatch(deletePlayList(props.idPlayList)),
+});
 
 export default connect(
-  mapStateToProps
+  mapStateToProps,
+  mapDispatchToProps
 )(PlayListItemComponent);

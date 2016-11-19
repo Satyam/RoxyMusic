@@ -13,7 +13,7 @@ import styles from './playLists.css';
 import PlayListItem from './playListItem';
 
 export function PlayListsComponent({
-  playLists,
+  hash,
  }) {
   return (
     <div className={styles.playLists}>
@@ -27,7 +27,7 @@ export function PlayListsComponent({
       </Navbar>
       <ListGroup>
         {
-          sortBy(playLists, playList => playList.name).map(playList => (
+          sortBy(hash, playList => playList.name).map(playList => (
             <PlayListItem
               key={playList.idPlayList}
               idPlayList={playList.idPlayList}
@@ -40,14 +40,14 @@ export function PlayListsComponent({
 }
 
 PlayListsComponent.propTypes = {
-  playLists: PropTypes.object,
+  hash: PropTypes.objectOf(PropTypes.object),
 };
 
 
 export const storeInitializer = (dispatch, state) =>
-  state.playLists.length || dispatch(getPlayLists());
+  state.playLists.loaded || dispatch(getPlayLists());
 
-export const mapStateToProps = state => state;
+export const mapStateToProps = state => state.playLists;
 
 
 const enhance = compose(

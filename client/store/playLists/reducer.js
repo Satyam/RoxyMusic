@@ -12,11 +12,17 @@ import {
   RENAME_PLAY_LIST,
   ADD_PLAY_LIST,
   DELETE_PLAY_LIST,
+  SELECT_PLAYLIST_FOR_TRACK,
+  CLOSE_ADD_TO_PLAYLIST,
 } from './actions';
 
 
 export default (
-  state = {},
+  state = {
+    loaded: false,
+    hash: {},
+    idTrackToAdd: null,
+  },
   action
 ) => {
   if (action.meta && action.meta.asyncAction !== REPLY_RECEIVED) return state;
@@ -25,34 +31,42 @@ export default (
   const idPlayList = original && original.idPlayList;
   switch (action.type) {
     case GET_PLAY_LISTS:
-      return payload.reduce(
-        (playLists, playList) => Object.assign(playLists, { [playList.idPlayList]: playList }),
-        state,
-      );
-    case GET_PLAY_LIST:
-      return update(state, { $merge: { [idPlayList]: payload } });
-    case REPLACE_PLAY_LIST_TRACKS:
       return update(state, {
+        hash: { $set: payload.reduce(
+          (playLists, playList) => Object.assign(playLists, { [playList.idPlayList]: playList }),
+          state.hash,
+        ) },
+        loaded: { $set: true },
+      });
+    case GET_PLAY_LIST:
+      return update(state, { hash: { $merge: { [idPlayList]: payload } } });
+    case REPLACE_PLAY_LIST_TRACKS:
+      return update(state, { hash: {
         [idPlayList]: {
           lastPlayed: { $set: original.lastPlayed },
           idTracks: { $set: original.idTracks },
         },
-      });
+      } });
     case RENAME_PLAY_LIST:
-      return update(state, {
+      return update(state, { hash: {
         [idPlayList]: {
           name: { $set: original.name },
         },
-      });
+      } });
     case ADD_PLAY_LIST:
-      return update(state, {
+      return update(state, { hash: {
         [payload.lastID]: { $set: {
           name: original.name,
           idPlayList: payload.lastID,
+          idTracks: [],
         } },
-      });
+      } });
     case DELETE_PLAY_LIST:
-      return omit(state, idPlayList);
+      return update(state, { hash: { $set: omit(state.hash, idPlayList) } });
+    case SELECT_PLAYLIST_FOR_TRACK:
+      return update(state, { idTrackToAdd: { $set: action.idTrack } });
+    case CLOSE_ADD_TO_PLAYLIST:
+      return update(state, { idTrackToAdd: { $set: null } });
     default:
       return state;
   }

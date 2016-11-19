@@ -9,7 +9,9 @@ export const REPLACE_PLAY_LIST_TRACKS = 'playlists/replace playlist tracks';
 export const RENAME_PLAY_LIST = 'playlists/rename playlist';
 export const ADD_PLAY_LIST = 'playlists/replace playlist';
 export const DELETE_PLAY_LIST = 'playlists/delete playlist';
-
+export const ADD_TRACK_TO_PLAYLIST = 'playlists/add track to playlist';
+export const SELECT_PLAYLIST_FOR_TRACK = 'playlists/select playlist for track';
+export const CLOSE_ADD_TO_PLAYLIST = 'playlists/close add to playlist';
 
 export function getPlayLists() {
   return asyncActionCreator(
@@ -42,18 +44,41 @@ export function renamePlayList(idPlayList, name) {
   );
 }
 
-export function addPlayList(idPlayList, name) {
+export function addPlayList(name) {
   return asyncActionCreator(
     ADD_PLAY_LIST,
-    api.create(`/${idPlayList}/name`, { name }),
-    { idPlayList, name }
+    api.create('/', { name }),
+    { name }
   );
 }
 
 export function deletePlayList(idPlayList) {
   return asyncActionCreator(
     DELETE_PLAY_LIST,
-    api.read(idPlayList),
+    api.delete(idPlayList),
     { idPlayList }
   );
+}
+
+export function addTrackToPlaylist(idTrack, idPlayList) {
+  if (arguments.length === 1) {
+    return {
+      type: SELECT_PLAYLIST_FOR_TRACK,
+      idTrack,
+    };
+  }
+  return (dispatch, getState) => {
+    const playList = getState().playLists.hash[idPlayList];
+    return replacePlayListTracks(
+      idPlayList,
+      playList.idTracks.concat(idTrack),
+      playList.lastPlayed
+    )(dispatch, getState);
+  };
+}
+
+export function closeAddToPlaylist() {
+  return {
+    type: CLOSE_ADD_TO_PLAYLIST,
+  };
 }
