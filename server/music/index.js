@@ -45,11 +45,11 @@ export default () =>
       validators.validateIdPlayList,
       transactions.updatePlayList
     ))
-    .put('playLists/:idPlayList/name', handleRequest(
+    .put('/playLists/:idPlayList/name', handleRequest(
       validators.validateIdPlayList,
       transactions.renamePlayList
     ))
-    .delete('playLists/:idPlayList', handleRequest(
+    .delete('/playLists/:idPlayList', handleRequest(
       validators.validateIdPlayList,
       transactions.deletePlayList
     ))
