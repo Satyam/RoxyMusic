@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
+import Button from 'react-bootstrap/lib/Button';
 import Icon from '_components/misc/icon';
 import compose from 'recompose/compose';
 import FoldingToolbar from '_components/misc/foldingToolbar';
@@ -12,9 +13,9 @@ import styles from './nowPlayingTracksToolbar.css';
 export const NowPlayingTracksToolbarComponent = ({ onPlayClick }) => (
   <div className={styles.right}>
     <FoldingToolbar>
-      <button onClick={onPlayClick} >
+      <Button onClick={onPlayClick} >
         <Icon type="play" />
-      </button>
+      </Button>
     </FoldingToolbar>
   </div>
 );
