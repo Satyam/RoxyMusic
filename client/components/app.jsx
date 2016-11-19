@@ -3,6 +3,7 @@ import React, { PropTypes } from 'react';
 import Errors from '_components/misc/errors';
 import Loading from '_components/misc/loading';
 import Audio from '_components/audio';
+import SelectPlayList from '_components/playLists/selectPlayList';
 import NowPlaying from '_components/nowPlaying';
 import { Link } from 'react-router';
 import styles from './app.css';
@@ -11,6 +12,7 @@ const App = ({ children }) => (
   <div className={styles.app}>
     <Loading />
     <Errors />
+    <SelectPlayList />
     {
       (
         BUNDLE === 'client'
