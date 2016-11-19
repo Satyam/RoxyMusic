@@ -4,16 +4,18 @@ import classnames from 'classnames';
 
 import styles from './icon.css';
 
-function Icon({ type, href, onClick, disabled, label, className }) {
+function Icon({ type, href, onClick, disabled, label, className, title }) {
   /* eslint-disable jsx-a11y/no-static-element-interactions */
   const actualOnClick = !disabled && onClick;
   const span = (
-    <span
-      className={`glyphicon glyphicon-${type}`}
-      style={{
-        opacity: (disabled ? 0.3 : 1),
-      }}
-    />
+    <span className={styles.icons}>{
+      type.split(',').map(t => (
+        <span
+          key={t}
+          className={`glyphicon glyphicon-${t}`}
+        />
+      ))
+    }</span>
   );
   const lbl = label && (<span className={styles.label}>{label}</span>);
   return (
@@ -21,6 +23,8 @@ function Icon({ type, href, onClick, disabled, label, className }) {
     ? (<Link
       className={classnames(className, styles.container, styles.pointer)}
       to={href}
+      title={title}
+      style={{ opacity: (disabled ? 0.3 : 1) }}
     >
       {span}
       {lbl}
@@ -28,6 +32,8 @@ function Icon({ type, href, onClick, disabled, label, className }) {
     : (<span
       onClick={actualOnClick}
       className={classnames(className, styles.container, actualOnClick && styles.pointer)}
+      title={title}
+      style={{ opacity: (disabled ? 0.3 : 1) }}
     >
       {span}
       {lbl}
@@ -42,6 +48,7 @@ Icon.propTypes = {
   disabled: PropTypes.bool,
   label: PropTypes.string,
   className: PropTypes.string,
+  title: PropTypes.string,
 };
 
 export default Icon;
