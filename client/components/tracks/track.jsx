@@ -50,7 +50,12 @@ TrackComponent.propTypes = {
   album: PropTypes.string,
   idAlbum: PropTypes.number,
   track: PropTypes.number,
-  Toolbar: PropTypes.element,
+  Toolbar: PropTypes.oneOfType([
+    PropTypes.element,
+    PropTypes.func,
+    PropTypes.oneOf(['default']),
+  ]),
+
   background: PropTypes.string,
 };
 

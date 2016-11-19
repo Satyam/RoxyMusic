@@ -39,7 +39,11 @@ TrackListComponent.propTypes = {
   idTracks: PropTypes.arrayOf(
     PropTypes.number
   ),
-  Toolbar: PropTypes.func,
+  Toolbar: PropTypes.oneOfType([
+    PropTypes.element,
+    PropTypes.func,
+    PropTypes.oneOf(['default']),
+  ]),
   background: PropTypes.objectOf(PropTypes.string),
   Before: PropTypes.element,
   After: PropTypes.element,
