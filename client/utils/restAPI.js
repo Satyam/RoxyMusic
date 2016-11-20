@@ -26,7 +26,7 @@ export default (base) => {
       });
       ipc.send('restAPI', {
         channel,
-        url: `${HOST}:${PORT}${join(REST_API_PATH, base, path)}`,
+        url: `${HOST}:${PORT}${join(REST_API_PATH, base, String(path))}`,
         method,
         data: body,
       });
