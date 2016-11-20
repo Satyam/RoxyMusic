@@ -22,6 +22,13 @@
   },
   "rules": {
     "no-console": 0,
-    "import/no-extraneous-dependencies": [2, {"devDependencies": true}]
+    "import/no-extraneous-dependencies": [2, {"devDependencies": true}],
+    "comma-dangle": ["error", {
+      "arrays": "always-multiline",
+      "objects": "always-multiline",
+      "imports": "always-multiline",
+      "exports": "always-multiline",
+      "functions": "ignore"
+    }]
   }
 }
