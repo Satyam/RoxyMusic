@@ -15,7 +15,7 @@ export const PlayListComponent = ({ idPlayList, name, idTracks }) =>
         <Navbar.Header>
           <Navbar.Brand>
             <Icon type="arrow-up" href="/" label="  " />
-            <Icon type="tasks" label={name} />
+            <Icon type="list" label={name} />
           </Navbar.Brand>
         </Navbar.Header>
         <Navbar.Toggle />

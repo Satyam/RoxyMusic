@@ -1,59 +1,83 @@
 import React, { PropTypes } from 'react';
+import { Link } from 'react-router';
+import Measure from 'react-measure';
+import { connect } from 'react-redux';
+import compose from 'recompose/compose';
 
 import Errors from '_components/misc/errors';
 import Loading from '_components/misc/loading';
 import Audio from '_components/audio';
 import SelectPlayList from '_components/playLists/selectPlayList';
 import NowPlaying from '_components/nowPlaying';
-import { Link } from 'react-router';
+
+import {
+  changeDimensions,
+} from '_store/actions';
+
 import styles from './app.css';
 
-const App = ({ children }) => (
-  <div className={styles.app}>
-    <Loading />
-    <Errors />
-    <SelectPlayList />
-    {
-      (
-        BUNDLE === 'client'
-        ? (
-          <div className={styles.desktopMain}>
-            <div className={styles.leftPanel}>
+const AppComponent = ({ width, children, onMeasureChange }) => (
+  <Measure onMeasure={onMeasureChange}>
+    <div className={styles.app}>
+      <Loading />
+      <Errors />
+      <SelectPlayList />
+      {
+        (
+          width > 800
+          ? (
+            <div className={styles.wide}>
+              <div className={styles.wideLeftPanel}>
+                { children || (
+                  <ul className={styles.menu}>
+                    <li className={styles.menuItem}><Link to="/albums">Albums</Link></li>
+                    <li className={styles.menuItem}><Link to="/artists">Artists</Link></li>
+                    <li className={styles.menuItem}><Link to="/songs">Songs</Link></li>
+                    <li className={styles.menuItem}><Link to="/playLists">Play Lists</Link></li>
+                  </ul>
+                )}
+              </div>
+              <div className={styles.wideRightPanel}>
+                <Audio />
+                <NowPlaying />
+              </div>
+            </div>
+          )
+          : (
+            <div className={styles.narrow}>
               { children || (
-                <ul className={styles.mainMenu}>
+                <ul className={styles.menu}>
                   <li className={styles.menuItem}><Link to="/albums">Albums</Link></li>
                   <li className={styles.menuItem}><Link to="/artists">Artists</Link></li>
                   <li className={styles.menuItem}><Link to="/songs">Songs</Link></li>
                   <li className={styles.menuItem}><Link to="/playLists">Play Lists</Link></li>
+                  <li className={styles.menuItem}><Link to="/now">Now Playing</Link></li>
                 </ul>
               )}
-            </div>
-            <div className={styles.rightPanel}>
               <Audio />
-              <NowPlaying />
             </div>
-          </div>
+          )
         )
-        : (
-          <div className={styles.tablet}>
-            { children || (
-              <ul className={styles.tabletMain}>
-                <li className={styles.menuItem}><Link to="/albums">Albums</Link></li>
-                <li className={styles.menuItem}><Link to="/artists">Artists</Link></li>
-                <li className={styles.menuItem}><Link to="/songs">Songs</Link></li>
-                <li className={styles.menuItem}><Link to="/now">Now Playing</Link></li>
-              </ul>
-            )}
-            <Audio />
-          </div>
-        )
-      )
-    }
-  </div>
+      }
+    </div>
+  </Measure>
 );
 
-App.propTypes = {
+AppComponent.propTypes = {
+  width: PropTypes.number,
   children: PropTypes.node,
+  onMeasureChange: PropTypes.func,
 };
 
-export default App;
+export const mapStateToProps = state => state.dimensions;
+
+export const mapDispatchToProps = dispatch => ({
+  onMeasureChange: dimensions => dispatch(changeDimensions(dimensions)),
+});
+
+export default compose(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps,
+  )
+)(AppComponent);

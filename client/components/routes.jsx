@@ -8,6 +8,7 @@ import albums from './albums/routes';
 import artists from './artists/routes';
 import songs from './songs/routes';
 import playLists from './playLists/routes';
+import nowPlaying from './nowPlaying/routes';
 
 export default path => (
   <Route path={path} component={App}>
@@ -15,6 +16,7 @@ export default path => (
     {artists('artists')}
     {songs('songs')}
     {playLists('playLists')}
+    {nowPlaying('now')}
     <Route path="*" component={NotFound} />
   </Route>
 );

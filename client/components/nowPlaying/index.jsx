@@ -4,18 +4,20 @@ import compose from 'recompose/compose';
 import initStore from '_utils/initStore';
 
 import Navbar from 'react-bootstrap/lib/Navbar';
+import Icon from '_components/misc/icon';
 import TrackList from '_components/tracks/trackList';
 
 import { loadPlayingList } from '_store/actions';
 
 import Toolbar from './nowPlayingTracksToolbar';
 
-export const NowPlayingComponent = ({ idTracks, current }) =>
+export const NowPlayingComponent = ({ idTracks, current, router }) =>
   (idTracks || null) && (
     <div>
       <Navbar>
         <Navbar.Header>
           <Navbar.Brand>
+            { router && (<Icon type="arrow-up" href="/" label="  " />)}
             Now Playing {current === -1 ? ' (none) ' : ''}
           </Navbar.Brand>
         </Navbar.Header>
