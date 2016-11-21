@@ -10,8 +10,8 @@ const absPath = relative => join(root, relative);
 module.exports = version => [
   'client',
   'server',
-  // 'electron',
-  // 'electronClient',
+  'electron',
+  'electronClient',
 ].map((bundle) => {
   const aliases = {
     _store: absPath('client/store'),
@@ -26,7 +26,7 @@ module.exports = version => [
         client: 'client/index.jsx',
         server: 'server/index.js',
         electron: 'electron/index.js',
-        electronClient: 'client/index.jsx',
+        electronClient: 'electron/client.js',
       }[bundle]),
     },
     output: {
