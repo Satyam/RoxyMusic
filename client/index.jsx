@@ -18,6 +18,10 @@ export const store = createStore(browserHistory);
 
 const history = syncHistoryWithStore(browserHistory, store);
 
+if (BUNDLE === 'electronClient') {
+  browserHistory.replace('/');
+}
+
 const dest = document.getElementById('contents');
 
 export default render((
