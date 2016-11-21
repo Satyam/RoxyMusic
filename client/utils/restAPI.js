@@ -1,5 +1,8 @@
 import { join } from 'path';
+import debug from 'debug';
 
+// debug.enable('RoxyMusic:restAPI');
+const log = debug('RoxyMusic:restAPI');
 
 const clients = {};
 
@@ -12,8 +15,9 @@ export default (base) => {
     const ipc = require('electron').ipcRenderer;
     /* eslint-enable import/no-extraneous-dependencies, global-require */
     restClient = method => (path, body) => new Promise((resolve, reject) => {
-      const channel = `req-${count += 1}`;
+      const channel = `${base}-${count += 1}`;
       ipc.once(channel, (event, response) => {
+        log('< %s \n%j', channel, response.data);
         if (response.status < 300) {
           resolve(response.data);
         } else {
@@ -24,6 +28,12 @@ export default (base) => {
           });
         }
       });
+      log('> %s %s %s \n%j',
+        channel,
+        method,
+        join(base, String(path)),
+        body,
+      );
       ipc.send('restAPI', {
         channel,
         url: `${HOST}:${PORT}${join(REST_API_PATH, base, String(path))}`,
