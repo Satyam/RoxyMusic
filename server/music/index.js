@@ -14,43 +14,43 @@ export default () =>
       transactions.getAlbums
     ))
     .get('/albums/:idAlbum', handleRequest(
-      validators.validateIdAlbum,
+      validators.idAlbum,
       transactions.getAlbum
     ))
     .get('/artists', handleRequest(
       transactions.getArtists
     ))
     .get('/artists/:idArtist', handleRequest(
-      validators.validateIdArtist,
+      validators.idArtist,
       transactions.getArtist
     ))
     .get('/songs', handleRequest(
       transactions.getSongs
     ))
     .get('/tracks/:idTracks', handleRequest(
-      validators.validateIdTracks,
+      validators.idTracks,
       transactions.getTracks
     ))
     .get('/playLists', handleRequest(
       transactions.getPlayLists
     ))
     .get('/playLists/:idPlayList', handleRequest(
-      validators.validateIdPlayList,
+      validators.idPlayList,
       transactions.getPlayList
     ))
     .post('/playLists', handleRequest(
       transactions.addPlayList
     ))
     .put('/playLists/:idPlayList', handleRequest(
-      validators.validateIdPlayList,
+      validators.idPlayList,
       transactions.updatePlayList
     ))
     .put('/playLists/:idPlayList/name', handleRequest(
-      validators.validateIdPlayList,
+      validators.idPlayList,
       transactions.renamePlayList
     ))
     .delete('/playLists/:idPlayList', handleRequest(
-      validators.validateIdPlayList,
+      validators.idPlayList,
       transactions.deletePlayList
     ))
     .get('/config/:key', handleRequest(

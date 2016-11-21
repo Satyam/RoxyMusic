@@ -4,30 +4,27 @@ const testIdTracks = /^\d+(,\d+)*$/;
 const testInteger = /^\d+$/;
 
 /* eslint-disable no-param-reassign, consistent-return */
-export function validateIdTracks(o) {
-  const idTracks = o.keys.idTracks;
-  if (idTracks && !testIdTracks.test(idTracks)) {
+export function isInteger(id) {
+  if (id && !testInteger.test(id)) {
     return failRequest(400, 'Bad Request');
   }
 }
 
-export function validateIdAlbum(o) {
-  const idAlbum = o.keys.idAlbum;
-  if (idAlbum && !testInteger.test(idAlbum)) {
+export function idTracks(o) {
+  const id = o.keys.idTracks;
+  if (id && !testIdTracks.test(id)) {
     return failRequest(400, 'Bad Request');
   }
 }
 
-export function validateIdArtist(o) {
-  const idArtist = o.keys.idArtist;
-  if (idArtist && !testInteger.test(idArtist)) {
-    return failRequest(400, 'Bad Request');
-  }
+export function idAlbum(o) {
+  return isInteger(o.keys.idAlbum);
 }
 
-export function validateIdPlayList(o) {
-  const idPlayList = o.keys.idPlayList;
-  if (idPlayList && !testInteger.test(idPlayList)) {
-    return failRequest(400, 'Bad Request');
-  }
+export function idArtist(o) {
+  return isInteger(o.keys.idArtist);
+}
+
+export function idPlayList(o) {
+  return isInteger(o.keys.idPlayList);
 }
