@@ -10,6 +10,10 @@ import Audio from '_components/audio';
 import SelectPlayList from '_components/playLists/selectPlayList';
 import NowPlaying from '_components/nowPlaying';
 
+// import { remote } from 'electron';
+// const db = remote.getGlobal('db');
+// console.log(db.all('select * from Albums'));
+
 import {
   changeDimensions,
 } from '_store/actions';
