@@ -38,6 +38,13 @@ export default () =>
       validators.idPlayList,
       transactions.getPlayList
     ))
+    .post('/playLists/saveAll', handleRequest(
+      transactions.saveAllPlaylists
+    ))
+    .post('/playLists/save/:idPlayList', handleRequest(
+      validators.idPlayList,
+      transactions.savePlaylist
+    ))
     .post('/playLists', handleRequest(
       transactions.addPlayList
     ))

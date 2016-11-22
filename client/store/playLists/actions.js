@@ -12,6 +12,8 @@ export const DELETE_PLAY_LIST = 'playlists/delete playlist';
 export const ADD_TRACK_TO_PLAYLIST = 'playlists/add track to playlist';
 export const SELECT_PLAYLIST_FOR_TRACK = 'playlists/select playlist for track';
 export const CLOSE_ADD_TO_PLAYLIST = 'playlists/close add to playlist';
+export const SAVE_ALL_PLAYLISTS = 'playlists/save all playlists';
+export const SAVE_PLAYLIST = 'playlists/save playlist';
 
 export function getPlayLists() {
   return asyncActionCreator(
@@ -81,4 +83,19 @@ export function closeAddToPlaylist() {
   return {
     type: CLOSE_ADD_TO_PLAYLIST,
   };
+}
+
+export function saveAllPlaylists() {
+  return asyncActionCreator(
+    SAVE_ALL_PLAYLISTS,
+    api.create('saveAll')
+  );
+}
+
+export function savePlaylist(idPlayList) {
+  return asyncActionCreator(
+    SAVE_PLAYLIST,
+    api.create(`/save/${idPlayList}`),
+    { idPlayList }
+  );
 }

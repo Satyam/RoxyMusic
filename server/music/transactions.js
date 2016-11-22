@@ -1,6 +1,12 @@
-import { getConfig as getCfg, setConfig as setCfg } from '_server/config';
+import { join } from 'path';
+import denodeify from 'denodeify';
+import fs from 'fs';
 
+import { getConfig as getCfg, setConfig as setCfg } from '_server/config';
 import initRefresh, { startRefresh, refreshStatus, stopRefresh } from './refreshDb';
+
+const absPath = relPath => join(ROOT_DIR, relPath);
+const writeFile = denodeify(fs.writeFile);
 
 let prepared = {};
 
@@ -18,7 +24,7 @@ export function init() {
     searchSongs: 'select idTrack, title from Tracks where title like $search order by title limit $count offset $offset',
 
     getPlayLists: 'select * from PlayLists',
-    getPlayList: 'select* from PlayLists where idPlayList = $idPlayList',
+    getPlayList: 'select * from PlayLists where idPlayList = $idPlayList',
     addPlayList: 'insert into PlayLists (name) values ($name)',
     updatePlayList: 'update PlayLists set lastPlayed = $lastPlayed, idTracks = $idTracks where idPlayList = $idPlayList',
     renamePlayList: 'update PlayLists set name = $name where idPlayList = $idPlayList',
@@ -176,4 +182,36 @@ export function getConfig(o) {
 
 export function setConfig(o) {
   return setCfg(o.keys.key, o.data);
+}
+
+function saveOnePlaylist(playlist) {
+  const musicDir = getCfg('musicDir');
+  const fileName = join(musicDir, `${playlist.name}.m3u`);
+  return db.all(
+    `select title, duration, location, coalesce(AlbumArtist.artist, Artist.artist) as artist
+      from Tracks
+      left join People as AlbumArtist on idAlbumArtist = AlbumArtist.idPerson
+      left join People as Artist on idAlbumArtist = Artist.idPerson
+      where idTrack in (${playlist.idTracks})`)
+    .then(tracks => tracks.reduce((m3u, track) =>
+      `${m3u}
+#EXTINF:${track.duration || -1},${track.artist || ''} - ${track.title || ''}
+${track.location}`,
+      '#EXTM3U'
+    ))
+    .then(m3u => console.log('----%s\n%s', fileName, m3u))
+//    .then(m3u => writeFile(fileName, m3u))
+    .then(() => fileName);
+}
+
+export function saveAllPlaylists() {
+  return prepared.getPlayLists.all()
+  .then(playlists => Promise.all(
+    playlists.map(saveOnePlaylist)
+  ));
+}
+
+export function savePlaylist(o) {
+  return getPlayList(o)
+  .then(saveOnePlaylist);
 }
