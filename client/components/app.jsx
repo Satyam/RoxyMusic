@@ -4,11 +4,14 @@ import Measure from 'react-measure';
 import { connect } from 'react-redux';
 import compose from 'recompose/compose';
 
+import Button from 'react-bootstrap/lib/Button';
+
 import Errors from '_components/misc/errors';
 import Loading from '_components/misc/loading';
 import Audio from '_components/audio';
 import SelectPlayList from '_components/playLists/selectPlayList';
 import NowPlaying from '_components/nowPlaying';
+
 
 // import { remote } from 'electron';
 // const db = remote.getGlobal('db');
@@ -33,12 +36,12 @@ const AppComponent = ({ width, children, onMeasureChange }) => (
             <div className={styles.wide}>
               <div className={styles.wideLeftPanel}>
                 { children || (
-                  <ul className={styles.menu}>
-                    <li className={styles.menuItem}><Link to="/albums">Albums</Link></li>
-                    <li className={styles.menuItem}><Link to="/artists">Artists</Link></li>
-                    <li className={styles.menuItem}><Link to="/songs">Songs</Link></li>
-                    <li className={styles.menuItem}><Link to="/playLists">Play Lists</Link></li>
-                  </ul>
+                  <div className={styles.menu}>
+                    <Button block bsStyle="primary" bsSize="large" href="/albums">Albums</Button>
+                    <Button block bsStyle="primary" bsSize="large" href="/artists">Artists</Button>
+                    <Button block bsStyle="primary" bsSize="large" href="/songs">Songs</Button>
+                    <Button block bsStyle="primary" bsSize="large" href="/playLists">Play Lists</Button>
+                  </div>
                 )}
               </div>
               <div className={styles.wideRightPanel}>
@@ -51,11 +54,11 @@ const AppComponent = ({ width, children, onMeasureChange }) => (
             <div className={styles.narrow}>
               { children || (
                 <ul className={styles.menu}>
-                  <li className={styles.menuItem}><Link to="/albums">Albums</Link></li>
-                  <li className={styles.menuItem}><Link to="/artists">Artists</Link></li>
-                  <li className={styles.menuItem}><Link to="/songs">Songs</Link></li>
-                  <li className={styles.menuItem}><Link to="/playLists">Play Lists</Link></li>
-                  <li className={styles.menuItem}><Link to="/now">Now Playing</Link></li>
+                  <Button block bsStyle="primary" bsSize="large" href="/albums">Albums</Button>
+                  <Button block bsStyle="primary" bsSize="large" href="/artists">Artists</Button>
+                  <Button block bsStyle="primary" bsSize="large" href="/songs">Songs</Button>
+                  <Button block bsStyle="primary" bsSize="large" href="/playLists">Play Lists</Button>
+                  <Button block bsStyle="primary" bsSize="large" href="/now">Now Playing</Button>
                 </ul>
               )}
               <Audio />

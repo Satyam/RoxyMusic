@@ -30,14 +30,3 @@
   flex-direction: column;
   justify-content: space-around;
 }
-
-.menu-item {
-  composes: global(btn);
-  composes: global(btn-primary);
-  composes: global(btn-lg);
-  composes: global(btn-block);
-}
-
-.menu-item a {
-  color: white;
-}
