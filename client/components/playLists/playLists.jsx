@@ -11,13 +11,13 @@ import FoldingToolbar from '_components/misc/foldingToolbar';
 
 import isPlainClick from '_utils/isPlainClick';
 import initStore from '_utils/initStore';
-import { getPlayLists, saveAllPlaylists } from '_store/actions';
+import { getPlayLists, saveAllPlayLists } from '_store/actions';
 import styles from './playLists.css';
 import PlayListItem from './playListItem';
 
 export function PlayListsComponent({
   hash,
-  onPlaylistSave,
+  onPlayListSave,
  }) {
   return (
     <div className={styles.playLists}>
@@ -29,7 +29,7 @@ export function PlayListsComponent({
         </Navbar.Header>
         <Navbar.Toggle />
         <FoldingToolbar>
-          <Button onClick={onPlaylistSave} title="Save all playlists">
+          <Button onClick={onPlayListSave} title="Save all playlists">
             <Icon type="save" />
           </Button>
         </FoldingToolbar>
@@ -50,7 +50,7 @@ export function PlayListsComponent({
 
 PlayListsComponent.propTypes = {
   hash: PropTypes.objectOf(PropTypes.object),
-  onPlaylistSave: PropTypes.func,
+  onPlayListSave: PropTypes.func,
 };
 
 
@@ -60,7 +60,7 @@ export const storeInitializer = (dispatch, state) =>
 export const mapStateToProps = state => state.playLists;
 
 export const mapDispatchToProps = dispatch => ({
-  onPlaylistSave: ev => isPlainClick(ev) && dispatch(saveAllPlaylists()),
+  onPlayListSave: ev => isPlainClick(ev) && dispatch(saveAllPlayLists()),
 });
 
 const enhance = compose(

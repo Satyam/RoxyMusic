@@ -62,7 +62,7 @@ export function deletePlayList(idPlayList) {
   );
 }
 
-export function addTrackToPlaylist(idTrack, idPlayList) {
+export function addTrackToPlayList(idTrack, idPlayList) {
   if (arguments.length === 1) {
     return {
       type: SELECT_PLAYLIST_FOR_TRACK,
@@ -79,20 +79,20 @@ export function addTrackToPlaylist(idTrack, idPlayList) {
   };
 }
 
-export function closeAddToPlaylist() {
+export function closeAddToPlayList() {
   return {
     type: CLOSE_ADD_TO_PLAYLIST,
   };
 }
 
-export function saveAllPlaylists() {
+export function saveAllPlayLists() {
   return asyncActionCreator(
     SAVE_ALL_PLAYLISTS,
     api.create('saveAll')
   );
 }
 
-export function savePlaylist(idPlayList) {
+export function savePlayList(idPlayList) {
   return asyncActionCreator(
     SAVE_PLAYLIST,
     api.create(`/save/${idPlayList}`),

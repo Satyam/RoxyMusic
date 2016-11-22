@@ -9,7 +9,7 @@ import Icon from '_components/misc/icon';
 import isPlainClick from '_utils/isPlainClick';
 import {
   deletePlayList,
-  savePlaylist,
+  savePlayList,
 } from '_store/actions';
 
 import styles from './playListItem.css';
@@ -50,7 +50,7 @@ export const mapStateToProps = (state, props) => state.playLists.hash[props.idPl
 
 export const mapDispatchToProps = (dispatch, props) => ({
   onDeleteClick: ev => isPlainClick(ev) && dispatch(deletePlayList(props.idPlayList)),
-  onSaveClick: ev => isPlainClick(ev) && dispatch(savePlaylist(props.idPlayList)),
+  onSaveClick: ev => isPlainClick(ev) && dispatch(savePlayList(props.idPlayList)),
 });
 
 export default connect(

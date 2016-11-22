@@ -184,15 +184,15 @@ export function setConfig(o) {
   return setCfg(o.keys.key, o.data);
 }
 
-function saveOnePlaylist(playlist) {
+function saveOnePlayList(playList) {
   const musicDir = getCfg('musicDir');
-  const fileName = join(musicDir, `${playlist.name}.m3u`);
+  const fileName = join(musicDir, `${playList.name}.m3u`);
   return db.all(
     `select title, duration, location, coalesce(AlbumArtist.artist, Artist.artist) as artist
       from Tracks
       left join People as AlbumArtist on idAlbumArtist = AlbumArtist.idPerson
       left join People as Artist on idAlbumArtist = Artist.idPerson
-      where idTrack in (${playlist.idTracks})`)
+      where idTrack in (${playList.idTracks})`)
     .then(tracks => tracks.reduce((m3u, track) =>
       `${m3u}
 #EXTINF:${track.duration || -1},${track.artist || ''} - ${track.title || ''}
@@ -204,14 +204,14 @@ ${track.location}`,
     .then(() => fileName);
 }
 
-export function saveAllPlaylists() {
+export function saveAllPlayLists() {
   return prepared.getPlayLists.all()
-  .then(playlists => Promise.all(
-    playlists.map(saveOnePlaylist)
+  .then(playLists => Promise.all(
+    playLists.map(saveOnePlayList)
   ));
 }
 
-export function savePlaylist(o) {
+export function savePlayList(o) {
   return getPlayList(o)
-  .then(saveOnePlaylist);
+  .then(saveOnePlayList);
 }

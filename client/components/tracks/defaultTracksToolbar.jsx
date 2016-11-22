@@ -9,7 +9,7 @@ import {
   playNow,
   addToNowPlaying,
   replaceNowPlaying,
-  addTrackToPlaylist,
+  addTrackToPlayList,
 } from '_store/actions';
 import styles from './defaultTracksToolbar.css';
 
@@ -50,7 +50,7 @@ export const mapDispatchToProps = (dispatch, props) => ({
   onPlayNowClick: ev => isPlainClick(ev) && dispatch(playNow(props.idTrack)),
   onAddToPlayNowClick: ev => isPlainClick(ev) && dispatch(addToNowPlaying(props.idTrack)),
   onReplacePlayNowClick: ev => isPlainClick(ev) && dispatch(replaceNowPlaying(props.idTrack)),
-  onAddToPlayList: ev => isPlainClick(ev) && dispatch(addTrackToPlaylist(props.idTrack)),
+  onAddToPlayList: ev => isPlainClick(ev) && dispatch(addTrackToPlayList(props.idTrack)),
 });
 
 export default compose(

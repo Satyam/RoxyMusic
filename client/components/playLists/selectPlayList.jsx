@@ -15,13 +15,13 @@ import Button from 'react-bootstrap/lib/Button';
 import Icon from '_components/misc/icon';
 
 import initStore from '_utils/initStore';
-import { addTrackToPlaylist, closeAddToPlaylist, addPlayList } from '_store/actions';
+import { addTrackToPlayList, closeAddToPlayList, addPlayList } from '_store/actions';
 import isPlainClick from '_utils/isPlainClick';
 import bindHandlers from '_utils/bindHandlers';
 
 import { storeInitializer, mapStateToProps } from './playLists';
 
-export class SelectPlaylistComponent extends Component {
+export class SelectPlayListComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -37,7 +37,7 @@ export class SelectPlaylistComponent extends Component {
       newName,
       duplicate: some(
         this.props.hash,
-        playlist => playlist.name.toLowerCase() === testName
+        playList => playList.name.toLowerCase() === testName
       ),
     });
   }
@@ -45,9 +45,9 @@ export class SelectPlaylistComponent extends Component {
     if (isPlainClick(ev)) {
       const {
         idTrackToAdd,
-        onAddToNewPlaylist,
+        onAddToNewPlayList,
       } = this.props;
-      onAddToNewPlaylist(idTrackToAdd, this.state.newName);
+      onAddToNewPlayList(idTrackToAdd, this.state.newName);
       this.setState({ newName: '' });
     }
   }
@@ -116,25 +116,25 @@ export class SelectPlaylistComponent extends Component {
   }
 }
 
-SelectPlaylistComponent.propTypes = {
+SelectPlayListComponent.propTypes = {
   idTrackToAdd: PropTypes.number,
   hash: PropTypes.objectOf(PropTypes.object),
   onPlayListClick: PropTypes.func,
-  onAddToNewPlaylist: PropTypes.func,
+  onAddToNewPlayList: PropTypes.func,
   onClose: PropTypes.func,
 };
 
 export const mapDispatchToProps = dispatch => ({
   onPlayListClick: (idTrackToAdd, idPlayList) => ev =>
     isPlainClick(ev)
-    && dispatch(addTrackToPlaylist(idTrackToAdd, idPlayList))
-    .then(() => dispatch(closeAddToPlaylist())),
-  onAddToNewPlaylist: (idTrackToAdd, name) =>
+    && dispatch(addTrackToPlayList(idTrackToAdd, idPlayList))
+    .then(() => dispatch(closeAddToPlayList())),
+  onAddToNewPlayList: (idTrackToAdd, name) =>
     dispatch(addPlayList(name))
-    .then(res => dispatch(addTrackToPlaylist(idTrackToAdd, res.payload.lastID))
-    .then(() => dispatch(closeAddToPlaylist()))
+    .then(res => dispatch(addTrackToPlayList(idTrackToAdd, res.payload.lastID))
+    .then(() => dispatch(closeAddToPlayList()))
   ),
-  onClose: ev => isPlainClick(ev) && dispatch(closeAddToPlaylist()),
+  onClose: ev => isPlainClick(ev) && dispatch(closeAddToPlayList()),
 });
 
 const enhance = compose(
@@ -145,4 +145,4 @@ const enhance = compose(
   )
 );
 
-export default enhance(SelectPlaylistComponent);
+export default enhance(SelectPlayListComponent);

@@ -39,11 +39,11 @@ export default () =>
       transactions.getPlayList
     ))
     .post('/playLists/saveAll', handleRequest(
-      transactions.saveAllPlaylists
+      transactions.saveAllPlayLists
     ))
     .post('/playLists/save/:idPlayList', handleRequest(
       validators.idPlayList,
-      transactions.savePlaylist
+      transactions.savePlayList
     ))
     .post('/playLists', handleRequest(
       transactions.addPlayList
