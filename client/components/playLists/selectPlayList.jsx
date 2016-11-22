@@ -2,12 +2,14 @@ import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'recompose';
 import sortBy from 'lodash/sortBy';
+import some from 'lodash/some';
 
 import ListGroup from 'react-bootstrap/lib/ListGroup';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 import FormGroup from 'react-bootstrap/lib/FormGroup';
 import InputGroup from 'react-bootstrap/lib/InputGroup';
 import FormControl from 'react-bootstrap/lib/FormControl';
+import HelpBlock from 'react-bootstrap/lib/HelpBlock';
 import Modal from 'react-bootstrap/lib/Modal';
 import Button from 'react-bootstrap/lib/Button';
 import Icon from '_components/misc/icon';
@@ -22,11 +24,22 @@ import { storeInitializer, mapStateToProps } from './playLists';
 export class SelectPlaylistComponent extends Component {
   constructor(props) {
     super(props);
-    this.state = { newName: '' };
+    this.state = {
+      newName: '',
+      duplicate: false,
+    };
     bindHandlers(this);
   }
   onChangeHandler(ev) {
-    this.setState({ newName: ev.target.value });
+    const newName = ev.target.value;
+    const testName = newName.trim().toLowerCase();
+    this.setState({
+      newName,
+      duplicate: some(
+        this.props.hash,
+        playlist => playlist.name.toLowerCase() === testName
+      ),
+    });
   }
   onSubmitHandler(ev) {
     if (isPlainClick(ev)) {
@@ -66,7 +79,7 @@ export class SelectPlaylistComponent extends Component {
               ))
             }
             <ListGroupItem key="new">
-              <FormGroup>
+              <FormGroup validationState={this.state.duplicate ? 'warning' : null}>
                 <InputGroup>
                   <InputGroup.Addon>New Playlist</InputGroup.Addon>
                   <FormControl
@@ -84,6 +97,11 @@ export class SelectPlaylistComponent extends Component {
                     />
                   </InputGroup.Addon>
                 </InputGroup>
+                {
+                  this.state.duplicate
+                  ? (<HelpBlock>Nombre ya existe.</HelpBlock>)
+                  : null
+                }
               </FormGroup>
             </ListGroupItem>
           </ListGroup>
