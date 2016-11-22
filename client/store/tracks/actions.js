@@ -2,7 +2,7 @@ import restAPI from '_utils/restAPI';
 import asyncActionCreator from '_utils/asyncActionCreator';
 import difference from 'lodash/difference';
 
-const api = restAPI('music/tracks');
+const api = restAPI('tracks');
 
 export const GET_TRACKS = 'tracks/get tracks';
 

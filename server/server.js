@@ -6,8 +6,14 @@ import denodeify from 'denodeify';
 import fs from 'fs';
 import sqliteP from './utils/sqliteP';
 
-import music from './music';
-import { initConfig, getConfig } from './config';
+import albums from './albums';
+import playlists from './playlists';
+import artists from './artists';
+import songs from './songs';
+import tracks from './tracks';
+import refreshDb from './refreshDb';
+
+import config, { getConfig } from './config';
 
 const absPath = relPath => join(ROOT_DIR, relPath);
 
@@ -48,9 +54,17 @@ export function start() {
   .then((db) => {
     global.db = db;
   })
-  .then(initConfig)
+  .then(() =>
+    // This one needs to be done before the rest
+    config().then(router => dataRouter.use('/config', router))
+  )
   .then(() => Promise.all([
-    music().then(router => dataRouter.use('/music', router)),
+    albums().then(router => dataRouter.use('/albums', router)),
+    playlists().then(router => dataRouter.use('/playLists', router)),
+    artists().then(router => dataRouter.use('/artists', router)),
+    songs().then(router => dataRouter.use('/songs', router)),
+    tracks().then(router => dataRouter.use('/tracks', router)),
+    refreshDb().then(router => dataRouter.use('/refreshDb', router)),
   ]))
   .then(() => listen(PORT));
 }

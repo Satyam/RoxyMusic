@@ -1,7 +1,7 @@
 import restAPI from '_utils/restAPI';
 import asyncActionCreator from '_utils/asyncActionCreator';
 
-const api = restAPI('music/artists');
+const api = restAPI('artists');
 
 export const GET_ARTISTS = 'artists/get artists';
 export const GET_MORE_ARTISTS = 'artists/get more artists';

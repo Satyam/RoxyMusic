@@ -1,7 +1,7 @@
 import restAPI from '_utils/restAPI';
 import asyncActionCreator from '_utils/asyncActionCreator';
 
-const api = restAPI('music/config');
+const api = restAPI('config');
 
 export const PLAY_NEXT_TRACK = 'now playing/play next track in now playing list';
 export const PLAY_NOW = 'now playing/play now';

@@ -1,3 +1,6 @@
+import { Router as createRouter } from 'express';
+import { handleRequest } from '_server/utils/handleRequest';
+
 let prepared = {};
 const config = {};
 
@@ -87,7 +90,7 @@ export function setConfig(key, newValue) {
   });
 }
 
-export function initConfig() {
+export function init() {
   return db.prepareAll({
     selectAllConfig: 'select * from config',
     selectConfigValue: 'select * from config where key=$key',
@@ -99,3 +102,17 @@ export function initConfig() {
   })
   .then(() => loadConfig());
 }
+
+export default () =>
+  init()
+  .then(() => createRouter()
+    .get('/:key', handleRequest(
+      o => getConfig(o.keys.key)
+    ))
+    .post('/:key', handleRequest(
+      o => setConfig(o.keys.key)
+    ))
+    .put('/:key', handleRequest(
+      o => setConfig(o.keys.key)
+    ))
+  );

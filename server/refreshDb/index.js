@@ -1,3 +1,6 @@
+import { Router as createRouter } from 'express';
+import { handleRequest } from '_server/utils/handleRequest';
+
 import fs from 'fs';
 import denodeify from 'denodeify';
 import path from 'path';
@@ -18,7 +21,7 @@ let audioExtensions = [];
 let initialDir = '';
 let prepared = {};
 
-export default function init() {
+export function init() {
   initialDir = getConfig('musicDir');
   audioExtensions = getConfig('audioExtensions').split(',').map(e => e.trim());
   return db.prepareAll({
@@ -335,3 +338,23 @@ export function stopRefresh() {
   stopRequested = true;
   return refreshStatus();
 }
+
+export function refreshDatabase(o) {
+  switch (o.options.op) {
+    case 'start':
+      return startRefresh();
+    case 'stop':
+      return stopRefresh();
+    default:
+      return refreshStatus();
+  }
+}
+
+
+export default () =>
+  init()
+  .then(() => createRouter()
+    .get('/', handleRequest(
+      refreshDatabase
+    ))
+  );

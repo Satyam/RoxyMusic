@@ -6,10 +6,16 @@ import fs from 'fs';
 import denodeify from 'denodeify';
 import sqliteP from '_server/utils/sqliteP';
 
-import music from '_server/music';
+import config from '_server/config';
+import albums from '_server/albums';
+import playlists from '_server/playlists';
+import artists from '_server/artists';
+import songs from '_server/songs';
+import tracks from '_server/tracks';
+import refreshDb from '_server/refreshDb';
+
 import serverIPC from './serverIPC';
 import htmlTpl from './htmlTemplate';
-import { initConfig, getConfig } from '_server/config';
 
 const DELDB = false;
 
@@ -51,9 +57,17 @@ app.on('ready', () => {
   .then((db) => {
     global.db = db;
   })
-  .then(initConfig)
+  .then(() =>
+    // This one needs to be done before the rest
+    config().then(router => dataRouter.use('/config', router))
+  )
   .then(() => Promise.all([
-    music().then(router => dataRouter.use('/music', router)),
+    albums().then(router => dataRouter.use('/albums', router)),
+    playlists().then(router => dataRouter.use('/playLists', router)),
+    artists().then(router => dataRouter.use('/artists', router)),
+    songs().then(router => dataRouter.use('/songs', router)),
+    tracks().then(router => dataRouter.use('/tracks', router)),
+    refreshDb().then(router => dataRouter.use('/refreshDb', router)),
   ]))
   .then(() =>
     writeFile(
