@@ -5,25 +5,34 @@ import sortBy from 'lodash/sortBy';
 
 import Navbar from 'react-bootstrap/lib/Navbar';
 import ListGroup from 'react-bootstrap/lib/ListGroup';
-
-import initStore from '_utils/initStore';
+import Button from 'react-bootstrap/lib/Button';
 import Icon from '_components/misc/icon';
-import { getPlayLists } from '_store/actions';
+import FoldingToolbar from '_components/misc/foldingToolbar';
+
+import isPlainClick from '_utils/isPlainClick';
+import initStore from '_utils/initStore';
+import { getPlayLists, saveAllPlaylists } from '_store/actions';
 import styles from './playLists.css';
 import PlayListItem from './playListItem';
 
 export function PlayListsComponent({
   hash,
+  onPlaylistSave,
  }) {
   return (
     <div className={styles.playLists}>
-      <Navbar>
+      <Navbar fluid>
         <Navbar.Header>
           <Navbar.Brand>
             <Icon type="arrow-up" href="/" label="Play Lists" />
           </Navbar.Brand>
         </Navbar.Header>
         <Navbar.Toggle />
+        <FoldingToolbar>
+          <Button onClick={onPlaylistSave} title="Save all playlists">
+            <Icon type="save" />
+          </Button>
+        </FoldingToolbar>
       </Navbar>
       <ListGroup>
         {
@@ -41,6 +50,7 @@ export function PlayListsComponent({
 
 PlayListsComponent.propTypes = {
   hash: PropTypes.objectOf(PropTypes.object),
+  onPlaylistSave: PropTypes.func,
 };
 
 
@@ -49,11 +59,15 @@ export const storeInitializer = (dispatch, state) =>
 
 export const mapStateToProps = state => state.playLists;
 
+export const mapDispatchToProps = dispatch => ({
+  onPlaylistSave: ev => isPlainClick(ev) && dispatch(saveAllPlaylists()),
+});
 
 const enhance = compose(
   initStore(storeInitializer),
   connect(
-    mapStateToProps
+    mapStateToProps,
+    mapDispatchToProps
   )
 );
 
