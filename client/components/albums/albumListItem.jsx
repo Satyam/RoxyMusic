@@ -19,15 +19,13 @@ export const AlbumListItemComponent = ({ idAlbum, album, artists }) => (
         {artists}
       </div>
     </div>
-    <div className={styles.right}>
-      <FoldingToolbar>
-        {/*
-        <Button onClick={console.log.bind(console, 'play')}><Icon type="play" /></Button>
-        <Button onClick={console.log.bind(console, 'up')}><Icon type="arrow-up" /></Button>
-        <Button onClick={console.log.bind(console, 'otro')}>otro</Button>
-        */}
-      </FoldingToolbar>
-    </div>
+    <FoldingToolbar>
+      {/*
+      <Button onClick={console.log.bind(console, 'play')}><Icon type="play" /></Button>
+      <Button onClick={console.log.bind(console, 'up')}><Icon type="arrow-up" /></Button>
+      <Button onClick={console.log.bind(console, 'otro')}>otro</Button>
+      */}
+    </FoldingToolbar>
   </ListGroupItem>
 );
 

@@ -19,22 +19,20 @@ export const TracksToolbarComponent = ({
   onReplacePlayNowClick,
   onAddToPlayList,
 }) => (
-  <div className={styles.right}>
-    <FoldingToolbar>
-      <Button onClick={onPlayNowClick} >
-        <Icon type="play" label="!" title="play now" />
-      </Button>
-      <Button onClick={onAddToPlayNowClick} >
-        <Icon type="play,plus" title="Play later" />
-      </Button>
-      <Button onClick={onReplacePlayNowClick} >
-        <Icon type="remove-sign,play" title="Clear list and play this" />
-      </Button>
-      <Button onClick={onAddToPlayList} >
-        <Icon type="indent-left" title="add to PlayList" />
-      </Button>
-    </FoldingToolbar>
-  </div>
+  <FoldingToolbar>
+    <Button onClick={onPlayNowClick} title="play now" >
+      <Icon type="play" label="!" />
+    </Button>
+    <Button onClick={onAddToPlayNowClick} title="Play later" >
+      <Icon type="play,plus" />
+    </Button>
+    <Button onClick={onReplacePlayNowClick} title="Clear list and play this" >
+      <Icon type="remove-sign,play" />
+    </Button>
+    <Button onClick={onAddToPlayList} title="add to PlayList" >
+      <Icon type="indent-left" />
+    </Button>
+  </FoldingToolbar>
 );
 
 TracksToolbarComponent.propTypes = {

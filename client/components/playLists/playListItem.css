@@ -6,10 +6,4 @@
 }
 .left {
   float:left;
-  width: 90%;
-}
-.right {
-  float:right;
-  width: 10%;
-  text-align: right;
 }

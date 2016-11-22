@@ -9,11 +9,12 @@ import Icon from '_components/misc/icon';
 import isPlainClick from '_utils/isPlainClick';
 import {
   deletePlayList,
+  savePlaylist,
 } from '_store/actions';
 
 import styles from './playListItem.css';
 
-export const PlayListItemComponent = ({ idPlayList, name, numTracks, onDeleteClick }) => (
+export const PlayListItemComponent = ({ idPlayList, name, numTracks, onDeleteClick, onSaveClick }) => (
   <ListGroupItem className={styles.li}>
     <div className={styles.left}>
       <div className={styles.name}>
@@ -25,13 +26,14 @@ export const PlayListItemComponent = ({ idPlayList, name, numTracks, onDeleteCli
         {numTracks}
       </div>
     </div>
-    <div className={styles.right}>
-      <FoldingToolbar>
-        <Button onClick={onDeleteClick} >
-          <Icon type="trash" title="delete" />
-        </Button>
-      </FoldingToolbar>
-    </div>
+    <FoldingToolbar>
+      <Button onClick={onDeleteClick} title="delete" >
+        <Icon type="trash" />
+      </Button>
+      <Button onClick={onSaveClick} title="save" >
+        <Icon type="save" />
+      </Button>
+    </FoldingToolbar>
   </ListGroupItem>
 );
 
@@ -41,12 +43,14 @@ PlayListItemComponent.propTypes = {
   name: PropTypes.string,
   numTracks: PropTypes.number,
   onDeleteClick: PropTypes.func,
+  onSaveClick: PropTypes.func,
 };
 
 export const mapStateToProps = (state, props) => state.playLists.hash[props.idPlayList] || {};
 
 export const mapDispatchToProps = (dispatch, props) => ({
   onDeleteClick: ev => isPlainClick(ev) && dispatch(deletePlayList(props.idPlayList)),
+  onSaveClick: ev => isPlainClick(ev) && dispatch(savePlaylist(props.idPlayList)),
 });
 
 export default connect(

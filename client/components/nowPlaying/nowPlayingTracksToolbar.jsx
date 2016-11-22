@@ -11,13 +11,11 @@ import {
 import styles from './nowPlayingTracksToolbar.css';
 
 export const NowPlayingTracksToolbarComponent = ({ onPlayClick }) => (
-  <div className={styles.right}>
-    <FoldingToolbar>
-      <Button onClick={onPlayClick} >
-        <Icon type="play" />
-      </Button>
-    </FoldingToolbar>
-  </div>
+  <FoldingToolbar>
+    <Button onClick={onPlayClick} title="Play now">
+      <Icon type="play" />
+    </Button>
+  </FoldingToolbar>
 );
 
 NowPlayingTracksToolbarComponent.propTypes = {
