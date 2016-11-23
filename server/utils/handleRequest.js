@@ -13,9 +13,11 @@ export const handleRequest = (...args) => (req, res) => {
   };
 
   log('> %s %j', req.url, o);
-  const action = args[args.length - 1];
-  Promise.all(args.slice(0, -1).map(validator => validator(o)))
-  .then(() => action(o))
+
+  return args.reduce(
+    (p, next) => p.then(next),
+    Promise.resolve(o)
+  )
   .then((reply) => {
     log('< %s %j', req.url, reply);
     return res.json(reply);
