@@ -11,7 +11,6 @@ import {
   replaceNowPlaying,
   addTrackToPlayList,
 } from '_store/actions';
-import styles from './defaultTracksToolbar.css';
 
 export const TracksToolbarComponent = ({
   onPlayNowClick,

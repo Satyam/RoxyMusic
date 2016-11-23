@@ -8,7 +8,6 @@ import isPlainClick from '_utils/isPlainClick';
 import {
   playNow,
 } from '_store/actions';
-import styles from './nowPlayingTracksToolbar.css';
 
 export const NowPlayingTracksToolbarComponent = ({ onPlayClick }) => (
   <FoldingToolbar>
