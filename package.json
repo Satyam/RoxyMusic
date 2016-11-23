@@ -78,6 +78,7 @@
     "eslint-plugin-promise": "^3.4.0",
     "eslint-plugin-react": "^6.7.1",
     "extract-text-webpack-plugin": "^1.0.1",
+    "has": "^1.0.1",
     "react-addons-perf": "^15.4.0",
     "react-addons-test-utils": "^15.4.0",
     "redux-devtools": "^3.3.1",
