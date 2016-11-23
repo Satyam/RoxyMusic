@@ -37,10 +37,10 @@ const AppComponent = ({ width, children, onMeasureChange }) => (
               <div className={styles.wideLeftPanel}>
                 { children || (
                   <div className={styles.menu}>
-                    <Button block bsStyle="primary" bsSize="large" href="/albums">Albums</Button>
-                    <Button block bsStyle="primary" bsSize="large" href="/artists">Artists</Button>
-                    <Button block bsStyle="primary" bsSize="large" href="/songs">Songs</Button>
-                    <Button block bsStyle="primary" bsSize="large" href="/playLists">Play Lists</Button>
+                    <Link className={styles.menuItem} to="/albums">Albums</Link>
+                    <Link className={styles.menuItem} to="/artists">Artists</Link>
+                    <Link className={styles.menuItem} to="/songs">Songs</Link>
+                    <Link className={styles.menuItem} to="/playLists">Play Lists</Link>
                   </div>
                 )}
               </div>
@@ -54,11 +54,11 @@ const AppComponent = ({ width, children, onMeasureChange }) => (
             <div className={styles.narrow}>
               { children || (
                 <ul className={styles.menu}>
-                  <Button block bsStyle="primary" bsSize="large" href="/albums">Albums</Button>
-                  <Button block bsStyle="primary" bsSize="large" href="/artists">Artists</Button>
-                  <Button block bsStyle="primary" bsSize="large" href="/songs">Songs</Button>
-                  <Button block bsStyle="primary" bsSize="large" href="/playLists">Play Lists</Button>
-                  <Button block bsStyle="primary" bsSize="large" href="/now">Now Playing</Button>
+                  <Link className={styles.menuItem} to="/albums">Albums</Link>
+                  <Link className={styles.menuItem} to="/artists">Artists</Link>
+                  <Link className={styles.menuItem} to="/songs">Songs</Link>
+                  <Link className={styles.menuItem} to="/playLists">Play Lists</Link>
+                  <Link className={styles.menuItem} to="/now">Now Playing</Link>
                 </ul>
               )}
               <Audio />
