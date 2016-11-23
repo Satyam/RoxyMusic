@@ -4,8 +4,6 @@ import Measure from 'react-measure';
 import { connect } from 'react-redux';
 import compose from 'recompose/compose';
 
-import Button from 'react-bootstrap/lib/Button';
-
 import Errors from '_components/misc/errors';
 import Loading from '_components/misc/loading';
 import Audio from '_components/audio';
