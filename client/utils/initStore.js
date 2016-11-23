@@ -14,6 +14,12 @@ const initStore = initializer => (BaseComponent) => {
       const store = this.store;
       this.isInitialized(initializer(store.dispatch, store.getState(), this.props));
     }
+    componentDidMount() {
+      this.mounted = true;
+    }
+    componentWillUnmount() {
+      this.mounted = false;
+    }
 
     componentWillReceiveProps(nextProps) {
       const store = this.store;
@@ -26,7 +32,7 @@ const initStore = initializer => (BaseComponent) => {
         this.shouldUpdate = false;
         initRet.then(() => {
           this.shouldUpdate = true;
-          this.forceUpdate();
+          if (this.mounted) this.forceUpdate();
         });
       }
     }
