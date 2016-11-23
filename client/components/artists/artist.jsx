@@ -30,7 +30,11 @@ export const ArtistComponent = ({ idArtist, artist, numTracks, idTracks, error }
             </div>
           </Navbar.Collapse>
         </Navbar>
-        <TrackList idTracks={idTracks} Toolbar="default" />
+        <TrackList
+          idTracks={idTracks}
+          Toolbar="default"
+          sorted
+        />
       </div>
     )
   );

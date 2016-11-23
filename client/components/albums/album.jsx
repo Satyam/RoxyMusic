@@ -31,7 +31,11 @@ export const AlbumComponent = ({ idAlbum, album, artists, numTracks, idTracks, e
             </div>
           </Navbar.Collapse>
         </Navbar>
-        <TrackList idTracks={idTracks} Toolbar="default" />
+        <TrackList
+          idTracks={idTracks}
+          Toolbar="default"
+          sorted
+        />
       </div>
     )
   );
