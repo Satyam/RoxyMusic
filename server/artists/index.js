@@ -45,12 +45,11 @@ export function getArtist(o) {
 export default () =>
   init()
   .then(() => createRouter()
-  .get('/', handleRequest(
-    getArtists
-  ))
-  .get('/:idArtist', handleRequest(
-    validators.idArtist,
-    getArtist
-  ))
-
+    .get('/', handleRequest(
+      getArtists
+    ))
+    .get('/:idArtist', handleRequest(
+      validators.idArtist,
+      getArtist
+    ))
   );

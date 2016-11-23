@@ -9,7 +9,6 @@ import splitIdTracks from '_server/utils/splitIdTracks';
 
 import { getConfig } from '_server/config';
 
-const absPath = relPath => join(ROOT_DIR, relPath);
 const writeFile = denodeify(fs.writeFile);
 
 let prepared = {};
@@ -87,8 +86,8 @@ function saveOnePlayList(playList) {
 ${track.location}`,
       '#EXTM3U'
     ))
-    .then(m3u => console.log('----%s\n%s', fileName, m3u))
-//    .then(m3u => writeFile(fileName, m3u))
+//    .then(m3u => console.log('----%s\n%s', fileName, m3u))
+    .then(m3u => writeFile(fileName, m3u))
     .then(() => fileName);
 }
 
@@ -107,33 +106,33 @@ export function savePlayList(o) {
 export default () =>
   init()
   .then(() => createRouter()
-  .get('/', handleRequest(
-    getPlayLists
-  ))
-  .get('/:idPlayList', handleRequest(
-    validators.idPlayList,
-    getPlayList
-  ))
-  .post('/saveAll', handleRequest(
-    saveAllPlayLists
-  ))
-  .post('/save/:idPlayList', handleRequest(
-    validators.idPlayList,
-    savePlayList
-  ))
-  .post('', handleRequest(
-    addPlayList
-  ))
-  .put('/:idPlayList', handleRequest(
-    validators.idPlayList,
-    updatePlayList
-  ))
-  .put('/:idPlayList/name', handleRequest(
-    validators.idPlayList,
-    renamePlayList
-  ))
-  .delete('/:idPlayList', handleRequest(
-    validators.idPlayList,
-    deletePlayList
-  ))
-);
+    .get('/', handleRequest(
+      getPlayLists
+    ))
+    .get('/:idPlayList', handleRequest(
+      validators.idPlayList,
+      getPlayList
+    ))
+    .post('/saveAll', handleRequest(
+      saveAllPlayLists
+    ))
+    .post('/save/:idPlayList', handleRequest(
+      validators.idPlayList,
+      savePlayList
+    ))
+    .post('', handleRequest(
+      addPlayList
+    ))
+    .put('/:idPlayList', handleRequest(
+      validators.idPlayList,
+      updatePlayList
+    ))
+    .put('/:idPlayList/name', handleRequest(
+      validators.idPlayList,
+      renamePlayList
+    ))
+    .delete('/:idPlayList', handleRequest(
+      validators.idPlayList,
+      deletePlayList
+    ))
+  );

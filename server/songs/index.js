@@ -34,7 +34,7 @@ export function getSongs(o) {
 export default () =>
   init()
   .then(() => createRouter()
-  .get('/', handleRequest(
-    getSongs
-  ))
-);
+    .get('/', handleRequest(
+      getSongs
+    ))
+  );

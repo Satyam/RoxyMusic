@@ -14,8 +14,8 @@ export function getTracks(o) {
 export default () =>
   init()
   .then(() => createRouter()
-  .get('/:idTracks', handleRequest(
-    validators.idTracks,
-    getTracks
-  ))
-);
+    .get('/:idTracks', handleRequest(
+      validators.idTracks,
+      getTracks
+    ))
+  );

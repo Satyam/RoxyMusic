@@ -14,7 +14,13 @@ import {
 
 import styles from './playListItem.css';
 
-export const PlayListItemComponent = ({ idPlayList, name, numTracks, onDeleteClick, onSaveClick }) => (
+export const PlayListItemComponent = ({
+  idPlayList,
+  name,
+  numTracks,
+  onDeleteClick,
+  onSaveClick,
+}) => (
   <ListGroupItem className={styles.li}>
     <div className={styles.left}>
       <div className={styles.name}>
