@@ -27,11 +27,14 @@ export const TrackComponent = ({
     ? (<div className={styles.notFound}>Track for that URL no longer exists</div>)
     : (
       <ListGroupItem className={styles.track} bsStyle={background}>
-        <div className={styles.trackNum}>{track || '_'}</div>
         <div className={styles.left}>
           <div className={styles.title}>{title}</div>
           <div className={styles.album}>
-            <Icon type="cd" href={idAlbum && `/albums/${idAlbum}`} label={album || '--'} />
+            <Icon
+              type="cd"
+              href={idAlbum && `/albums/${idAlbum}`}
+              label={`${album || '--'} (# ${track || '_'})`}
+            />
           </div>
           <div className={styles.artist}>
             <Icon type="user" href={idArtist && `/artists/${idArtist}`} label={artist || '--'} />

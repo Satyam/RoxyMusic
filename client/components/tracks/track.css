@@ -1,12 +1,6 @@
 .track {
     overflow: hidden;
 }
-.trackNum {
-  float: left;
-  width: 2em;
-  text-align: right;
-  margin-right: 1em;
-}
 .left {
   float:left;
 }
