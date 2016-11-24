@@ -1,5 +1,3 @@
-import { Router as createRouter } from 'express';
-import handleRequest from '_server/utils/handleRequest';
 import * as validators from '_server/utils/validators';
 import splitIdTracks from '_server/utils/splitIdTracks';
 
@@ -45,12 +43,14 @@ export function getAlbum(o) {
 
 export default () =>
   init()
-  .then(() => createRouter()
-    .get('/', handleRequest(
-      getAlbums
-    ))
-    .get('/:idAlbum', handleRequest(
-      validators.idAlbum,
-      getAlbum
-    ))
-  );
+  .then(() => ({
+    '/': {
+      read: getAlbums,
+    },
+    '/:idAlbum': {
+      read: [
+        validators.idAlbum,
+        getAlbum,
+      ],
+    },
+  }));

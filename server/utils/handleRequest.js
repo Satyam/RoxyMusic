@@ -3,7 +3,7 @@ import debug from 'debug';
 // debug.enable('RoxyMusic:handleRequest');
 const log = debug('RoxyMusic:handleRequest');
 
-export default (...args) => (req, res) => {
+export default actions => (req, res) => {
   const o = {
     keys: req.params || {},
     data: req.body,
@@ -11,8 +11,7 @@ export default (...args) => (req, res) => {
   };
 
   log('> %s %j', req.url, o);
-
-  return args.reduce(
+  return [].concat(actions).reduce(
     (p, next) => p.then(next),
     Promise.resolve(o)
   )

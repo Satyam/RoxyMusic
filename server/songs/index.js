@@ -1,6 +1,3 @@
-import { Router as createRouter } from 'express';
-import handleRequest from '_server/utils/handleRequest';
-
 let prepared = {};
 
 export function init() {
@@ -33,8 +30,8 @@ export function getSongs(o) {
 
 export default () =>
   init()
-  .then(() => createRouter()
-    .get('/', handleRequest(
-      getSongs
-    ))
-  );
+  .then(() => ({
+    '/': {
+      read: getSongs,
+    },
+  }));

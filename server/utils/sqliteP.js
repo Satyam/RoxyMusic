@@ -45,8 +45,7 @@ function myDenodeify(nodeStyleFunction, context, dolarize) {
       }
       if (dolarize) {
         /* eslint-disable no-param-reassign */
-        dolarize -= 1;
-        functionArguments[dolarize] = dolarizeQueryParams(functionArguments[dolarize]);
+        functionArguments[dolarize - 1] = dolarizeQueryParams(functionArguments[dolarize - 1]);
         /* eslint-enable no-param-reassign */
       }
       functionArguments.push(callbackFunction);

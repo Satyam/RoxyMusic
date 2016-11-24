@@ -1,6 +1,3 @@
-import { Router as createRouter } from 'express';
-import handleRequest from '_server/utils/handleRequest';
-
 let prepared = {};
 const config = {};
 
@@ -105,14 +102,10 @@ export function init() {
 
 export default () =>
   init()
-  .then(() => createRouter()
-    .get('/:key', handleRequest(
-      o => getConfig(o.keys.key)
-    ))
-    .post('/:key', handleRequest(
-      o => setConfig(o.keys.key)
-    ))
-    .put('/:key', handleRequest(
-      o => setConfig(o.keys.key)
-    ))
-  );
+  .then(() => ({
+    '/:key': {
+      read: o => getConfig(o.keys.key),
+      create: o => setConfig(o.keys.key),
+      update: o => setConfig(o.keys.key),
+    },
+  }));

@@ -4,7 +4,10 @@ import express, { Router as createRouter } from 'express';
 import bodyParser from 'body-parser';
 import denodeify from 'denodeify';
 import fs from 'fs';
+import forEach from 'lodash/forEach';
+
 import sqliteP from './utils/sqliteP';
+import handleRequest from './utils/handleRequest';
 
 import albums from './albums';
 import playlists from './playlists';
@@ -33,7 +36,7 @@ app.use(express.static(absPath('public')));
 const musicRegExp = /^\/music\/(.+)$/;
 app.get(musicRegExp, (req, res) => {
   const filename = decodeURI(musicRegExp.exec(req.path)[1]);
-  console.log(filename);
+  console.log('requested music file', filename);
   res.sendFile(join(getConfig('musicDir'), filename));
 });
 app.get('/kill', (req, res) => {
@@ -43,9 +46,23 @@ app.get('/kill', (req, res) => {
 });
 app.get('*', (req, res) => res.sendFile(absPath('server/index.html')));
 
-const DELDB = false;
+const equivalent = {
+  create: 'post',
+  read: 'get',
+  update: 'put',
+  delete: 'delete',
+};
 
+function addToDataRouter(prefix, routes) {
+  forEach(routes, (operations, route) => {
+    forEach(operations, (actions, operation) => {
+      const method = equivalent[operation];
+      dataRouter[method](join(prefix, route), handleRequest(actions));
+    });
+  });
+}
 export function start() {
+  const DELDB = false;
   return (DELDB ? unlink('server/data.db') : Promise.resolve())
   .then(() => sqliteP.open(absPath('server/data.db'), {
     initFileName: absPath('server/data.sql'),
@@ -56,15 +73,15 @@ export function start() {
   })
   .then(() =>
     // This one needs to be done before the rest
-    config().then(router => dataRouter.use('/config', router))
+    config().then(routes => addToDataRouter('/config', routes))
   )
   .then(() => Promise.all([
-    albums().then(router => dataRouter.use('/albums', router)),
-    playlists().then(router => dataRouter.use('/playLists', router)),
-    artists().then(router => dataRouter.use('/artists', router)),
-    songs().then(router => dataRouter.use('/songs', router)),
-    tracks().then(router => dataRouter.use('/tracks', router)),
-    refreshDb().then(router => dataRouter.use('/refreshDb', router)),
+    albums().then(routes => addToDataRouter('/albums', routes)),
+    playlists().then(routes => addToDataRouter('/playLists', routes)),
+    artists().then(routes => addToDataRouter('/artists', routes)),
+    songs().then(routes => addToDataRouter('/songs', routes)),
+    tracks().then(routes => addToDataRouter('/tracks', routes)),
+    refreshDb().then(routes => addToDataRouter('/refreshDb', routes)),
   ]))
   .then(() => listen(PORT));
 }

@@ -1,5 +1,3 @@
-import { Router as createRouter } from 'express';
-import handleRequest from '_server/utils/handleRequest';
 import * as validators from '_server/utils/validators';
 import splitIdTracks from '_server/utils/splitIdTracks';
 
@@ -42,12 +40,14 @@ export function getArtist(o) {
 
 export default () =>
   init()
-  .then(() => createRouter()
-    .get('/', handleRequest(
-      getArtists
-    ))
-    .get('/:idArtist', handleRequest(
-      validators.idArtist,
-      getArtist
-    ))
-  );
+  .then(() => ({
+    '/': {
+      read: getArtists,
+    },
+    '/:idArtist': {
+      read: [
+        validators.idArtist,
+        getArtist,
+      ],
+    },
+  }));

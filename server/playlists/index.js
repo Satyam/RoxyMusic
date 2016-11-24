@@ -1,9 +1,7 @@
-import { Router as createRouter } from 'express';
 import { join } from 'path';
 import denodeify from 'denodeify';
 import fs from 'fs';
 
-import handleRequest from '_server/utils/handleRequest';
 import * as validators from '_server/utils/validators';
 import splitIdTracks from '_server/utils/splitIdTracks';
 
@@ -100,35 +98,40 @@ export function savePlayList(o) {
 }
 
 export default () =>
-  init()
-  .then(() => createRouter()
-    .get('/', handleRequest(
-      getPlayLists
-    ))
-    .get('/:idPlayList', handleRequest(
-      validators.idPlayList,
-      getPlayList
-    ))
-    .post('/saveAll', handleRequest(
-      saveAllPlayLists
-    ))
-    .post('/save/:idPlayList', handleRequest(
-      validators.idPlayList,
-      savePlayList
-    ))
-    .post('', handleRequest(
-      addPlayList
-    ))
-    .put('/:idPlayList', handleRequest(
-      validators.idPlayList,
-      updatePlayList
-    ))
-    .put('/:idPlayList/name', handleRequest(
-      validators.idPlayList,
-      renamePlayList
-    ))
-    .delete('/:idPlayList', handleRequest(
-      validators.idPlayList,
-      deletePlayList
-    ))
-  );
+    init()
+    .then(() => ({
+      '/': {
+        read: getPlayLists,
+        create: addPlayList,
+      },
+      '/:idPlayList': {
+        read: [
+          validators.idPlayList,
+          getPlayList,
+        ],
+        update: [
+          validators.idPlayList,
+          updatePlayList,
+        ],
+        delete: [
+          validators.idPlayList,
+          deletePlayList,
+        ],
+      },
+      '/saveAll': {
+        create: saveAllPlayLists,
+      },
+      '/save/:idPlayList': {
+        create: [
+          validators.idPlayList,
+          savePlayList,
+        ],
+      },
+      '/rename/:idPlayList': {
+        update: [
+          validators.idPlayList,
+          renamePlayList,
+        ],
+      },
+    })
+    );

@@ -1,6 +1,3 @@
-import { Router as createRouter } from 'express';
-import handleRequest from '_server/utils/handleRequest';
-
 import fs from 'fs';
 import denodeify from 'denodeify';
 import path from 'path';
@@ -340,14 +337,14 @@ export function stopRefresh() {
 
 export default () =>
   init()
-  .then(() => createRouter()
-    .get('/start', handleRequest(
-      startRefresh
-    ))
-    .get('/stop', handleRequest(
-      stopRefresh
-    ))
-    .get('/', handleRequest(
-      refreshStatus
-    ))
-  );
+  .then(() => ({
+    '/start': {
+      read: startRefresh,
+    },
+    '/stop': {
+      read: stopRefresh,
+    },
+    '/': {
+      read: refreshStatus,
+    },
+  }));
