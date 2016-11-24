@@ -3,7 +3,7 @@ import { join } from 'path';
 import denodeify from 'denodeify';
 import fs from 'fs';
 
-import { handleRequest } from '_server/utils/handleRequest';
+import handleRequest from '_server/utils/handleRequest';
 import * as validators from '_server/utils/validators';
 import splitIdTracks from '_server/utils/splitIdTracks';
 
@@ -35,24 +35,22 @@ export function getPlayLists() {
 
 // getPlayList: 'select* from PlayLists where idPlayList = $idPlayList',
 export function getPlayList(o) {
-  return prepared.getPlayList.get({
-    $idPlayList: o.keys.idPlayList,
-  })
+  return prepared.getPlayList.get(o.keys)
   .then(splitIdTracks);
 }
 
 // addPlayList: 'insert into PlayLists (name) values ($name)',
 export function addPlayList(o) {
-  return prepared.addPlayList.run({ $name: o.data.name });
+  return prepared.addPlayList.run(o.data);
 }
 
 // updatePlayList: 'update PlayLists
 // set lastPlayed = $lastPlayed, idTracks = $idTracks where idPlayList = $idPlayList',
 export function updatePlayList(o) {
   return prepared.updatePlayList.run({
-    $idPlayList: o.keys.idPlayList,
-    $lastPlayed: o.data.lastPlayed,
-    $idTracks: o.data.idTracks.join(','),
+    idPlayList: o.keys.idPlayList,
+    lastPlayed: o.data.lastPlayed,
+    idTracks: o.data.idTracks.join(','),
   });
 }
 
@@ -60,15 +58,13 @@ export function updatePlayList(o) {
 
 export function renamePlayList(o) {
   return prepared.renamePlayList.run({
-    $idPlayList: o.keys.idPlayList,
-    $name: o.data.name,
+    idPlayList: o.keys.idPlayList,
+    name: o.data.name,
   });
 }
 // deletePlayList: 'delete from PlayLists  where idPlayList = $idPlayList',
 export function deletePlayList(o) {
-  return prepared.deletePlayList.run({
-    $idPlayList: o.keys.idPlayList,
-  });
+  return prepared.deletePlayList.run(o.keys);
 }
 
 function saveOnePlayList(playList) {

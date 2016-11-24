@@ -1,5 +1,5 @@
 import { Router as createRouter } from 'express';
-import { handleRequest } from '_server/utils/handleRequest';
+import handleRequest from '_server/utils/handleRequest';
 
 let prepared = {};
 
@@ -20,13 +20,13 @@ export function getSongs(o) {
   return (
     o.options.search
     ? prepared.searchSongs.all({
-      $count: o.options.count || 20,
-      $offset: o.options.offset || 0,
-      $search: `%${o.options.search}%`,
+      count: o.options.count || 20,
+      offset: o.options.offset || 0,
+      search: `%${o.options.search}%`,
     })
     : prepared.getSongs.all({
-      $count: o.options.count || 20,
-      $offset: o.options.offset || 0,
+      count: o.options.count || 20,
+      offset: o.options.offset || 0,
     })
   );
 }

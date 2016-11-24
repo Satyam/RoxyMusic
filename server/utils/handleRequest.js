@@ -3,7 +3,7 @@ import debug from 'debug';
 // debug.enable('RoxyMusic:handleRequest');
 const log = debug('RoxyMusic:handleRequest');
 
-export const handleRequest = (...args) => (req, res) => {
+export default (...args) => (req, res) => {
   const o = {
     keys: req.params || {},
     data: req.body,

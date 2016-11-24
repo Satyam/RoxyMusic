@@ -12,7 +12,17 @@ export const OPEN_CREATE = sqlite3.OPEN_CREATE;
 export const OPEN_READWRITE = sqlite3.OPEN_READWRITE;
 export const OPEN_READONLY = sqlite3.OPEN_READONLY;
 
-function myDenodeify(nodeStyleFunction, context) {
+function dolarizeQueryParams(obj) {
+  const params = {};
+  if (obj) {
+    Object.keys(obj).forEach((key) => {
+      params[`$${key}`] = obj[key];
+    });
+  }
+  return params;
+}
+
+function myDenodeify(nodeStyleFunction, context, dolarize) {
   return (...functionArguments) => {
     const self = context || this;
     function promiseHandler(resolve, reject) {
@@ -33,7 +43,12 @@ function myDenodeify(nodeStyleFunction, context) {
         }
         return resolve(args[1]);
       }
-
+      if (dolarize) {
+        /* eslint-disable no-param-reassign */
+        dolarize -= 1;
+        functionArguments[dolarize] = dolarizeQueryParams(functionArguments[dolarize]);
+        /* eslint-enable no-param-reassign */
+      }
       functionArguments.push(callbackFunction);
       nodeStyleFunction.apply(self, functionArguments);
     }
@@ -41,6 +56,7 @@ function myDenodeify(nodeStyleFunction, context) {
     return new Promise(promiseHandler);
   };
 }
+
 /**
  * Turn methods on `source` that return callbacks into methods on `dest` that are bound to
  * `source` as if invoked as method calls.
@@ -49,10 +65,10 @@ function myDenodeify(nodeStyleFunction, context) {
  * @param dest an object upon which attributes will be set.
  * @param methods an array of method names.
  */
-function denodeifyMethods(source, dest, methods) {
+function denodeifyMethods(source, dest, methods, dolarize) {
   methods.forEach((method) => {
     /* eslint-disable no-param-reassign */
-    dest[method] = myDenodeify(source[method], source);
+    dest[method] = myDenodeify(source[method], source, dolarize);
     /* eslint-enable no-param-reassign */
   });
 }
@@ -77,7 +93,8 @@ class ST {
   constructor(statement, options = {}) {
     this.statement = statement;
     this.options = options;
-    denodeifyMethods(statement, this, ['reset', 'finalize', 'get', 'all']);
+    denodeifyMethods(statement, this, ['reset', 'finalize']);
+    denodeifyMethods(statement, this, ['get', 'all'], 1);
     this.bind = strangeDenodeify(statement, 'bind');
   }
 
@@ -87,7 +104,7 @@ class ST {
       // do not convert the following function callback into a fat arrow
       // because we need the `this` of that callback to extract info from it
       const self = this;
-      this.statement.run(params, function (err) {
+      this.statement.run(dolarizeQueryParams(params), function (err) {
         /* eslint-enable func-names */
         log(`Running: ${self.statement.sql}, ${JSON.stringify(params, null, 2)}`);
 
@@ -108,6 +125,8 @@ class ST {
     if (typeof params === 'function') {
       onRow = params;
       params = {};
+    } else {
+      params = dolarizeQueryParams(params);
     }
     /* eslint-enable no-param-reassign */
 
@@ -148,12 +167,13 @@ export default class DB {
   constructor(db, options = {}) {
     this.db = db;
     this.options = options;
-    denodeifyMethods(db, this, ['close', 'get', 'all', 'exec', 'serialize', 'parallelize']);
+    denodeifyMethods(db, this, ['close', 'exec', 'serialize', 'parallelize']);
+    denodeifyMethods(db, this, ['get', 'all'], 2);
     this.$prepare = strangeDenodeify(this.db, 'prepare');
   }
 
   prepare(sql, params) {
-    return this.$prepare(sql, params)
+    return this.$prepare(sql, dolarizeQueryParams(params))
       .then(statement => new ST(statement, this.options));
   }
 
@@ -168,17 +188,7 @@ export default class DB {
     .then(() => prepared);
   }
 
-/* eslint-disable class-methods-use-this */
-  dolarizeQueryParams(...objs) {
-    const params = {};
-    objs.forEach(obj =>
-      Object.keys(obj).forEach((key) => {
-        params[`$${key}`] = obj[key];
-      })
-    );
-    return params;
-  }
-  /* eslint-enable class-methods-use-this */
+
   /**
    * Invokes the provided `onRow` callback with each result row.
    * Returns a promise that resolves to the number of returned rows.
@@ -193,6 +203,8 @@ export default class DB {
     if (typeof params === 'function') {
       onRow = params;
       params = {};
+    } else {
+      params = dolarizeQueryParams(params);
     }
     /* eslint-enable no-param-reassign */
     return new Promise((resolve, reject) => {
@@ -230,7 +242,7 @@ export default class DB {
       /* eslint-disable func-names */
       // do not convert the following function callback into a fat arrow
       // because we need the `this` of that callback to extract info from it
-      this.db.run(sql, params, function (err) {
+      this.db.run(sql, dolarizeQueryParams(params), function (err) {
         /* eslint-enable func-names */
         log(`Running: ${sql}, ${JSON.stringify(params, null, 2)}`);
 

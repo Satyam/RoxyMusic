@@ -1,5 +1,5 @@
 import { Router as createRouter } from 'express';
-import { handleRequest } from '_server/utils/handleRequest';
+import handleRequest from '_server/utils/handleRequest';
 import * as validators from '_server/utils/validators';
 import splitIdTracks from '_server/utils/splitIdTracks';
 
@@ -23,13 +23,13 @@ export function getAlbums(o) {
   return (
     o.options.search
     ? prepared.searchAlbums.all({
-      $count: o.options.count || 20,
-      $offset: o.options.offset || 0,
-      $search: `%${o.options.search}%`,
+      count: o.options.count || 20,
+      offset: o.options.offset || 0,
+      search: `%${o.options.search}%`,
     })
     : prepared.getAlbums.all({
-      $count: o.options.count || 20,
-      $offset: o.options.offset || 0,
+      count: o.options.count || 20,
+      offset: o.options.offset || 0,
     })
   )
   .then(albums => albums.map(splitIdTracks))
@@ -38,9 +38,7 @@ export function getAlbums(o) {
 
 // getAlbum: 'select * from AllAlbums where idAlbum = $idAlbum',
 export function getAlbum(o) {
-  return prepared.getAlbum.get({
-    $idAlbum: o.keys.idAlbum,
-  })
+  return prepared.getAlbum.get(o.keys)
   .then(splitIdTracks);
 }
 

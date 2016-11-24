@@ -1,5 +1,5 @@
 import { Router as createRouter } from 'express';
-import { handleRequest } from '_server/utils/handleRequest';
+import handleRequest from '_server/utils/handleRequest';
 import * as validators from '_server/utils/validators';
 
 export function init() {

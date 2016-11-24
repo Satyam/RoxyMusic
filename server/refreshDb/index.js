@@ -1,5 +1,5 @@
 import { Router as createRouter } from 'express';
-import { handleRequest } from '_server/utils/handleRequest';
+import handleRequest from '_server/utils/handleRequest';
 
 import fs from 'fs';
 import denodeify from 'denodeify';
@@ -88,7 +88,7 @@ export function init() {
 const genreRxp = /\((\d+)\)/;
 
 export function getPersonId(name) {
-  const who = { $artist: name.trim() };
+  const who = { artist: name.trim() };
   const resId = `artist:${name}`;
   return choke(resId)
   .then(() => prepared.selectPersonId.get(who))
@@ -135,7 +135,7 @@ export function insertTrack(tags) {
       if (m) {
         return (t.idGenre = parseInt(m[1], 10));
       }
-      const which = { $genre: tags.genre };
+      const which = { genre: tags.genre };
       const resId = `genre:${tags.genre}`;
       return choke(resId)
       .then(() => prepared.selectGenreId.get(which))
@@ -155,7 +155,7 @@ export function insertTrack(tags) {
   .then(() => {
     const album = tags.album;
     if (album) {
-      const which = { $album: album };
+      const which = { album };
       const resId = `album:${album}`;
       return choke(resId)
       .then(() => prepared.selectAlbumId.get(which))
@@ -175,8 +175,8 @@ export function insertTrack(tags) {
   .then(() => {
     if (t.idAlbumArtist && t.idAlbum) {
       const aaMap = {
-        $idAlbum: t.idAlbum,
-        $idArtist: t.idAlbumArtist,
+        idAlbum: t.idAlbum,
+        idArtist: t.idAlbumArtist,
       };
       return prepared.hasAlbumArtistMap.get(aaMap)
       .then(row => (
@@ -187,7 +187,7 @@ export function insertTrack(tags) {
     }
     return null;
   })
-  .then(() => prepared.insertTrack.run(db.dolarizeQueryParams(t)))
+  .then(() => prepared.insertTrack.run(t))
   .then(res => res.lastID)
   .catch(err => console.trace('insertTrack', err));
 }
@@ -263,7 +263,7 @@ export function scan(dir) {
         const ext = path.extname(file).substr(1);
         if (audioExtensions.indexOf(ext) !== -1) {
           return prepared.fetchByLocation.all({
-            $location: relName,
+            location: relName,
           })
           .then((rows) => {
             if (rows.length) {

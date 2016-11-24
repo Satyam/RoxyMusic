@@ -1,5 +1,5 @@
 import { Router as createRouter } from 'express';
-import { handleRequest } from '_server/utils/handleRequest';
+import handleRequest from '_server/utils/handleRequest';
 import * as validators from '_server/utils/validators';
 import splitIdTracks from '_server/utils/splitIdTracks';
 
@@ -22,22 +22,20 @@ export function getArtists(o) {
   return (
     o.options.search
     ? prepared.searchArtists.all({
-      $count: o.options.count || 20,
-      $offset: o.options.offset || 0,
-      $search: `%${o.options.search}%`,
+      count: o.options.count || 20,
+      offset: o.options.offset || 0,
+      search: `%${o.options.search}%`,
     })
     : prepared.getArtists.all({
-      $count: o.options.count || 20,
-      $offset: o.options.offset || 0,
+      count: o.options.count || 20,
+      offset: o.options.offset || 0,
     })
   ).then(artists => artists.map(splitIdTracks));
 }
 
 // getArtist: 'select * from AllArtists where idArtist = $idArtist',
 export function getArtist(o) {
-  return prepared.getArtist.get({
-    $idArtist: o.keys.idArtist,
-  })
+  return prepared.getArtist.get(o.keys)
   .then(splitIdTracks);
 }
 

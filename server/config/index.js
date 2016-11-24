@@ -1,5 +1,5 @@
 import { Router as createRouter } from 'express';
-import { handleRequest } from '_server/utils/handleRequest';
+import handleRequest from '_server/utils/handleRequest';
 
 let prepared = {};
 const config = {};
@@ -83,7 +83,7 @@ export function setConfig(key, newValue) {
     return Promise.reject(`setConfig: Invalid type for ${key}: ${newValue}`);
   }
 
-  return prepared.updateConfigValue.run(db.dolarizeQueryParams({ key, type, value }))
+  return prepared.updateConfigValue.run({ key, type, value })
   .then(() => {
     config[key] = newValue;
     return newValue;
