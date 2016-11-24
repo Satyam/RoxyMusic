@@ -1,4 +1,7 @@
-import { failRequest } from './handleRequest';
+const failRequest = message => Promise.reject({
+  code: 400,
+  message: `Bad Request: ${message}`,
+});
 
 const testIdTracks = /^\d+(,\d+)*$/;
 const testInteger = /^\d+$/;
@@ -6,7 +9,7 @@ const testInteger = /^\d+$/;
 export function isIntegerKey(o, which) {
   const id = o.keys[which];
   if (id && !testInteger.test(id)) {
-    return failRequest(400, 'Bad Request');
+    return failRequest(`${which} should be an integer`);
   }
   return o;
 }
@@ -14,7 +17,7 @@ export function isIntegerKey(o, which) {
 export function idTracks(o) {
   const id = o.keys.idTracks;
   if (id && !testIdTracks.test(id)) {
-    return failRequest(400, 'Bad Request');
+    return failRequest('idTracks should be a comma separated sequence of integers');
   }
   return o;
 }

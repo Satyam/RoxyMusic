@@ -1,7 +1,5 @@
 import debug from 'debug';
 
-export const failRequest = (code, message) => Promise.reject({ code, message });
-
 // debug.enable('RoxyMusic:handleRequest');
 const log = debug('RoxyMusic:handleRequest');
 
