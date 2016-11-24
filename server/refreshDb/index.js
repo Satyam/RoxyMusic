@@ -333,28 +333,21 @@ export function startRefresh() {
   return refreshStatus;
 }
 
-
 export function stopRefresh() {
   stopRequested = true;
   return refreshStatus();
 }
 
-export function refreshDatabase(o) {
-  switch (o.options.op) {
-    case 'start':
-      return startRefresh();
-    case 'stop':
-      return stopRefresh();
-    default:
-      return refreshStatus();
-  }
-}
-
-
 export default () =>
   init()
   .then(() => createRouter()
+    .get('/start', handleRequest(
+      startRefresh
+    ))
+    .get('/stop', handleRequest(
+      stopRefresh
+    ))
     .get('/', handleRequest(
-      refreshDatabase
+      refreshStatus
     ))
   );
