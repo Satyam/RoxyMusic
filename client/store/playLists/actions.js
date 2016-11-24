@@ -41,7 +41,7 @@ export function replacePlayListTracks(idPlayList, idTracks, lastPlayed = -1) {
 export function renamePlayList(idPlayList, name) {
   return asyncActionCreator(
     RENAME_PLAY_LIST,
-    api.update(`/${idPlayList}/name`, { name }),
+    api.update(`/rename/${idPlayList}`, { name }),
     { idPlayList, name }
   );
 }
