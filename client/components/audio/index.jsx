@@ -8,6 +8,7 @@ import path from 'path';
 import {
   playNextTrack,
   getTrack,
+  getConfig,
 } from '_store/actions';
 
 export function AudioComponent({ src, autoPlay, onEnded }) {
@@ -29,7 +30,10 @@ export function storeInitializer(dispatch, state) {
     const current = nowPlaying.current;
     if (current !== -1) {
       const idTrack = nowPlaying.idTracks[current];
-      return state.tracks[idTrack] || dispatch(getTrack(idTrack));
+      return Promise.all([
+        state.tracks[idTrack] || dispatch(getTrack(idTrack)),
+        state.config.musicDir || dispatch(getConfig('musicDir')),
+      ]);
     }
   }
   return null;
@@ -41,10 +45,17 @@ export function mapStateToProps(state) {
     const current = nowPlaying.current;
     if (current !== -1) {
       const idTrack = nowPlaying.idTracks[current];
-      if (state.tracks[idTrack]) {
+      if (state.tracks[idTrack] && state.config.musicDir) {
         return {
           idTrack,
-          src: path.join('/music', state.tracks[idTrack].location),
+          src: path.join(
+            (
+              BUNDLE === 'electronClient'
+              ? state.config.musicDir
+              : '/music'
+            ),
+            state.tracks[idTrack].location
+          ),
           autoPlay: 'true',
         };
       }
