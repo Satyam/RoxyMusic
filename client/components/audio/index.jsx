@@ -25,18 +25,20 @@ AudioComponent.propTypes = {
 };
 
 export function storeInitializer(dispatch, state) {
+  const mDirP = state.config.musicDir || dispatch(getConfig('musicDir'));
+  let trackP = null;
   if (state.nowPlaying.loaded) {
     const nowPlaying = state.nowPlaying;
     const current = nowPlaying.current;
     if (current !== -1) {
       const idTrack = nowPlaying.idTracks[current];
-      return Promise.all([
-        state.tracks[idTrack] || dispatch(getTrack(idTrack)),
-        state.config.musicDir || dispatch(getConfig('musicDir')),
-      ]);
+      trackP = state.tracks[idTrack] || dispatch(getTrack(idTrack));
     }
   }
-  return null;
+  return Promise.all([
+    trackP,
+    mDirP,
+  ]);
 }
 
 export function mapStateToProps(state) {
