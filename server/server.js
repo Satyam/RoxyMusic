@@ -1,7 +1,7 @@
 import http from 'http';
 import { join } from 'path';
 import express, { Router as createRouter } from 'express';
-import debug from 'debug';
+import dbg from 'debug';
 
 import bodyParser from 'body-parser';
 import denodeify from 'denodeify';
@@ -29,8 +29,8 @@ const server = http.createServer(app);
 const listen = denodeify(server.listen.bind(server));
 const close = denodeify(server.close.bind(server));
 
-// debug.enable('RoxyMusic:server/server');
-const log = debug('RoxyMusic:server/server');
+// dbg.enable('RoxyMusic:server/server');
+const debug = dbg('RoxyMusic:server/server');
 
 const dataRouter = createRouter();
 app.use(REST_API_PATH, bodyParser.json(), dataRouter);
@@ -40,7 +40,7 @@ app.use(express.static(absPath('public')));
 const musicRegExp = /^\/music\/(.+)$/;
 app.get(musicRegExp, (req, res) => {
   const filename = decodeURI(musicRegExp.exec(req.path)[1]);
-  console.log('requested music file', filename);
+  debug('requested music file', filename);
   res.sendFile(join(getConfig('musicDir'), filename));
 });
 app.get('/kill', (req, res) => {
@@ -57,13 +57,13 @@ const handleRequest = actions => (req, res) => {
     options: req.query || {},
   };
 
-  log('> %s %j', req.url, o);
+  debug('> %s %j', req.url, o);
   return [].concat(actions).reduce(
     (p, next) => p.then(next),
     Promise.resolve(o)
   )
   .then((reply) => {
-    log('< %s %j', req.url, reply);
+    debug('< %s %j', req.url, reply);
     return res.json(reply);
   })
   .catch((reason) => {

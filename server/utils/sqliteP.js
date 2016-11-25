@@ -1,11 +1,11 @@
 import sqlite3 from 'sqlite3';
 import fs from 'fs';
 import denodeify from 'denodeify';
-import debug from 'debug';
+import dbg from 'debug';
 import map from 'lodash/map';
 
-debug.enable('RoxyMusic:sqliteP');
-const log = debug('RoxyMusic:sqliteP');
+// dbg.enable('RoxyMusic:sqliteP');
+const debug = dbg('RoxyMusic:sqliteP');
 const readFile = denodeify(fs.readFile);
 
 export const OPEN_CREATE = sqlite3.OPEN_CREATE;
@@ -30,7 +30,7 @@ function myDenodeify(nodeStyleFunction, context, dolarize) {
         const error = args[0];
 
         if (error) {
-          log({
+          debug({
             sqlError: error,
             args: JSON.stringify(functionArguments),
             sql: context.sql,
@@ -105,10 +105,10 @@ class ST {
       const self = this;
       this.statement.run(dolarizeQueryParams(params), function (err) {
         /* eslint-enable func-names */
-        log(`Running: ${self.statement.sql}, ${JSON.stringify(params, null, 2)}`);
+        debug(`Running: ${self.statement.sql}, ${JSON.stringify(params, null, 2)}`);
 
         if (err) {
-          log(`SQL error: ${err} in ${self.statement.sql}.`);
+          debug(`SQL error: ${err} in ${self.statement.sql}.`);
           reject(`${self.statement.sql}
             ${JSON.stringify(params, null, 2)}
             ${err}`);
@@ -136,7 +136,7 @@ class ST {
         if (done) return;
 
         if (err) {
-          log(`SQL error in row function: ${err} in ${this.statement.sql}, ${JSON.stringify(params, null, 2)}.`);
+          debug(`SQL error in row function: ${err} in ${this.statement.sql}, ${JSON.stringify(params, null, 2)}.`);
           done = true;
           reject(`${this.statement.sql}
             ${JSON.stringify(params, null, 2)}
@@ -149,7 +149,7 @@ class ST {
 
       const completionCallback = (err, count) => {
         if (err) {
-          log(`SQL error in completion function: ${err} in ${this.statement}, ${JSON.stringify(params, null, 2)}.`);
+          debug(`SQL error in completion function: ${err} in ${this.statement}, ${JSON.stringify(params, null, 2)}.`);
           reject(err);
           return;
         }
@@ -213,7 +213,7 @@ export default class DB {
         if (done) return;
 
         if (err) {
-          log(`SQL error in row function: ${err} in ${sql}, ${JSON.stringify(params, null, 2)}.`);
+          debug(`SQL error in row function: ${err} in ${sql}, ${JSON.stringify(params, null, 2)}.`);
           done = true;
           reject(`${err} in ${sql}, ${JSON.stringify(params, null, 2)}.`);
           return;
@@ -224,7 +224,7 @@ export default class DB {
 
       const completionCallback = (err, count) => {
         if (err) {
-          log(`SQL error in completion function: ${err} in ${sql}, ${JSON.stringify(params, null, 2)}.`);
+          debug(`SQL error in completion function: ${err} in ${sql}, ${JSON.stringify(params, null, 2)}.`);
           reject(err);
           return;
         }
@@ -243,10 +243,10 @@ export default class DB {
       // because we need the `this` of that callback to extract info from it
       this.db.run(sql, dolarizeQueryParams(params), function (err) {
         /* eslint-enable func-names */
-        log(`Running: ${sql}, ${JSON.stringify(params, null, 2)}`);
+        debug(`Running: ${sql}, ${JSON.stringify(params, null, 2)}`);
 
         if (err) {
-          log(`SQL error: ${err} in ${sql}, ${JSON.stringify(params, null, 2)}.`);
+          debug(`SQL error: ${err} in ${sql}, ${JSON.stringify(params, null, 2)}.`);
           reject(`${sql}
             ${JSON.stringify(params, null, 2)}
             ${err}`);

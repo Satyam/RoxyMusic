@@ -1,10 +1,10 @@
 import electron from 'electron';
 import url from 'url';
-import debug from 'debug';
+import dbg from 'debug';
 import pathToRegexp from 'path-to-regexp';
 
-// debug.enable('RoxyMusic:serverIPC');
-const log = debug('RoxyMusic:serverIPC');
+// dbg.enable('RoxyMusic:serverIPC');
+const debug = dbg('RoxyMusic:serverIPC');
 const routes = [];
 
 electron.ipcMain.on('restAPI', (event, msg) => {
@@ -29,14 +29,14 @@ electron.ipcMain.on('restAPI', (event, msg) => {
       Promise.resolve(o)
     )
     .then((data) => {
-      log('< %s %j', msg.url, data);
+      debug('< %s %j', msg.url, data);
       event.sender.send(msg.channel, {
         status: 200,
         data,
       });
     })
     .catch((reason) => {
-      log('<!!! %s %j', msg.url, reason);
+      debug('<!!! %s %j', msg.url, reason);
       event.sender.send(msg.channel, {
         status: (reason instanceof Error) ? 500 : reason.code,
         statusText: reason.message,
@@ -44,7 +44,7 @@ electron.ipcMain.on('restAPI', (event, msg) => {
     });
     return true;
   })) {
-    log('<!!! %s %j', msg.url, 'no match found');
+    debug('<!!! %s %j', msg.url, 'no match found');
     event.sender.send(msg.channel, {
       status: 404,
       statusText: 'no match found',

@@ -1,8 +1,8 @@
 import { join } from 'path';
-import debug from 'debug';
+import dbg from 'debug';
 
-// debug.enable('RoxyMusic:restAPI');
-const log = debug('RoxyMusic:restAPI');
+// dbg.enable('RoxyMusic:restAPI');
+const debug = dbg('RoxyMusic:restAPI');
 
 const clients = {};
 
@@ -17,7 +17,7 @@ export default (base) => {
     restClient = method => (path, body) => new Promise((resolve, reject) => {
       const channel = `${base}-${count += 1}`;
       ipc.once(channel, (event, response) => {
-        log('< %s \n%j', channel, response.data);
+        debug('< %s \n%j', channel, response.data);
         if (response.status < 300) {
           resolve(response.data);
         } else {
@@ -28,7 +28,7 @@ export default (base) => {
           });
         }
       });
-      log('> %s %s %s \n%j',
+      debug('> %s %s %s \n%j',
         channel,
         method,
         join(base, String(path)),
