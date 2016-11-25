@@ -46,6 +46,7 @@
     "lodash": "^4.17.2",
     "mp3-duration": "^1.0.10",
     "musicmetadata": "^2.0.4",
+    "path-to-regexp": "^1.7.0",
     "react": "^15.4.0",
     "react-addons-update": "^15.4.0",
     "react-audio-player": "^0.2.8",

@@ -1,7 +1,7 @@
 import { join } from 'path';
 import debug from 'debug';
 
-// debug.enable('RoxyMusic:restAPI');
+debug.enable('RoxyMusic:restAPI');
 const log = debug('RoxyMusic:restAPI');
 
 const clients = {};
@@ -36,10 +36,16 @@ export default (base) => {
       );
       ipc.send('restAPI', {
         channel,
-        url: `${HOST}:${PORT}${join(REST_API_PATH, base, String(path))}`,
+        url: join(base, String(path)),
         method,
         data: body,
       });
+    });
+    return (clients[base] = {
+      create: restClient('create'),
+      read: restClient('read'),
+      update: restClient('update'),
+      delete: restClient('delete'),
     });
   } else {
     restClient = method => (path, body) => fetch(

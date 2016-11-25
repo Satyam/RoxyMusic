@@ -1,10 +1,10 @@
 import electron from 'electron';
 import { join } from 'path';
-import { Router as createRouter } from 'express';
 
 import fs from 'fs';
 import denodeify from 'denodeify';
 import sqliteP from '_server/utils/sqliteP';
+import forEach from 'lodash/forEach';
 
 import config from '_server/config';
 import albums from '_server/albums';
@@ -32,9 +32,6 @@ const htmlFile = absPath('electron/index.html');
 
 let mainWindow;
 
-const dataRouter = createRouter();
-serverIPC(dataRouter);
-
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
@@ -49,6 +46,14 @@ app.on('ready', () => {
     mainWindow = null;
   });
 
+  function addToDataRouter(prefix, routes) {
+    forEach(routes, (operations, route) => {
+      forEach(operations, (actions, operation) =>
+        serverIPC(operation, join(prefix, route), actions)
+      );
+    });
+  }
+
   (DELDB ? unlink('server/data.db') : Promise.resolve())
   .then(() => sqliteP.open(absPath('server/data.db'), {
     initFileName: absPath('server/data.sql'),
@@ -59,15 +64,15 @@ app.on('ready', () => {
   })
   .then(() =>
     // This one needs to be done before the rest
-    config().then(router => dataRouter.use('/config', router))
+    config().then(routes => addToDataRouter('/config', routes))
   )
   .then(() => Promise.all([
-    albums().then(router => dataRouter.use('/albums', router)),
-    playlists().then(router => dataRouter.use('/playLists', router)),
-    artists().then(router => dataRouter.use('/artists', router)),
-    songs().then(router => dataRouter.use('/songs', router)),
-    tracks().then(router => dataRouter.use('/tracks', router)),
-    refreshDb().then(router => dataRouter.use('/refreshDb', router)),
+    albums().then(routes => addToDataRouter('/albums', routes)),
+    playlists().then(routes => addToDataRouter('/playLists', routes)),
+    artists().then(routes => addToDataRouter('/artists', routes)),
+    songs().then(routes => addToDataRouter('/songs', routes)),
+    tracks().then(routes => addToDataRouter('/tracks', routes)),
+    refreshDb().then(routes => addToDataRouter('/refreshDb', routes)),
   ]))
   .then(() =>
     writeFile(
