@@ -23,5 +23,5 @@ export function getTracks(idTracks) {
 }
 
 export function getTrack(idTrack) {
-  getTracks([idTrack]);
+  return getTracks([idTrack]);
 }
