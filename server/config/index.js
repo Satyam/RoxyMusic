@@ -105,7 +105,7 @@ export default () =>
   .then(() => ({
     '/:key': {
       read: o => getConfig(o.keys.key),
-      create: o => setConfig(o.keys.key),
-      update: o => setConfig(o.keys.key),
+      create: o => setConfig(o.keys.key, o.data),
+      update: o => setConfig(o.keys.key, o.data),
     },
   }));
