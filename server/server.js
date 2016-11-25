@@ -1,13 +1,14 @@
 import http from 'http';
 import { join } from 'path';
 import express, { Router as createRouter } from 'express';
+import debug from 'debug';
+
 import bodyParser from 'body-parser';
 import denodeify from 'denodeify';
 import fs from 'fs';
 import forEach from 'lodash/forEach';
 
 import sqliteP from './utils/sqliteP';
-import handleRequest from './utils/handleRequest';
 
 import albums from './albums';
 import playlists from './playlists';
@@ -28,6 +29,9 @@ const server = http.createServer(app);
 const listen = denodeify(server.listen.bind(server));
 const close = denodeify(server.close.bind(server));
 
+// debug.enable('RoxyMusic:server/server');
+const log = debug('RoxyMusic:server/server');
+
 const dataRouter = createRouter();
 app.use(REST_API_PATH, bodyParser.json(), dataRouter);
 
@@ -46,6 +50,26 @@ app.get('/kill', (req, res) => {
 });
 app.get('*', (req, res) => res.sendFile(absPath('server/index.html')));
 
+const handleRequest = actions => (req, res) => {
+  const o = {
+    keys: req.params || {},
+    data: req.body,
+    options: req.query || {},
+  };
+
+  log('> %s %j', req.url, o);
+  return [].concat(actions).reduce(
+    (p, next) => p.then(next),
+    Promise.resolve(o)
+  )
+  .then((reply) => {
+    log('< %s %j', req.url, reply);
+    return res.json(reply);
+  })
+  .catch((reason) => {
+    res.status((reason instanceof Error) ? 500 : reason.code).send(reason.message);
+  });
+};
 const equivalent = {
   create: 'post',
   read: 'get',
