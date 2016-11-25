@@ -1,7 +1,7 @@
 import { join } from 'path';
 import debug from 'debug';
 
-debug.enable('RoxyMusic:restAPI');
+// debug.enable('RoxyMusic:restAPI');
 const log = debug('RoxyMusic:restAPI');
 
 const clients = {};
@@ -47,7 +47,9 @@ export default (base) => {
       update: restClient('update'),
       delete: restClient('delete'),
     });
-  } else {
+  }
+  // For the sake of uglifier, so it can drop it.
+  if (BUNDLE !== 'electronClient') {
     restClient = method => (path, body) => fetch(
       `${HOST}:${PORT}${join(REST_API_PATH, base, String(path))}`,
       {
