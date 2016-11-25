@@ -25,7 +25,12 @@ function update(action, idTracks = [], current = -1) {
 export function playNow(idTrack) {
   return (dispatch, getState) => {
     const idTracks = getState().nowPlaying.idTracks;
-    return update(PLAY_NOW, idTracks.concat(idTrack), idTracks.length)(dispatch);
+    const index = idTracks.indexOf(idTrack);
+    return (
+      index === -1
+      ? update(PLAY_NOW, idTracks.concat(idTrack), idTracks.length)
+      : update(PLAY_NOW, idTracks, index)
+    )(dispatch);
   };
 }
 
