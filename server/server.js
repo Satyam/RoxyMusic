@@ -57,13 +57,13 @@ const handleRequest = actions => (req, res) => {
     options: req.query || {},
   };
 
-  debug('> %s %j', req.url, o);
+  debug('> %s %s %j', req.method, req.url, o);
   return [].concat(actions).reduce(
     (p, next) => p.then(next),
     Promise.resolve(o)
   )
   .then((reply) => {
-    debug('< %s %j', req.url, reply);
+    debug('< %s %s %j', req.method, req.url, reply);
     return res.json(reply);
   })
   .catch((reason) => {
