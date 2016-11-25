@@ -1,7 +1,7 @@
 import restAPI from '_utils/restAPI';
 import asyncActionCreator from '_utils/asyncActionCreator';
 
-const api = restAPI('PlayLists');
+const api = restAPI('playLists');
 
 export const GET_PLAY_LISTS = 'playlists/get playlists';
 export const GET_PLAY_LIST = 'playlists/get single playlist';
