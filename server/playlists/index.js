@@ -106,15 +106,15 @@ export default () =>
       },
       '/:idPlayList': {
         read: [
-          validators.idPlayList,
+          validators.keyIsInteger('idPlayList'),
           getPlayList,
         ],
         update: [
-          validators.idPlayList,
+          validators.keyIsInteger('idPlayList'),
           updatePlayList,
         ],
         delete: [
-          validators.idPlayList,
+          validators.keyIsInteger('idPlayList'),
           deletePlayList,
         ],
       },
@@ -123,13 +123,13 @@ export default () =>
       },
       '/save/:idPlayList': {
         create: [
-          validators.idPlayList,
+          validators.keyIsInteger('idPlayList'),
           savePlayList,
         ],
       },
       '/rename/:idPlayList': {
         update: [
-          validators.idPlayList,
+          validators.keyIsInteger('idPlayList'),
           renamePlayList,
         ],
       },

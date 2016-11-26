@@ -14,7 +14,7 @@ export default () =>
   .then(() => ({
     '/:idTracks': {
       read: [
-        validators.idTracks,
+        validators.keyIsIntegerList('idTracks'),
         getTracks,
       ],
     },

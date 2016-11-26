@@ -49,7 +49,7 @@ export default () =>
     },
     '/:idAlbum': {
       read: [
-        validators.idAlbum,
+        validators.keyIsInteger('idAlbum'),
         getAlbum,
       ],
     },

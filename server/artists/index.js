@@ -46,7 +46,7 @@ export default () =>
     },
     '/:idArtist': {
       read: [
-        validators.idArtist,
+        validators.keyIsInteger('idArtist'),
         getArtist,
       ],
     },
