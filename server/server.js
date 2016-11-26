@@ -8,7 +8,7 @@ import denodeify from 'denodeify';
 import fs from 'fs';
 import forEach from 'lodash/forEach';
 
-import sqliteP from './utils/sqliteP';
+import sqliteP from './utils/webSqlP';
 
 import albums from './albums';
 import playlists from './playlists';
