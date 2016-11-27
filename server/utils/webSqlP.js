@@ -62,8 +62,10 @@ class ST {
 
   each(params, onRow) {
     if (typeof params === 'function') {
+      /* eslint-disable no-param-reassign */
       onRow = params;
       params = undefined;
+      /* eslint-enable no-param-reassign */
     }
     return this.db.process(this.statement, this.params, params)
     .then((result) => {
@@ -171,8 +173,10 @@ export default class DB {
 
   each(sql, params, onRow) {
     if (typeof params === 'function') {
+      /* eslint-disable no-param-reassign */
       onRow = params;
       params = undefined;
+      /* eslint-enable no-param-reassign */
     }
     return this.process(replaceParams(sql), findParams(sql), params)
     .then((result) => {
