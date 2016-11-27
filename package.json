@@ -4,8 +4,8 @@
   "description": "client-server music player and sync service",
   "main": "index.js",
   "scripts": {
-    "start": "node bundles/server.js",
-    "debug": "node-debug -p 8888 bundles/server.js",
+    "start": "node bundles/webServer.js",
+    "debug": "node-debug -p 8888 bundles/webServer.js",
     "lint": "eslint --ext .jsx,.js . || exit 0",
     "test1": "echonode scripts/tests.js",
     "test": "exit 0",
@@ -13,7 +13,7 @@
     "build": "webpack -d --config webpack.config/development.js",
     "watch": "webpack -d --config webpack.config/development.js --watch &",
     "production": "webpack -p --config webpack.config/production.js",
-    "electron": "electron bundles/electron.js",
+    "electron": "electron bundles/electronServer.js",
     "updateModules": "updtr --test-stdout",
     "rebuildElectron": "electron-rebuild"
   },

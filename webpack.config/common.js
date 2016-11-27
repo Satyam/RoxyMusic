@@ -8,35 +8,37 @@ const absPath = relative => join(root, relative);
 
 
 module.exports = version => [
-  'client',
-  'server',
-  'electron',
+  'webClient',
+  'webServer',
+  'electronServer',
   'electronClient',
 ].map((bundle) => {
   const aliases = {
+    _client: absPath('client'),
+    _server: absPath('server'),
     _store: absPath('client/store'),
     _components: absPath('client/components'),
     _utils: absPath('client/utils'),
-    _server: absPath('server'),
     _test: absPath('test'),
+    _platform: absPath(bundle),
   };
   return {
     entry: {
       [bundle]: absPath({
-        client: 'client/index.jsx',
-        server: 'server/index.js',
-        electron: 'electron/index.js',
-        electronClient: 'electron/client.js',
+        webClient: 'webClient/index.jsx',
+        webServer: 'webServer/index.js',
+        electronServer: 'electronServer/index.js',
+        electronClient: 'electronClient/index.js',
       }[bundle]),
     },
     output: {
-      path: absPath(bundle === 'client' ? 'public/bundles' : 'bundles'),
+      path: absPath('bundles'),
       filename: '[name].js',
     },
     target: {
-      client: 'web',
-      server: 'node',
-      electron: 'electron',
+      webClient: 'web',
+      webServer: 'node',
+      electronServer: 'electron',
       electronClient: 'electron',
     }[bundle],
     module: {
@@ -71,7 +73,7 @@ module.exports = version => [
     },
     externals: [
       (context, request, callback) => {
-        if (bundle !== 'client') {
+        if (bundle !== 'webClient') {
           switch (request[0]) {
             case '.': {
               const fullPath = join(context, request);

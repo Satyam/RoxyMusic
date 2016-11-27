@@ -1,4 +1,4 @@
-import restAPI from '_utils/restAPI';
+import restAPI from '_platform/restAPI';
 import asyncActionCreator from '_utils/asyncActionCreator';
 
 const api = restAPI('albums');

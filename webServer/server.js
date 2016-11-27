@@ -8,16 +8,10 @@ import denodeify from 'denodeify';
 import fs from 'fs';
 import forEach from 'lodash/forEach';
 
-import sqliteP from './utils/webSqlP';
+import { getConfig } from '_server/config';
+import dataServers from '_server';
 
-import albums from './albums';
-import playlists from './playlists';
-import artists from './artists';
-import songs from './songs';
-import tracks from './tracks';
-import refreshDb from './refreshDb';
-
-import config, { getConfig } from './config';
+import sqlP from '_server/utils/webSqlP';
 
 const absPath = relPath => join(ROOT_DIR, relPath);
 
@@ -36,7 +30,9 @@ const dataRouter = createRouter();
 app.use(REST_API_PATH, bodyParser.json(), dataRouter);
 
 app.use('/bootstrap', express.static(absPath('node_modules/bootstrap/dist')));
-app.use(express.static(absPath('public')));
+app.use('/bundles', express.static(absPath('bundles')));
+app.use(express.static(absPath('webServer/public')));
+
 const musicRegExp = /^\/music\/(.+)$/;
 app.get(musicRegExp, (req, res) => {
   const filename = decodeURI(musicRegExp.exec(req.path)[1]);
@@ -48,7 +44,7 @@ app.get('/kill', (req, res) => {
   close();
   process.exit();
 });
-app.get('*', (req, res) => res.sendFile(absPath('server/index.html')));
+app.get('*', (req, res) => res.sendFile(absPath('webServer/index.html')));
 
 const handleRequest = actions => (req, res) => {
   const o = {
@@ -88,22 +84,11 @@ function addToDataRouter(prefix, routes) {
 export function start() {
   const DELDB = false;
   return (DELDB ? unlink('server/data.db') : Promise.resolve())
-  .then(() => sqliteP.open(absPath('server/data.db'), {
+  .then(() => sqlP.open(absPath('server/data.db'), {
     initFileName: absPath('server/data.sql'),
     verbose: true,
   }))
-  .then(db =>
-    // This one needs to be done before the rest
-    config(db).then(routes => addToDataRouter('/config', routes))
-    .then(() => Promise.all([
-      albums(db).then(routes => addToDataRouter('/albums', routes)),
-      playlists(db).then(routes => addToDataRouter('/playLists', routes)),
-      artists(db).then(routes => addToDataRouter('/artists', routes)),
-      songs(db).then(routes => addToDataRouter('/songs', routes)),
-      tracks(db).then(routes => addToDataRouter('/tracks', routes)),
-      refreshDb(db).then(routes => addToDataRouter('/refreshDb', routes)),
-    ]))
-  )
+  .then(db => dataServers(db, addToDataRouter))
   .then(() => listen(PORT));
 }
 export function stop() {
