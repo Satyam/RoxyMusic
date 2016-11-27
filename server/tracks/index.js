@@ -1,16 +1,18 @@
 import * as validators from '_server/utils/validators';
 
-export function init() {
+let $db;
+export function init(db) {
+  $db = db;
   return Promise.resolve();
 }
 
 // getTracks: 'select * from AllTracks where idTrack in ($idTracks)',
 export function getTracks(o) {
-  return db.all(`select * from AllTracks where idTrack in (${o.keys.idTracks})`);
+  return $db.all(`select * from AllTracks where idTrack in (${o.keys.idTracks})`);
 }
 
-export default () =>
-  init()
+export default db =>
+  init(db)
   .then(() => ({
     '/:idTracks': {
       read: [

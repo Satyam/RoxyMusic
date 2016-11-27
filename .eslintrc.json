@@ -13,7 +13,6 @@
     "import/core-modules": [ "electron" ]
   },
   "globals": {
-    "db": false,
     "ROOT_DIR": false,
     "HOST": false,
     "PORT": false,

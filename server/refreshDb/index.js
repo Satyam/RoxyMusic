@@ -17,8 +17,10 @@ const stat = denodeify(fs.stat);
 let audioExtensions = [];
 let initialDir = '';
 let prepared = {};
+let $db;
 
-export function init() {
+export function init(db) {
+  $db = db;
   initialDir = getConfig('musicDir');
   audioExtensions = getConfig('audioExtensions').split(',').map(e => e.trim());
   return db.prepareAll({
@@ -289,7 +291,7 @@ export function scan(dir) {
     if (stopRequested || steps < 0) {
       pending.length = 0;
       stopRequested = false;
-      db.exec('vacuum');
+      $db.exec('vacuum');
     } else if (pending.length) {
       setImmediate(scan, pending.shift());
     }
@@ -335,8 +337,8 @@ export function stopRefresh() {
   return refreshStatus();
 }
 
-export default () =>
-  init()
+export default db =>
+  init(db)
   .then(() => ({
     '/start': {
       read: startRefresh,

@@ -10,8 +10,10 @@ import { getConfig } from '_server/config';
 const writeFile = denodeify(fs.writeFile);
 
 let prepared = {};
+let $db;
 
-export function init() {
+export function init(db) {
+  $db = db;
   return db.prepareAll({
     getPlayLists: 'select * from PlayLists',
     getPlayList: 'select * from PlayLists where idPlayList = $idPlayList',
@@ -68,7 +70,7 @@ export function deletePlayList(o) {
 function saveOnePlayList(playList) {
   const musicDir = getConfig('musicDir');
   const fileName = join(musicDir, `${playList.name}.m3u`);
-  return db.all(
+  return $db.all(
     `select title, duration, location, coalesce(AlbumArtist.artist, Artist.artist) as artist
       from Tracks
       left join People as AlbumArtist on idAlbumArtist = AlbumArtist.idPerson
@@ -97,8 +99,8 @@ export function savePlayList(o) {
   .then(saveOnePlayList);
 }
 
-export default () =>
-    init()
+export default db =>
+    init(db)
     .then(() => ({
       '/': {
         read: getPlayLists,

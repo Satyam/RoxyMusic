@@ -1,6 +1,6 @@
 let prepared = {};
 
-export function init() {
+export function init(db) {
   return db.prepareAll({
     getSongs: 'select idTrack, title from Tracks order by title limit $count offset $offset',
     searchSongs: 'select idTrack, title from Tracks where title like $search order by title limit $count offset $offset',
@@ -28,8 +28,8 @@ export function getSongs(o) {
   );
 }
 
-export default () =>
-  init()
+export default db =>
+  init(db)
   .then(() => ({
     '/': {
       read: getSongs,

@@ -3,7 +3,7 @@ import splitIdTracks from '_server/utils/splitIdTracks';
 
 let prepared = {};
 
-export function init() {
+export function init(db) {
   return db.prepareAll({
     getArtists: 'select * from AllArtists limit $count offset $offset',
     searchArtists: 'select * from AllArtists where artist like $search limit $count offset $offset',
@@ -38,8 +38,8 @@ export function getArtist(o) {
 }
 
 
-export default () =>
-  init()
+export default db =>
+  init(db)
   .then(() => ({
     '/': {
       read: getArtists,

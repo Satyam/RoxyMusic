@@ -59,21 +59,18 @@ app.on('ready', () => {
     initFileName: absPath('server/data.sql'),
     verbose: true,
   }))
-  .then((db) => {
-    global.db = db;
-  })
-  .then(() =>
+  .then(db =>
     // This one needs to be done before the rest
-    config().then(routes => addToDataRouter('/config', routes))
+    config(db).then(routes => addToDataRouter('/config', routes))
+    .then(() => Promise.all([
+      albums(db).then(routes => addToDataRouter('/albums', routes)),
+      playlists(db).then(routes => addToDataRouter('/playLists', routes)),
+      artists(db).then(routes => addToDataRouter('/artists', routes)),
+      songs(db).then(routes => addToDataRouter('/songs', routes)),
+      tracks(db).then(routes => addToDataRouter('/tracks', routes)),
+      refreshDb(db).then(routes => addToDataRouter('/refreshDb', routes)),
+    ]))
   )
-  .then(() => Promise.all([
-    albums().then(routes => addToDataRouter('/albums', routes)),
-    playlists().then(routes => addToDataRouter('/playLists', routes)),
-    artists().then(routes => addToDataRouter('/artists', routes)),
-    songs().then(routes => addToDataRouter('/songs', routes)),
-    tracks().then(routes => addToDataRouter('/tracks', routes)),
-    refreshDb().then(routes => addToDataRouter('/refreshDb', routes)),
-  ]))
   .then(() =>
     writeFile(
       htmlFile,

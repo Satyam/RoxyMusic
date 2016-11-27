@@ -87,7 +87,7 @@ export function setConfig(key, newValue) {
   });
 }
 
-export function init() {
+export function init(db) {
   return db.prepareAll({
     selectAllConfig: 'select * from config',
     selectConfigValue: 'select * from config where key=$key',
@@ -100,8 +100,8 @@ export function init() {
   .then(() => loadConfig());
 }
 
-export default () =>
-  init()
+export default db =>
+  init(db)
   .then(() => ({
     '/:key': {
       read: o => getConfig(o.keys.key),
