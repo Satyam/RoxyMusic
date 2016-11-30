@@ -16,14 +16,17 @@ electron.ipcMain.on('restAPI', (event, msg) => {
     keys: {},
     body: msg.data,
   };
-  if (!routes.some((route) => {
-    if (method !== route.method) return false;
-    const m = route.regexp.exec(path);
-    if (!m) return m;
+  const route = routes.find((rt) => {
+    if (method !== rt.method) return false;
+    const m = rt.regexp.exec(path);
+    if (!m) return false;
     for (let i = 1; i < m.length; i += 1) {
-      const prop = route.keys[i - 1].name;
+      const prop = rt.keys[i - 1].name;
       o.keys[prop] = m[i];
     }
+    return true;
+  });
+  if (route) {
     route.actions.reduce(
       (p, next) => p.then(next),
       Promise.resolve(o)
@@ -42,8 +45,7 @@ electron.ipcMain.on('restAPI', (event, msg) => {
         statusText: reason.message,
       });
     });
-    return true;
-  })) {
+  } else {
     debug('<!!! %s %j', msg.url, 'no match found');
     event.sender.send(msg.channel, {
       status: 404,
@@ -54,8 +56,9 @@ electron.ipcMain.on('restAPI', (event, msg) => {
 
 export default (method, route, actions) => {
   const keys = [];
+  const regexp = pathToRegexp(route, keys);
   routes.push({
-    regexp: pathToRegexp(route, keys),
+    regexp,
     keys,
     method,
     actions: [].concat(actions),

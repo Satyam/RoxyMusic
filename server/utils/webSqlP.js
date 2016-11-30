@@ -218,15 +218,33 @@ export default class DB {
   @returns {Promise} a Promise that resolves to the database instance
   */
   static open(filename, options) {
-    return new Promise(resolve =>
-      openDatabase(
-        filename,
-        options.version || '1.0',
-        options.description || 'description',
-        options.size || 1,
-        db => resolve(new DB(db, options))
-      )
-    ).then(db =>
+    return new Promise((resolve, reject) => {
+    /* global window, cordova */
+      if (window && window.sqlitePlugin) {
+        window.resolveLocalFileSystemURL(
+          `${cordova.file.externalRootDirectory}/Music`,
+          (externalDataDirectoryEntry) => {
+            resolve(window.sqlitePlugin.openDatabase(
+              {
+                name: filename,
+                androidDatabaseLocation: externalDataDirectoryEntry.toURL(),
+              }
+            ));
+          },
+          reject
+        );
+      } else {
+        openDatabase(
+          filename,
+          options.version || '1.0',
+          options.description || 'description',
+          options.size || 1,
+          resolve
+        );
+      }
+    })
+    .then(db => new DB(db, options))
+    .then(db =>
       db.get('select count(*) as c  from sqlite_master')
       .then((row) => {
         if (row.c === 0) {

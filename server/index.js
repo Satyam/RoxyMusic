@@ -1,3 +1,6 @@
+import forEach from 'lodash/forEach';
+import { join } from 'path';
+
 import albums from './albums';
 import playlists from './playlists';
 import artists from './artists';
@@ -7,7 +10,14 @@ import refreshDb from './refreshDb';
 
 import config from './config';
 
-export default function (db, addToDataRouter) {
+export default function (db, routeAdd) {
+  function addToDataRouter(prefix, routes) {
+    forEach(routes, (operations, route) => {
+      forEach(operations, (actions, operation) =>
+        routeAdd(operation, join(prefix, route), actions)
+      );
+    });
+  }
   // This one needs to be done before the rest
   return config(db).then(routes => addToDataRouter('/config', routes))
   .then(() => Promise.all([

@@ -6,16 +6,17 @@ import dbg from 'debug';
 import bodyParser from 'body-parser';
 import denodeify from 'denodeify';
 import fs from 'fs';
-import forEach from 'lodash/forEach';
 
 import { getConfig } from '_server/config';
 import dataServers from '_server';
 
-import sqlP from '_server/utils/webSqlP';
+import openDatabase from '_server/utils/openWebSql';
+import DB from '_server/utils/webSqlP';
 
 const absPath = relPath => join(ROOT_DIR, relPath);
 
 const unlink = denodeify(fs.unlink);
+const readFile = denodeify(fs.readFile);
 
 const app = express();
 const server = http.createServer(app);
@@ -73,22 +74,28 @@ const equivalent = {
   delete: 'delete',
 };
 
-function addToDataRouter(prefix, routes) {
-  forEach(routes, (operations, route) => {
-    forEach(operations, (actions, operation) => {
-      const method = equivalent[operation];
-      dataRouter[method](join(prefix, route), handleRequest(actions));
-    });
-  });
+function addRoute(operation, path, actions) {
+  dataRouter[equivalent[operation]](path, handleRequest(actions));
 }
+
 export function start() {
   const DELDB = false;
   return (DELDB ? unlink('server/data.db') : Promise.resolve())
-  .then(() => sqlP.open(absPath('server/data.db'), {
-    initFileName: absPath('server/data.sql'),
+  .then(() => openDatabase(absPath('server/data.db'), {
     verbose: true,
   }))
-  .then(db => dataServers(db, addToDataRouter))
+  .then(rawDb => new DB(rawDb))
+  .then(db =>
+    db.get('select count(*) as c  from sqlite_master')
+    .then(row => (
+      row.c === 0
+      ? readFile(absPath('server/data.sql'), 'utf8')
+        .then(data => db.exec(data))
+        .then(() => db)
+      : db
+    ))
+  )
+  .then(db => dataServers(db, addRoute))
   .then(() => listen(PORT));
 }
 export function stop() {

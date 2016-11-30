@@ -1,12 +1,9 @@
 import sqlite3 from 'sqlite3';
-import fs from 'fs';
-import denodeify from 'denodeify';
 import dbg from 'debug';
 import map from 'lodash/map';
 
 // dbg.enable('RoxyMusic:sqliteP');
 const debug = dbg('RoxyMusic:sqliteP');
-const readFile = denodeify(fs.readFile);
 
 export const OPEN_CREATE = sqlite3.OPEN_CREATE;
 export const OPEN_READWRITE = sqlite3.OPEN_READWRITE;
@@ -279,51 +276,5 @@ export default class DB {
         .run('ROLLBACK')
         .then(() => Promise.reject(err))
       );
-  }
-
-  /**
-  Opens the database located in filename given with the given options.
-  Returns a Promise that resolves to the open database.
-
-  @param filename {string} the name of the database file to open.
-  @param [options] {object} options
-  @param options.mode one of the OPEN_xxx option flags, defaults to OPEN_CREATE + OPEN_READWRITE
-  @param options.initSql {string} sql statements to initialize the database if found empty
-  @param options.initFileName {string} name of a file containing the sql statements
-    to initialize the database if found empty
-  @param options.verbose {boolean} if truish, it opens the database in verbose mode.
-  @returns {Promise} a Promise that resolves to the database instance
-  */
-  static open(filename, options) {
-    return new Promise((resolve, reject) => {
-      const sq = new (options.verbose ? sqlite3.verbose() : sqlite3).Database(
-        filename,
-        options.mode || (OPEN_CREATE + OPEN_READWRITE),
-        (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(new DB(sq, options));
-          }
-        }
-      );
-    }).then(db =>
-      db.get('select count(*) as c  from sqlite_master')
-      .then((row) => {
-        if (row.c === 0) {
-          let src;
-          if (options.initSql) {
-            src = Promise.resolve(options.initSql);
-          } else if (options.initFileName) {
-            src = readFile(options.initFileName, 'utf8');
-          }
-          if (src) {
-            return src.then(data => db.exec(data))
-            .then(() => db);
-          }
-        }
-        return db;
-      })
-    );
   }
 }

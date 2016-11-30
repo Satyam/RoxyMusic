@@ -3,8 +3,9 @@ import { join } from 'path';
 
 import fs from 'fs';
 import denodeify from 'denodeify';
-import sqlP from '_server/utils/sqliteP';
-import forEach from 'lodash/forEach';
+
+import openDatabase from '_server/utils/openSqlite';
+import DB from '_server/utils/sqliteP';
 
 import dataServers from '_server';
 
@@ -21,6 +22,7 @@ const absPath = relative => join(ROOT_DIR, relative);
 
 const writeFile = denodeify(fs.writeFile);
 const unlink = denodeify(fs.unlink);
+const readFile = denodeify(fs.readFile);
 
 const htmlFile = absPath('electronServer/index.html');
 
@@ -40,20 +42,22 @@ app.on('ready', () => {
     mainWindow = null;
   });
 
-  function addToDataRouter(prefix, routes) {
-    forEach(routes, (operations, route) => {
-      forEach(operations, (actions, operation) =>
-        IPC(operation, join(prefix, route), actions)
-      );
-    });
-  }
-
   (DELDB ? unlink('server/data.db') : Promise.resolve())
-  .then(() => sqlP.open(absPath('server/data.db'), {
-    initFileName: absPath('server/data.sql'),
+  .then(() => openDatabase(absPath('server/data.db'), {
     verbose: true,
   }))
-  .then(db => dataServers(db, addToDataRouter))
+  .then(rawDb => new DB(rawDb))
+  .then(db =>
+    db.get('select count(*) as c  from sqlite_master')
+    .then(row => (
+      row.c === 0
+      ? readFile(absPath('server/data.sql'), 'utf8')
+        .then(data => db.exec(data))
+        .then(() => db)
+      : db
+    ))
+  )
+  .then(db => dataServers(db, IPC))
   .then(() =>
     writeFile(
       htmlFile,

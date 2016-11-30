@@ -12,6 +12,7 @@ module.exports = version => [
   'webServer',
   'electronServer',
   'electronClient',
+  'phonegap',
 ].map((bundle) => {
   const aliases = {
     _client: absPath('client'),
@@ -29,6 +30,7 @@ module.exports = version => [
         webServer: 'webServer/index.js',
         electronServer: 'electronServer/index.js',
         electronClient: 'electronClient/index.js',
+        phonegap: 'phonegap/index.js',
       }[bundle]),
     },
     output: {
@@ -40,6 +42,7 @@ module.exports = version => [
       webServer: 'node',
       electronServer: 'electron',
       electronClient: 'electron',
+      phonegap: 'web',
     }[bundle],
     module: {
       loaders: [
@@ -68,32 +71,44 @@ module.exports = version => [
       }),
     ],
     resolve: {
-      alias: aliases,
+      alias: (
+        bundle === 'phonegap'
+        ? Object.assign(aliases, { fs: absPath('node_modules/html5-fs') })
+        : aliases
+      ),
       extensions: ['', '.js', '.jsx'],
     },
     externals: [
       (context, request, callback) => {
-        if (bundle !== 'webClient') {
-          switch (request[0]) {
-            case '.': {
-              const fullPath = join(context, request);
-              if (fullPath.indexOf('/node_modules/') > -1) {
-                return callback(null, `commonjs ${fullPath}`);
-              }
-              break;
-            }
-            case '/':
-              break;
-            default: {
-              const firstPart = request.split('/')[0];
-              if (Object.keys(aliases).indexOf(firstPart) === -1) {
-                return callback(null, `commonjs ${request}`);
-              }
-              break;
-            }
-          }
-        } else if (request === 'electron') {
+        if (bundle === 'webClient') {
+          return callback();
+        }
+        if (bundle === 'phonegap') {
+          // if (request === 'fs') {
+          //   return callback(null, 'commonjs html5-fs')
+          // }
+          return callback();
+        }
+        if (request === 'electron') {
           return callback(null, `commonjs ${request}`);
+        }
+        switch (request[0]) {
+          case '.': {
+            const fullPath = join(context, request);
+            if (fullPath.indexOf('/node_modules/') > -1) {
+              return callback(null, `commonjs ${fullPath}`);
+            }
+            break;
+          }
+          case '/':
+            break;
+          default: {
+            const firstPart = request.split('/')[0];
+            if (Object.keys(aliases).indexOf(firstPart) === -1) {
+              return callback(null, `commonjs ${request}`);
+            }
+            break;
+          }
         }
         return callback();
       },
