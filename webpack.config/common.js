@@ -6,6 +6,14 @@ const join = path.join;
 const root = process.cwd();
 const absPath = relative => join(root, relative);
 
+const phonegapRemplacements = {
+  react: 'React',
+  'react-dom': 'ReactDOM',
+  'react-bootstrap': 'ReactBootstrap',
+  'react-router': 'ReactRouter',
+  'redux-devtools': null,
+  'react-addons-perf': null,
+};
 
 module.exports = version => [
   'webClient',
@@ -56,6 +64,11 @@ module.exports = version => [
           loader: ExtractTextPlugin.extract('style-loader', 'css-loader?modules&camelCase'),
         },
       ],
+      noParse: (
+        bundle === 'phonegap'
+        ? Object.keys(phonegapRemplacements).map(request => new RegExp(`^${request}$`))
+        : undefined
+      ),
     },
     plugins: [
       new ExtractTextPlugin(`${bundle}.css`),
@@ -87,6 +100,9 @@ module.exports = version => [
           // if (request === 'fs') {
           //   return callback(null, 'commonjs html5-fs')
           // }
+          if (phonegapRemplacements[request]) {
+            return callback(null, `var ${phonegapRemplacements[request]}`);
+          }
           return callback();
         }
         if (request === 'electron') {
