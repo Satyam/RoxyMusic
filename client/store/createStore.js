@@ -31,6 +31,7 @@ export default (history, initialState) => {
     reducers,
     initialState,
     process.env.NODE_ENV !== 'production' &&
+    BUNDLE !== 'phonegap' &&
     typeof window !== 'undefined' &&
     window.devToolsExtension
     ? compose(mw, window.devToolsExtension())

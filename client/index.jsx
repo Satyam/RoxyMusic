@@ -9,7 +9,7 @@ import createStore from '_store/createStore';
 import routes from '_components/routes';
 
 export default function () {
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' && BUNDLE !== 'phonegap') {
     /* eslint-disable import/no-extraneous-dependencies, global-require */
     window.Perf = require('react-addons-perf');
     /* eslint-enable import/no-extraneous-dependencies, global-require */
