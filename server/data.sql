@@ -9,7 +9,7 @@ CREATE TABLE `config` (
 INSERT INTO `config` (key, value, type) values
  ('musicDir', '/home/satyam/Music', 0),
  ('audioExtensions', 'mp3,mp4,m4a,wav,wma,flac', 0),
- ('nowPlaying', '{current: -1, idTracks: []}', 5);
+ ('nowPlaying', '{"current": -1, "idTracks": []}', 5);
 
 DROP TABLE IF EXISTS `Tracks`;
 CREATE TABLE `Tracks` (
