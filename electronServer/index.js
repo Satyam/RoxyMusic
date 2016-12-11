@@ -4,11 +4,10 @@ import { join } from 'path';
 import fs from 'fs';
 import denodeify from 'denodeify';
 
-import openDatabase from '_server/utils/openSqlite';
-import DB from '_server/utils/sqliteP';
+import openDatabase from '_server/utils/openWebSql';
+import DB from '_server/utils/webSqlP';
 
 import dataServers from '_server';
-
 import IPC from './IPC';
 import htmlTpl from './htmlTemplate';
 
@@ -37,11 +36,13 @@ app.on('window-all-closed', () => {
 app.on('ready', () => {
   mainWindow = new BrowserWindow();
   mainWindow.maximize();
+  // Un-comment the following to open the DevTools.
+  mainWindow.webContents.openDevTools({ mode: 'bottom' });
+  // ---------
 
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
-
   (DELDB ? unlink('server/data.db') : Promise.resolve())
   .then(() => openDatabase(absPath('server/data.db'), {
     verbose: true,
@@ -65,9 +66,6 @@ app.on('ready', () => {
     ),
   )
   .then(() => mainWindow.loadURL(`file://${htmlFile}`))
-  // Un-comment the following to open the DevTools.
-  .then(() => mainWindow.webContents.openDevTools({ mode: 'bottom' }))
-  // ---------
   .catch((err) => {
     throw err;
   });
