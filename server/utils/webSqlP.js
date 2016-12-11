@@ -1,9 +1,4 @@
-import openDatabase from 'websql';
-import fs from 'fs';
-import denodeify from 'denodeify';
 import map from 'lodash/map';
-
-const readFile = denodeify(fs.readFile);
 
 const paramsRE = /\$(\w+)/g;
 const sqlSplitRE = /\s*;\s*(?=([^']*'[^']*')*[^']*$)/g;
@@ -95,9 +90,13 @@ export default class DB {
           statement,
           params.map(name => paramValues[name]),
           (tx1, rs) => resolve(rs),
-          reject
+          (tx2, err) => {
+            reject(`Error: ${JSON.stringify(err)} executing statement "${statement}", values ${paramValues}`);
+          }
         ),
-        reject
+        (err) => {
+          reject(`Error: ${JSON.stringify(err)} securing transaction for statement "${statement}", values ${paramValues}`);
+        }
       );
     });
   }
@@ -127,25 +126,29 @@ export default class DB {
         (tx) => {
           let lastIndex = 0;
           function solveOne() {
-            const m = sqlSplitRE(sql);
+            const m = sqlSplitRE.exec(sql);
             if (m) {
               const s = sql.substring(lastIndex, m.index);
-              if (transactionRE.text(s)) {
+              lastIndex = m.index + 1;
+              if (transactionRE.test(s)) {
                 solveOne();
               } else {
                 tx.executeSql(
                   s,
                   [],
                   solveOne,
-                  reject
+                  (tx1, err) => {
+                    reject(`Error: ${JSON.stringify(err)} executing statement "${sql}`);
+                  }
                 );
               }
-              lastIndex = m.index + 1;
             }
           }
           solveOne();
         },
-        reject,
+        (err) => {
+          reject(`Error: ${JSON.stringify(err)} securing transaction for statement "${sql}"`);
+        },
         resolve
       );
     });
@@ -202,65 +205,5 @@ export default class DB {
 
   inTransaction(f) {
     return f();
-  }
-
-  /**
-  Opens the database located in filename given with the given options.
-  Returns a Promise that resolves to the open database.
-
-  @param filename {string} the name of the database file to open.
-  @param [options] {object} options
-  @param options.mode one of the OPEN_xxx option flags, defaults to OPEN_CREATE + OPEN_READWRITE
-  @param options.initSql {string} sql statements to initialize the database if found empty
-  @param options.initFileName {string} name of a file containing the sql statements
-    to initialize the database if found empty
-  @param options.verbose {boolean} if truish, it opens the database in verbose mode.
-  @returns {Promise} a Promise that resolves to the database instance
-  */
-  static open(filename, options) {
-    return new Promise((resolve, reject) => {
-    /* global window, cordova */
-      if (window && window.sqlitePlugin) {
-        window.resolveLocalFileSystemURL(
-          `${cordova.file.externalRootDirectory}/Music`,
-          (externalDataDirectoryEntry) => {
-            resolve(window.sqlitePlugin.openDatabase(
-              {
-                name: filename,
-                androidDatabaseLocation: externalDataDirectoryEntry.toURL(),
-              }
-            ));
-          },
-          reject
-        );
-      } else {
-        openDatabase(
-          filename,
-          options.version || '1.0',
-          options.description || 'description',
-          options.size || 1,
-          resolve
-        );
-      }
-    })
-    .then(db => new DB(db, options))
-    .then(db =>
-      db.get('select count(*) as c  from sqlite_master')
-      .then((row) => {
-        if (row.c === 0) {
-          let src;
-          if (options.initSql) {
-            src = Promise.resolve(options.initSql);
-          } else if (options.initFileName) {
-            src = readFile(options.initFileName, 'utf8');
-          }
-          if (src) {
-            return src.then(data => db.exec(data))
-            .then(() => db);
-          }
-        }
-        return db;
-      })
-    );
   }
 }
