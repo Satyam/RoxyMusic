@@ -1,7 +1,7 @@
 import client from '_client';
-// import { join } from 'path';
+import { join } from 'path';
 // import fs from 'fs';
-import openDatabase from '_server/utils/openCordovaWebSqlevcore';
+import openDatabase from '_server/utils/openCordovaWebSqlEvcoreFullPath';
 import DB from '_server/utils/webSqlP';
 
 import dataServers from '_server';
@@ -13,7 +13,7 @@ const resolveLocalFileSystemURL = path => new Promise((resolve, reject) =>
     path,
     resolve,
     (err) => {
-      reject(`resolveLocalFileSystemURL for ${path} returned ${JSON.stringify(err)}`);
+      reject(`resolveLocalFileSystemURL for ${path} returned ${err.message || err}`);
     }
   )
 );
@@ -28,12 +28,12 @@ function readFile(path, encoding) {
           resolve(reader.result);
         };
         reader.onerror = (ev) => {
-          reject(`readAsText for ${path} returned ${JSON.stringify(ev)}`);
+          reject(`readAsText for ${path} returned ${ev.message || ev}`);
         };
         reader.readAsText(file, encoding);
       },
       (err) => {
-        reject(`readFile for ${path} returned ${JSON.stringify(err)}`);
+        reject(`readFile for ${path} returned ${err.message || err}`);
       }
     );
   }));
@@ -49,12 +49,12 @@ window.addEventListener('load', () => {
   const el = document.getElementById('log');
   function log(msg) {
     el.innerHTML = `${el.innerHTML}<pre>${msg}</pre>`;
-    // navigator.notification.alert(
-    //   msg,  // message
-    //   () => {},         // callback
-    //   'Game Over',            // title
-    //   'Done'                  // buttonName
-    // );
+    navigator.notification.alert(
+      msg,  // message
+      () => {},         // callback
+      'Log:',            // title
+      'Continue'                  // buttonName
+    );
   }
   // const listDir = (key, path, howMany = 10) =>
   //   resolveLocalFileSystemURL(path)
@@ -78,7 +78,7 @@ window.addEventListener('load', () => {
   //     }
   //   }))
   //   .catch((err) => {
-  //     log(`Failed to resolve ${key}, ${path}, err: ${JSON.stringify(err)}`);
+  //     log(`Failed to resolve ${key}, ${path}, err: ${err.message || err}`);
   //   });
 
   // log('comenzando');
@@ -96,13 +96,13 @@ window.addEventListener('load', () => {
       }
       log('arranque');
       const DELDB = false;
-      // const musicDb = join(cordova.file.externalRootDirectory || '/', 'Music/RoxyMusic.db');
-      //
-      // log(`musicdb: ${musicDb}`);
+      const musicDb = join(cordova.file.externalRootDirectory || '/', 'Music/RoxyMusic.db');
+
+      log(`musicdb: ${musicDb}`);
       // if (fs && fs.init) {
       //   fs.init(null, (err, granted) => {
       //     if (err) {
-      //       log(`fs.init error ${JSON.stringify(err)}`);
+      //       log(`fs.init error ${err.message || err}`);
       //     } else {
       //       log(`Fs.init granted ${granted}`);
       //       if (fs.readdir) {
@@ -110,7 +110,7 @@ window.addEventListener('load', () => {
       //           '/',
       //           (err1, files) => {
       //             if (err) {
-      //               log(`fs.readdir error: ${JSON.stringify(err1)}`);
+      //               log(`fs.readdir error: ${err1.message || err1}`);
       //             } else {
       //               log(`fs.readdir found ${files.length} entries`);
       //               log(files.map(entry => entry.name).join(',\n'));
@@ -121,20 +121,34 @@ window.addEventListener('load', () => {
       //     }
       //   });
       // }
-      window.sqlitePlugin.echoTest(() => {
-        log('sqlitePlugin ECHO test OK');
-      });
-      window.sqlitePlugin.selfTest(() => {
-        log('sqlitePlugin SELF test OK');
-      });
-      openDatabase('RoxyMusic.db') // (musicDb))
+      if (window && window.sqlitePlugin) {
+        const sP = window.sqlitePlugin;
+        if (typeof sP.echoTest === 'function') {
+          sP.echoTest(() => {
+            log('sqlitePlugin ECHO test OK');
+          });
+        } else {
+          log(`echoTest not a function ${typeof sP.echoTest}`);
+        }
+        if (typeof sP.selfTest === 'function') {
+          sP.selfTest(() => {
+            log('sqlitePlugin SELF test OK');
+          });
+        } else {
+          log(`selfTest not a function ${typeof sP.selfTest}`);
+        }
+      } else {
+        log('either no window or no window.sqlitePlugin');
+      }
+
+      openDatabase(true ? musicDb : 'RoxyMusic.db')
       .then((rawDb) => {
         log('database opened');
         return new DB(rawDb);
       })
       .then((db) => {
         function initDb() {
-          return readFile(`${cordova.file.applicationDirectory}/www/res/data.sql`, 'utf8')
+          return readFile(join(cordova.file.applicationDirectory, 'www/res/data.sql'), 'utf8')
             .then((data) => {
               log(`data read ${data.substr(0, 200)}`);
               return db.exec(data);
@@ -145,14 +159,14 @@ window.addEventListener('load', () => {
         return db.get('select count(*) as c from config')
         .then(() => db)
         .catch((err1) => {
-          log(`catch row ${JSON.stringify(err1)}`);
+          log(`catch read on config ${err1.message || err1}`);
           return initDb();
         });
       })
       .then(db => dataServers(db, addRoute))
       .then(client)
       .catch((err) => {
-        log(`catch: ${JSON.stringify(err)}`);
+        log(`catch: ${err.message || err}`);
       });
     },
     false
