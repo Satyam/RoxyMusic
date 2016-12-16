@@ -6,7 +6,7 @@ const join = path.join;
 const root = process.cwd();
 const absPath = relative => join(root, relative);
 
-const phonegapRemplacements = {
+const phonegapReplacements = {
   react: 'React',
   'react-dom': 'ReactDOM',
   'react-bootstrap': 'ReactBootstrap',
@@ -20,7 +20,7 @@ module.exports = version => [
   'webServer',
   'electronServer',
   'electronClient',
-  'phonegap',
+  'cordova',
 ].map((bundle) => {
   const aliases = {
     _client: absPath('client'),
@@ -38,7 +38,7 @@ module.exports = version => [
         webServer: 'webServer/index.js',
         electronServer: 'electronServer/index.js',
         electronClient: 'electronClient/index.js',
-        phonegap: 'phonegap/index.js',
+        cordova: 'cordova/index.js',
       }[bundle]),
     },
     output: {
@@ -50,7 +50,7 @@ module.exports = version => [
       webServer: 'node',
       electronServer: 'electron',
       electronClient: 'electron',
-      phonegap: 'web',
+      cordova: 'web',
     }[bundle],
     module: {
       loaders: [
@@ -65,8 +65,8 @@ module.exports = version => [
         },
       ],
       noParse: (
-        bundle === 'phonegap'
-        ? Object.keys(phonegapRemplacements).map(request => new RegExp(`^${request}$`))
+        bundle === 'cordova'
+        ? Object.keys(phonegapReplacements).map(request => new RegExp(`^${request}$`))
         : undefined
       ),
     },
@@ -85,7 +85,7 @@ module.exports = version => [
     ],
     resolve: {
       alias: (
-        bundle === 'phonegap'
+        bundle === 'cordova'
         ? Object.assign(aliases, { fs: absPath('node_modules/html5-fs') })
         : aliases
       ),
@@ -96,12 +96,12 @@ module.exports = version => [
         if (bundle === 'webClient') {
           return callback();
         }
-        if (bundle === 'phonegap') {
+        if (bundle === 'cordova') {
           // if (request === 'fs') {
           //   return callback(null, 'commonjs html5-fs')
           // }
-          if (phonegapRemplacements[request]) {
-            return callback(null, `var ${phonegapRemplacements[request]}`);
+          if (phonegapReplacements[request]) {
+            return callback(null, `var ${phonegapReplacements[request]}`);
           }
           return callback();
         }
