@@ -24,13 +24,13 @@ module.exports = version => [
   };
   return {
     entry: {
-      [bundle]: absPath({
+      [bundle]: ['babel-polyfill', absPath({
         webClient: 'webClient/index.jsx',
         webServer: 'webServer/index.js',
         electronServer: 'electronServer/index.js',
         electronClient: 'electronClient/index.js',
         cordova: 'cordova/index.js',
-      }[bundle]),
+      }[bundle])],
     },
     output: {
       path: absPath('bundles'),
