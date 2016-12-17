@@ -116,9 +116,15 @@ export default class DB {
     .then(() => prepared);
   }
 
-  /* eslint-disable class-methods-use-this */
   close() {
-    return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      if (typeof this.db.close === 'function') {
+        this.db.close(
+          resolve,
+          err => reject(`db close returned error ${err.message || err}`)
+        );
+      } else resolve();
+    });
   }
   exec(sql) {
     return new Promise((resolve, reject) => {
@@ -203,6 +209,7 @@ export default class DB {
     }));
   }
 
+  /* eslint-disable class-methods-use-this */
   inTransaction(f) {
     return f();
   }
