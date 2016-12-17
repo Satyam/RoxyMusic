@@ -30,3 +30,7 @@ bundles
 electron/index.html
 tmp
 server/data.db
+cordova/hooks
+cordova/platforms
+cordova/plugins
+cordova/www
