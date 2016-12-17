@@ -15,7 +15,9 @@
     "production": "webpack -p --config webpack.config/production.js",
     "electron": "electron bundles/electronServer.js",
     "updateModules": "updtr --test-stdout",
-    "rebuildElectron": "electron-rebuild"
+    "rebuildElectron": "electron-rebuild",
+    "precordova": "cp bundles/cordova.js cordova/www/index.js && cp bundles/cordova.css cordova/www/index.css && cp server/data.sql cordova/www/res && cp cordova/index.html cordova/www",
+    "cordova": "cd cordova && cordova build"
   },
   "author": "Daniel Barreiro",
   "license": "MIT",
@@ -33,6 +35,7 @@
     "restAPIpath": "/data/v2"
   },
   "dependencies": {
+    "babel-polyfill": "^6.20.0",
     "body-parser": "^1.15.2",
     "bootstrap": "^3.3.6",
     "classnames": "^2.2.5",

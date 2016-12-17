@@ -49,12 +49,12 @@ window.addEventListener('load', () => {
   const el = document.getElementById('log');
   function log(msg) {
     el.innerHTML = `${el.innerHTML}<pre>${msg}</pre>`;
-    navigator.notification.alert(
-      msg,  // message
-      () => {},         // callback
-      'Log:',            // title
-      'Continue'                  // buttonName
-    );
+    // navigator.notification.alert(
+    //   msg,  // message
+    //   () => {},         // callback
+    //   'Log:',            // title
+    //   'Continue'                  // buttonName
+    // );
   }
   // const listDir = (key, path, howMany = 10) =>
   //   resolveLocalFileSystemURL(path)
@@ -94,6 +94,12 @@ window.addEventListener('load', () => {
           'Done'                  // buttonName
         );
       }
+      document.addEventListener('pause', () => {
+        console.log('---Pausing ----');
+      }, false);
+      document.addEventListener('resume', () => {
+        console.log('--- Resuming ---');
+      }, false);
       log('arranque');
       const DELDB = false;
       const musicDb = join(cordova.file.externalRootDirectory || '/', 'Music/RoxyMusic.db');
@@ -121,25 +127,27 @@ window.addEventListener('load', () => {
       //     }
       //   });
       // }
-      if (window && window.sqlitePlugin) {
-        const sP = window.sqlitePlugin;
-        if (typeof sP.echoTest === 'function') {
-          sP.echoTest(() => {
-            log('sqlitePlugin ECHO test OK');
-          });
-        } else {
-          log(`echoTest not a function ${typeof sP.echoTest}`);
-        }
-        if (typeof sP.selfTest === 'function') {
-          sP.selfTest(() => {
-            log('sqlitePlugin SELF test OK');
-          });
-        } else {
-          log(`selfTest not a function ${typeof sP.selfTest}`);
-        }
-      } else {
-        log('either no window or no window.sqlitePlugin');
-      }
+
+      // -----------------------------------
+      // if (window && window.sqlitePlugin) {
+      //   const sP = window.sqlitePlugin;
+      //   if (typeof sP.echoTest === 'function') {
+      //     sP.echoTest(() => {
+      //       log('sqlitePlugin ECHO test OK');
+      //     });
+      //   } else {
+      //     log(`echoTest not a function ${typeof sP.echoTest}`);
+      //   }
+      //   if (typeof sP.selfTest === 'function') {
+      //     sP.selfTest(() => {
+      //       log('sqlitePlugin SELF test OK');
+      //     });
+      //   } else {
+      //     log(`selfTest not a function ${typeof sP.selfTest}`);
+      //   }
+      // } else {
+      //   log('either no window or no window.sqlitePlugin');
+      // }
 
       openDatabase(true ? musicDb : 'RoxyMusic.db')
       .then((rawDb) => {

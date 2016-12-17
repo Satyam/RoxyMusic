@@ -6,15 +6,6 @@ const join = path.join;
 const root = process.cwd();
 const absPath = relative => join(root, relative);
 
-const phonegapReplacements = {
-  react: 'React',
-  'react-dom': 'ReactDOM',
-  'react-bootstrap': 'ReactBootstrap',
-  'react-router': 'ReactRouter',
-  'redux-devtools': null,
-  'react-addons-perf': null,
-};
-
 module.exports = version => [
   'webClient',
   'webServer',
@@ -66,7 +57,11 @@ module.exports = version => [
       ],
       noParse: (
         bundle === 'cordova'
-        ? Object.keys(phonegapReplacements).map(request => new RegExp(`^${request}$`))
+        ? [
+          'redux-devtools',
+          'react-addons-perf',
+          'fs',
+        ].map(request => new RegExp(`^${request}$`))
         : undefined
       ),
     },
@@ -97,12 +92,6 @@ module.exports = version => [
           return callback();
         }
         if (bundle === 'cordova') {
-          // if (request === 'fs') {
-          //   return callback(null, 'commonjs html5-fs')
-          // }
-          if (phonegapReplacements[request]) {
-            return callback(null, `var ${phonegapReplacements[request]}`);
-          }
           return callback();
         }
         if (request === 'electron') {

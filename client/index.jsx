@@ -9,7 +9,7 @@ import createStore from '_store/createStore';
 import routes from '_components/routes';
 
 export default function () {
-  if (process.env.NODE_ENV !== 'production' && BUNDLE !== 'phonegap') {
+  if (process.env.NODE_ENV !== 'production' && BUNDLE !== 'cordova') {
     /* eslint-disable import/no-extraneous-dependencies, global-require */
     window.Perf = require('react-addons-perf');
     /* eslint-enable import/no-extraneous-dependencies, global-require */
@@ -18,13 +18,11 @@ export default function () {
   const store = createStore(browserHistory);
 
   const history = syncHistoryWithStore(browserHistory, store);
-
-  if (BUNDLE === 'electronClient') {
+  if (BUNDLE === 'electronClient' || BUNDLE === 'cordova') {
     browserHistory.replace('/');
   }
 
   const dest = document.getElementById('contents');
-
   render((
     <Provider store={store}>
       <Router history={history}>
