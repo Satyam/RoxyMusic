@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
-import { Router, browserHistory } from 'react-router';
+import { Router, browserHistory, createMemoryHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 import { Provider } from 'react-redux';
 
@@ -15,12 +15,15 @@ export default function () {
     /* eslint-enable import/no-extraneous-dependencies, global-require */
   }
 
-  const store = createStore(browserHistory);
+  const baseHistory = (
+    (BUNDLE === 'electronClient' || BUNDLE === 'cordova')
+    ? createMemoryHistory()
+    : browserHistory
+  );
 
-  const history = syncHistoryWithStore(browserHistory, store);
-  if (BUNDLE === 'electronClient' || BUNDLE === 'cordova') {
-    browserHistory.replace('/');
-  }
+  const store = createStore(baseHistory);
+
+  const history = syncHistoryWithStore(baseHistory, store);
 
   const dest = document.getElementById('contents');
   render((
