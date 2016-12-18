@@ -20,8 +20,8 @@ export default (base) => {
   if (clients[base]) return clients[base];
   const restClient = method => (reqUrl, body) => {
     const parsedUrl = url.parse(reqUrl, true);
-    const path = join('/', base, parsedUrl.pathname);
-    console.log(`> ${method} ${path}`);
+    const path = join('/', base, parsedUrl.pathname || '');
+    // console.log(`> ${method} ${path}`);
     const o = {
       options: parsedUrl.query,
       keys: {},
@@ -42,23 +42,20 @@ export default (base) => {
         (p, next) => p.then(next),
         Promise.resolve(o)
       )
-      .then((data) => {
-        console.log(`< ${method} ${path}, ${JSON.stringify(data)}`);
-        return {
-          status: 200,
-          data,
-        };
-      })
+      // .then((data) => {
+      //   console.log(`< ${method} ${path}, ${JSON.stringify(data)}`);
+      //   return data;
+      // })
       .catch((reason) => {
-        console.log(`<!!! ${method} ${path}, ${reason}`);
-        return {
+        // console.log(`<!!! ${method} ${path}, ${reason}`);
+        return Promise.reject({
           status: (reason instanceof Error) ? 500 : reason.code,
           statusText: reason.message,
-        };
+        });
       });
     }
 
-    console.log(`<!!! ${method} ${path}, no match found`);
+    // console.log(`<!!! ${method} ${path}, no match found`);
     return {
       status: 404,
       statusText: 'no match found',
