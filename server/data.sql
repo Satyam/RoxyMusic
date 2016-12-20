@@ -22,8 +22,6 @@ CREATE TABLE `Tracks` (
 	`year`	INTEGER,
 	`duration` INTEGER,
 	`idGenre`	INTEGER,
-  `location` TEXT,
-  `fileModified` TEXT,
 	`size` INTEGER,
 	`hasIssues` INTEGER,
   	FOREIGN KEY(`idArtist`) REFERENCES People(idPerson),
@@ -36,6 +34,7 @@ CREATE TABLE `People` (
 	`idPerson`	INTEGER PRIMARY KEY AUTOINCREMENT,
 	`artist`	TEXT NOT NULL UNIQUE
 );
+
 DROP TABLE IF EXISTS `Albums`;
 CREATE TABLE `Albums` (
 	`idAlbum`	INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -57,11 +56,28 @@ CREATE TABLE `AlbumArtistMap` (
 );
 
 DROP TABLE IF EXISTS `PlayLists`;
-CREATE TABLE `PlayLists` (
-	`idPlayList`	INTEGER PRIMARY KEY AUTOINCREMENT,
-	`name`	TEXT,
+CREATE TABLE "PlayLists" (
+	`name`	TEXT NOT NULL COLLATE NOCASE,
 	`lastPlayed`	INTEGER,
-	`idTracks` TEXT
+	`idTracks`	TEXT,
+	PRIMARY KEY(name)
+);
+
+DROP TABLE IF EXISTS `Devices`;
+CREATE TABLE `Devices` (
+	`idDevice`	INTEGER PRIMARY KEY AUTOINCREMENT,
+	`uuid`	TEXT UNIQUE
+);
+
+DROP TABLE IF EXISTS `Files`;
+CREATE TABLE `Files` (
+	`idTrack`	INTEGER NOT NULL,
+	`idDevice`	INTEGER,
+	`location`	TEXT,
+	`fileModified`	TEXT,
+	PRIMARY KEY(idTrack,idDevice),
+	FOREIGN KEY(`idTrack`) REFERENCES Tracks ( idTrack ),
+	FOREIGN KEY(`idDevice`) REFERENCES Devices(idDevice)
 );
 
 CREATE INDEX `track_title` ON `Tracks` (`title` ASC);
@@ -69,17 +85,21 @@ CREATE INDEX `track_album` ON `Tracks` (`idAlbum` ASC);
 CREATE INDEX `artist_name` ON `People` (`artist` ASC);
 CREATE INDEX `album_name` ON `Albums` (`album` ASC);
 CREATE INDEX `genre_name` ON `Genres` (`genre` ASC);
-CREATE INDEX `track_location` ON `Tracks` (`location` ASC);
+CREATE INDEX `file_location` ON `Files` (`location` ASC);
 CREATE INDEX `album_artists` ON `AlbumArtistMap` (`idAlbum` ASC);
+CREATE INDEX `device_uuid` ON `Devices` (`uuid` ASC);
 
+DROP VIEW IF EXISTS `AllTracks`;
 CREATE VIEW `AllTracks` AS
 	select *
 		from Tracks
+		left join Files using(idTrack)
 		left join Albums using(idAlbum)
 		left join (select artist as albumArtist, idPerson as idAlbumArtist from People) using (idAlbumArtist)
 		left join People on idArtist = idPerson
 		left join Genres using (idGenre);
 
+DROP VIEW IF EXISTS `AllAlbums`;
 CREATE VIEW `AllAlbums` AS
 select idAlbum,  album, group_concat(artist) as artists, numTracks, idTracks
 	from Albums
@@ -92,6 +112,7 @@ select idAlbum,  album, group_concat(artist) as artists, numTracks, idTracks
 	group by album
 	order by album;
 
+	DROP VIEW IF EXISTS `AllArtists`;
 	CREATE VIEW `AllArtists` as
 	select idArtist, artist, numTracks, idTracks from people
 		left join (
