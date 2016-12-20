@@ -26,9 +26,14 @@ const close = denodeify(server.close.bind(server));
 
 // dbg.enable('RoxyMusic:server/server');
 const debug = dbg('RoxyMusic:server/server');
+// function showRequest(req, res, next) {
+//   debug(`${req.method}: ${req.path}`);
+//   next();
+// }
+
 
 const dataRouter = createRouter();
-app.use(REST_API_PATH, bodyParser.json(), dataRouter);
+app.use(REST_API_PATH, bodyParser.json(), /* showRequest, */ dataRouter);
 
 app.use('/bootstrap', express.static(absPath('node_modules/bootstrap/dist')));
 app.use('/bundles', express.static(absPath('bundles')));
