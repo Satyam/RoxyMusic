@@ -22,6 +22,8 @@ CREATE TABLE `Tracks` (
 	`year`	INTEGER,
 	`duration` INTEGER,
 	`idGenre`	INTEGER,
+  `location` TEXT,
+  `fileModified` TEXT,
 	`size` INTEGER,
 	`hasIssues` INTEGER,
   	FOREIGN KEY(`idArtist`) REFERENCES People(idPerson),
@@ -58,7 +60,7 @@ CREATE TABLE `AlbumArtistMap` (
 DROP TABLE IF EXISTS `PlayLists`;
 CREATE TABLE "PlayLists" (
 	`name`	TEXT NOT NULL COLLATE NOCASE,
-	`lastPlayed`	INTEGER,
+	`lastTrackPlayed`	INTEGER,
 	`idTracks`	TEXT,
 	PRIMARY KEY(name)
 );
@@ -69,15 +71,27 @@ CREATE TABLE `Devices` (
 	`uuid`	TEXT UNIQUE
 );
 
-DROP TABLE IF EXISTS `Files`;
-CREATE TABLE `Files` (
+DROP TABLE IF EXISTS `RemoteFiles`;
+CREATE TABLE `RemoteFiles` (
 	`idTrack`	INTEGER NOT NULL,
 	`idDevice`	INTEGER,
 	`location`	TEXT,
-	`fileModified`	TEXT,
-	PRIMARY KEY(idTrack,idDevice),
+	`timeSent`	TEXT,
+	PRIMARY KEY(idTrack, idDevice),
 	FOREIGN KEY(`idTrack`) REFERENCES Tracks ( idTrack ),
 	FOREIGN KEY(`idDevice`) REFERENCES Devices(idDevice)
+);
+
+DROP TABLE IF EXISTS `PlayListsHistory`;
+CREATE TABLE `PlayListsHistory` (
+	`id`	INTEGER PRIMARY KEY AUTOINCREMENT,
+	`name`	TEXT COLLATE NOCASE,
+	`idDevice`	INTEGER,
+	`timeChanged` TEXT,
+	`before` TEXT,
+	`after` TEXT,
+	FOREIGN KEY (`name`) REFERENCES PlayLists(name),
+	FOREIGN KEY (`idDevice`) REFERENCES Devices(idDevice)
 );
 
 CREATE INDEX `track_title` ON `Tracks` (`title` ASC);
@@ -85,15 +99,15 @@ CREATE INDEX `track_album` ON `Tracks` (`idAlbum` ASC);
 CREATE INDEX `artist_name` ON `People` (`artist` ASC);
 CREATE INDEX `album_name` ON `Albums` (`album` ASC);
 CREATE INDEX `genre_name` ON `Genres` (`genre` ASC);
-CREATE INDEX `file_location` ON `Files` (`location` ASC);
+CREATE INDEX `track_location` ON `Tracks` (`location` ASC);
 CREATE INDEX `album_artists` ON `AlbumArtistMap` (`idAlbum` ASC);
 CREATE INDEX `device_uuid` ON `Devices` (`uuid` ASC);
+CREATE INDEX `playListsHistory_device` ON `PlayListsHistory` (`idDevice` ASC);
 
 DROP VIEW IF EXISTS `AllTracks`;
 CREATE VIEW `AllTracks` AS
 	select *
 		from Tracks
-		left join Files using(idTrack)
 		left join Albums using(idAlbum)
 		left join (select artist as albumArtist, idPerson as idAlbumArtist from People) using (idAlbumArtist)
 		left join People on idArtist = idPerson
