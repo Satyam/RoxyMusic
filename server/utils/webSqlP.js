@@ -50,7 +50,7 @@ class ST {
   run(params) {
     return this.db.process(this.statement, this.params, params, true)
     .then(result => ({
-      lastID: result.inserId,
+      lastID: result.insertId,
       changes: result.rowsAffected,
     }));
   }
