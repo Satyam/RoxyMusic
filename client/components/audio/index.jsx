@@ -20,7 +20,7 @@ export function AudioComponent({ src, autoPlay, onEnded }) {
 AudioComponent.propTypes = {
   // idTrack: PropTypes.number,
   src: PropTypes.string,
-  autoPlay: PropTypes.string,
+  autoPlay: PropTypes.bool,
   onEnded: PropTypes.func,
 };
 
@@ -58,14 +58,14 @@ export function mapStateToProps(state) {
             ),
             state.tracks[idTrack].location
           ),
-          autoPlay: 'true',
+          autoPlay: true,
         };
       }
     }
   }
   return {
     src: '',
-    autoPlay: 'false',
+    autoPlay: false,
   };
 }
 
