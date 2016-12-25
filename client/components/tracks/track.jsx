@@ -4,9 +4,9 @@ import { compose } from 'recompose';
 import isPlainClick from '_utils/isPlainClick';
 import { getTracks, playNow } from '_store/actions';
 import initStore from '_utils/initStore';
-import Icon from '_components/misc/icon';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 import renderAttr from '_components/misc/renderAttr';
+import { Song, Album, Artist } from '_components/entries';
 import styles from './track.css';
 import DefaultToolbar from './defaultTracksToolbar';
 
@@ -28,17 +28,22 @@ export const TrackComponent = ({
     : (
       <ListGroupItem className={styles.track} bsStyle={background}>
         <div className={styles.left}>
-          <div className={styles.title}>{title}</div>
-          <div className={styles.album}>
-            <Icon
-              type="cd"
-              href={idAlbum && `/albums/${idAlbum}`}
-              label={`${album || '--'} (# ${track || '_'})`}
-            />
-          </div>
-          <div className={styles.artist}>
-            <Icon type="user" href={idArtist && `/artists/${idArtist}`} label={artist || '--'} />
-          </div>
+          <Song
+            className={styles.title}
+            title={title}
+          />
+          <Album
+            className={styles.album}
+            idAlbum={idAlbum}
+            album={album}
+          >
+            {track && ` (# ${track})`}
+          </Album>
+          <Artist
+            className={styles.artist}
+            idArtist={idArtist}
+            artist={artist}
+          />
         </div>
         {renderAttr(Toolbar === 'default' ? DefaultToolbar : Toolbar, { idTrack })}
       </ListGroupItem>

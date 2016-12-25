@@ -117,7 +117,7 @@ CREATE VIEW `AllTracks` AS
 
 DROP VIEW IF EXISTS `AllAlbums`;
 CREATE VIEW `AllAlbums` AS
-select idAlbum,  album, group_concat(artist) as artists, numTracks, idTracks
+select idAlbum,  album, group_concat(artist) as artists, idArtist, numTracks, idTracks
 	from Albums
 	left join AlbumArtistMap using(idAlbum)
 	left join People on People.idPerson = AlbumArtistMap.idArtist

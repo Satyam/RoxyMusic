@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router';
+import { Artist } from '_components/entries';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 import FoldingToolbar from '_components/misc/foldingToolbar';
 // import Icon from '_components/misc/icon';
@@ -10,14 +10,15 @@ import styles from './artistListItem.css';
 export const ArtistListItemComponent = ({ idArtist, artist, numTracks }) => (
   <ListGroupItem className={styles.li}>
     <div className={styles.left}>
-      <div className={styles.artist}>
-        <Link to={`/artists/${idArtist}`}>
-          {artist}
-        </Link>
-      </div>
-      <div className={styles.numTracks}>
-        {numTracks} tracks
-      </div>
+      <Artist
+        className={styles.artist}
+        idArtist={idArtist}
+        artist={artist}
+      >
+        <div className={styles.numTracks}>
+          {numTracks} tracks
+        </div>
+      </Artist>
     </div>
     <FoldingToolbar>
       {/*
