@@ -43,7 +43,7 @@ export default (
     case REPLACE_PLAY_LIST_TRACKS:
       return update(state, { hash: {
         [idPlayList]: {
-          lastPlayed: { $set: original.lastPlayed },
+          lastTrackPlayed: { $set: original.lastTrackPlayed },
           idTracks: { $set: original.idTracks },
         },
       } });
