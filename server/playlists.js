@@ -30,7 +30,7 @@ export function init(db) {
 // getPlayLists: 'select * from PlayLists order by name',
 export function getPlayLists() {
   return prepared.getPlayLists.all()
-  .then(playLists => playLists.map(splitIdTracks));
+  .then(playLists => ({ list: playLists.map(splitIdTracks) }));
 }
 
 // getPlayList: 'select* from PlayLists where idPlayList = $idPlayList',

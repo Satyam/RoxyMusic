@@ -25,9 +25,10 @@ export default (
   action
 ) => {
   const payload = action.payload;
+  const list = payload && payload.list;
   if (action.error) {
     if (action.type === GET_ARTIST) {
-      const idArtist = payload.originalPayload.idArtist;
+      const idArtist = payload.idArtist;
       return update(state, { artists: { $merge: {
         [idArtist]: {
           idArtist,
@@ -36,22 +37,22 @@ export default (
       } } });
     }
     return state;
-  } else if (action.meta && action.meta.asyncAction !== REPLY_RECEIVED) return state;
-  const originalPayload = action.meta && action.meta.originalPayload;
+  }
+  if (action.stage !== REPLY_RECEIVED) return state;
   switch (action.type) {
     case GET_ARTISTS: {
       return {
-        search: originalPayload.search || '',
-        nextOffset: payload.length,
-        artistList: payload,
-        artistHash: indexArtists(payload),
+        search: payload.search || '',
+        nextOffset: list.length,
+        artistList: list,
+        artistHash: indexArtists(list),
       };
     }
     case GET_MORE_ARTISTS: {
       return update(state, {
-        nextOffset: { $apply: offset => offset + payload.length },
-        artistList: { $push: payload },
-        artistHash: { $set: indexArtists(payload, state.artistHash) },
+        nextOffset: { $apply: offset => offset + list.length },
+        artistList: { $push: list },
+        artistHash: { $set: indexArtists(list, state.artistHash) },
       });
     }
     case GET_ARTIST: {

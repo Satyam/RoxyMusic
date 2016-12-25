@@ -12,11 +12,12 @@ export default (
   action
 ) => {
   const payload = action.payload;
-  if (action.meta && action.meta.asyncAction !== REPLY_RECEIVED) return state;
+  const list = payload && payload.list;
+  if (action.stage !== REPLY_RECEIVED) return state;
   switch (action.type) {
     case GET_TRACKS: {
-      const requested = action.meta.originalPayload.missing;
-      const indexed = payload.reduce(
+      const requested = payload.missing;
+      const indexed = list.reduce(
         (hash, track) => Object.assign(hash, { [track.idTrack]: track }),
         {}
       );

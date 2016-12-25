@@ -28,7 +28,7 @@ export function getArtists(o) {
       count: o.options.count || 20,
       offset: o.options.offset || 0,
     })
-  ).then(artists => artists.map(splitIdTracks));
+  ).then(artists => ({ list: artists.map(splitIdTracks) }));
 }
 
 // getArtist: 'select * from AllArtists where idArtist = $idArtist',

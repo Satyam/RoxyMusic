@@ -4,36 +4,27 @@ import {
   FAILURE_RECEIVED,
 } from '_store/requests/actions';
 
-export default (type, asyncRequest, payload = {}) =>
+export default (type, asyncRequest, payload = {}, meta) =>
   (dispatch) => {
     dispatch({
       type,
+      stage: REQUEST_SENT,
       payload,
-      meta: { asyncAction: REQUEST_SENT },
+      meta,
     });
     return asyncRequest.then(
       response => dispatch({
         type,
-        payload: response,
-        meta: {
-          asyncAction: REPLY_RECEIVED,
-          originalPayload: payload,
-        },
+        stage: REPLY_RECEIVED,
+        payload: Object.assign({}, payload, response),
+        meta,
       }),
-      (error) => {
-        const err = {
-          status: error.status,
-          statusText: error.statusText,
-          message: error.toString(),
-          actionType: type,
-          originalPayload: payload,
-        };
-        return dispatch({
-          type,
-          payload: err,
-          error: true,
-          meta: { asyncAction: FAILURE_RECEIVED },
-        });
-      }
+      error => dispatch({
+        type,
+        stage: FAILURE_RECEIVED,
+        payload,
+        error,
+        meta,
+      })
     );
   };

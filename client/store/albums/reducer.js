@@ -25,9 +25,10 @@ export default (
   action
 ) => {
   const payload = action.payload;
+  const list = payload && payload.list;
   if (action.error) {
     if (action.type === GET_ALBUM) {
-      const idAlbum = payload.originalPayload.idAlbum;
+      const idAlbum = payload.idAlbum;
       return update(state, { albums: { $merge: {
         [idAlbum]: {
           idAlbum,
@@ -36,22 +37,22 @@ export default (
       } } });
     }
     return state;
-  } else if (action.meta && action.meta.asyncAction !== REPLY_RECEIVED) return state;
-  const originalPayload = action.meta && action.meta.originalPayload;
+  }
+  if (action.stage !== REPLY_RECEIVED) return state;
   switch (action.type) {
     case GET_ALBUMS: {
       return {
-        search: originalPayload.search || '',
-        nextOffset: payload.length,
-        albumList: payload,
-        albumHash: indexAlbums(payload),
+        search: payload.search || '',
+        nextOffset: list.length,
+        albumList: list,
+        albumHash: indexAlbums(list),
       };
     }
     case GET_MORE_ALBUMS: {
       return update(state, {
-        nextOffset: { $apply: offset => offset + payload.length },
-        albumList: { $push: payload },
-        albumHash: { $set: indexAlbums(payload, state.albumHash) },
+        nextOffset: { $apply: offset => offset + list.length },
+        albumList: { $push: list },
+        albumHash: { $set: indexAlbums(list, state.albumHash) },
       });
     }
     case GET_ALBUM: {

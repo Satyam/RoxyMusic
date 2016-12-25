@@ -30,7 +30,7 @@ export function getAlbums(o) {
       offset: o.options.offset || 0,
     })
   )
-  .then(albums => albums.map(splitIdTracks))
+  .then(albums => ({ list: albums.map(splitIdTracks) }))
   ;
 }
 

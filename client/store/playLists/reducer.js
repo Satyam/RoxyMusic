@@ -25,39 +25,39 @@ export default (
   },
   action
 ) => {
-  if (action.meta && action.meta.asyncAction !== REPLY_RECEIVED) return state;
+  if (action.stage !== REPLY_RECEIVED) return state;
   const payload = action.payload;
-  const original = action.meta && action.meta.originalPayload;
-  const idPlayList = original && original.idPlayList;
+  const list = payload && payload.list;
+  const idPlayList = payload && payload.idPlayList;
   switch (action.type) {
     case GET_PLAY_LISTS:
       return update(state, {
-        hash: { $set: payload.reduce(
+        hash: { $set: list.reduce(
           (playLists, playList) => Object.assign(playLists, { [playList.idPlayList]: playList }),
           state.hash,
         ) },
         loaded: { $set: true },
       });
     case GET_PLAY_LIST:
-      return update(state, { hash: { $merge: { [idPlayList]: payload } } });
+      return update(state, { hash: { $merge: { [idPlayList]: list } } });
     case REPLACE_PLAY_LIST_TRACKS:
       return update(state, { hash: {
         [idPlayList]: {
-          lastTrackPlayed: { $set: original.lastTrackPlayed },
-          idTracks: { $set: original.idTracks },
+          lastTrackPlayed: { $set: payload.lastTrackPlayed },
+          idTracks: { $set: payload.idTracks },
         },
       } });
     case RENAME_PLAY_LIST:
       return update(state, { hash: {
         [idPlayList]: {
-          name: { $set: original.name },
+          name: { $set: payload.name },
         },
       } });
     case ADD_PLAY_LIST:
       return update(state, { hash: {
-        [payload.lastID]: { $set: {
-          name: original.name,
-          idPlayList: payload.idPlayList,
+        [idPlayList]: { $set: {
+          name: payload.name,
+          idPlayList,
           idTracks: [],
         } },
       } });

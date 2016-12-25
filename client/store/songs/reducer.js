@@ -24,22 +24,22 @@ export default (
   action
 ) => {
   const payload = action.payload;
-  if (action.meta && action.meta.asyncAction !== REPLY_RECEIVED) return state;
-  const originalPayload = action.meta && action.meta.originalPayload;
+  const list = payload && payload.list;
+  if (action.stage !== REPLY_RECEIVED) return state;
   switch (action.type) {
     case GET_SONGS: {
       return {
-        search: originalPayload.search || '',
-        nextOffset: payload.length,
-        songList: payload,
-        songHash: indexSongs(payload),
+        search: payload.search || '',
+        nextOffset: list.length,
+        songList: list,
+        songHash: indexSongs(list),
       };
     }
     case GET_MORE_SONGS: {
       return update(state, {
-        nextOffset: { $apply: offset => offset + payload.length },
-        songList: { $push: payload },
-        songHash: { $set: indexSongs(payload, state.songHash) },
+        nextOffset: { $apply: offset => offset + list.length },
+        songList: { $push: list },
+        songHash: { $set: indexSongs(list, state.songHash) },
       });
     }
     default:

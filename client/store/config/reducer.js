@@ -14,12 +14,11 @@ export default (
   action
 ) => {
   const payload = action.payload;
-  if (action.meta && action.meta.asyncAction !== REPLY_RECEIVED) return state;
-  const originalPayload = action.meta && action.meta.originalPayload;
+  if (action.stage !== REPLY_RECEIVED) return state;
   switch (action.type) {
     case GET_CONFIG:
     case SET_CONFIG:
-      return update(state, { [originalPayload.key]: { $set: payload } });
+      return update(state, { [payload.key]: { $set: payload.value } });
     default:
       return state;
   }

@@ -21,9 +21,8 @@ export default (
   },
   action
 ) => {
-  if (action.meta && action.meta.asyncAction !== REPLY_RECEIVED) return state;
+  if (action.stage !== REPLY_RECEIVED) return state;
   const payload = action.payload;
-  // const original = action.meta && action.meta.originalPayload;
   switch (action.type) {
     case PLAY_NEXT_TRACK:
     case PLAY_NOW:
@@ -31,7 +30,7 @@ export default (
     case CLEAR_NOW_PLAYING:
     case REPLACE_NOW_PLAYING:
     case LOAD_NOW_PLAYING:
-      return Object.assign(payload, { loaded: true });
+      return Object.assign(payload.value, { loaded: true });
     default:
       return state;
   }

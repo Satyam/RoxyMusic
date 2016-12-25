@@ -25,7 +25,8 @@ export function getSongs(o) {
       count: o.options.count || 20,
       offset: o.options.offset || 0,
     })
-  );
+  )
+  .then(list => ({ list }));
 }
 
 export default db =>

@@ -14,7 +14,7 @@ export default (state = { pending: 0, errors: [] }, action) => {
     case CLEAR_HTTP_ERRORS:
       return update(state, { errors: { $set: [] } });
     default:
-      switch (action.meta && action.meta.asyncAction) {
+      switch (action.stage) {
         case REQUEST_SENT:
           return update(state, { pending: { $apply: x => x + 1 } });
         case REPLY_RECEIVED:
@@ -28,7 +28,7 @@ export default (state = { pending: 0, errors: [] }, action) => {
             state,
             {
               pending: { $apply: x => (x > 0 ? x - 1 : 0) },
-              errors: { $push: [action.payload] },
+              errors: { $push: [action] },
             });
         default:
           return state;

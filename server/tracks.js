@@ -8,7 +8,8 @@ export function init(db) {
 
 // getTracks: 'select * from AllTracks where idTrack in ($idTracks)',
 export function getTracks(o) {
-  return $db.all(`select * from AllTracks where idTrack in (${o.keys.idTracks})`);
+  return $db.all(`select * from AllTracks where idTrack in (${o.keys.idTracks})`)
+  .then(list => ({ list }));
 }
 
 export default db =>
