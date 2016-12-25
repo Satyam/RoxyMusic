@@ -39,7 +39,7 @@ NowPlayingComponent.propTypes = {
 };
 
 export const storeInitializer = (dispatch, state) => (
-  state.nowPlaying.loaded || dispatch(loadPlayingList())
+  state.nowPlaying.status > 0 || dispatch(loadPlayingList())
 );
 
 export const mapStateToProps = state => state.nowPlaying || {};

@@ -27,7 +27,7 @@ AudioComponent.propTypes = {
 export function storeInitializer(dispatch, state) {
   const mDirP = state.config.musicDir || dispatch(getConfig('musicDir'));
   let trackP = null;
-  if (state.nowPlaying.loaded) {
+  if (state.nowPlaying.status === 2) {
     const nowPlaying = state.nowPlaying;
     const current = nowPlaying.current;
     if (current !== -1) {
@@ -42,7 +42,7 @@ export function storeInitializer(dispatch, state) {
 }
 
 export function mapStateToProps(state) {
-  if (state.nowPlaying.loaded) {
+  if (state.nowPlaying.status === 2) {
     const nowPlaying = state.nowPlaying;
     const current = nowPlaying.current;
     if (current !== -1) {

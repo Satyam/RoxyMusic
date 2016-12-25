@@ -2,6 +2,7 @@ import update from 'react-addons-update';
 import omit from 'lodash/omit';
 
 import {
+  REQUEST_SENT,
   REPLY_RECEIVED,
 } from '_store/requests/actions';
 
@@ -19,12 +20,15 @@ import {
 
 export default (
   state = {
-    loaded: false,
+    status: 0,
     hash: {},
     idTrackToAdd: null,
   },
   action
 ) => {
+  if (action.type === GET_PLAY_LISTS && action.stage === REQUEST_SENT) {
+    return update(state, { status: { $set: 1 } });
+  }
   if (action.stage !== REPLY_RECEIVED) return state;
   const payload = action.payload;
   const list = payload && payload.list;
@@ -36,7 +40,7 @@ export default (
           (playLists, playList) => Object.assign(playLists, { [playList.idPlayList]: playList }),
           state.hash,
         ) },
-        loaded: { $set: true },
+        status: { $set: 2 },
       });
     case GET_PLAY_LIST:
       return update(state, { hash: { $merge: { [idPlayList]: list } } });

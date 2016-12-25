@@ -1,7 +1,8 @@
-// import update from 'react-addons-update';
+import update from 'react-addons-update';
 
 import {
   REPLY_RECEIVED,
+  REQUEST_SENT,
 } from '_store/requests/actions';
 
 import {
@@ -17,7 +18,7 @@ export default (
   state = {
     current: -1,
     idTracks: [],
-    loaded: false,
+    status: 0,
   },
   action
 ) => {
@@ -30,7 +31,13 @@ export default (
     case CLEAR_NOW_PLAYING:
     case REPLACE_NOW_PLAYING:
     case LOAD_NOW_PLAYING:
-      return Object.assign(payload.value, { loaded: true });
+      switch (action.stage) {
+        case REPLY_RECEIVED:
+          return Object.assign(payload.value, { status: 2 });
+        case REQUEST_SENT:
+          return update(state, { status: { $set: 1 } });
+        default: return state;
+      }
     default:
       return state;
   }

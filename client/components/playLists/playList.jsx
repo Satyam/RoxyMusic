@@ -42,7 +42,7 @@ PlayListComponent.propTypes = {
 export const storeInitializer = (dispatch, state, props) => {
   const idPlayList = props.params.idPlayList || 0;
   return (
-    state.playLists.hash.loaded
+    state.playLists.status > 0
     ? Promise.resolve()
     : dispatch(getPlayLists())
   ).then(() =>

@@ -55,7 +55,7 @@ PlayListsComponent.propTypes = {
 
 
 export const storeInitializer = (dispatch, state) =>
-  state.playLists.loaded || dispatch(getPlayLists());
+  state.playLists.status > 0 || dispatch(getPlayLists());
 
 export const mapStateToProps = state => state.playLists;
 
