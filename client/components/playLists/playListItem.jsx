@@ -45,7 +45,7 @@ export const PlayListItemComponent = ({
 
 
 PlayListItemComponent.propTypes = {
-  idPlayList: PropTypes.number.isRequired,
+  idPlayList: PropTypes.string.isRequired,
   name: PropTypes.string,
   numTracks: PropTypes.number,
   onDeleteClick: PropTypes.func,

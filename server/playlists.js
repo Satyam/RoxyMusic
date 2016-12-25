@@ -1,8 +1,8 @@
 import { join } from 'path';
 import denodeify from 'denodeify';
 import fs from 'fs';
+import uuid from 'uuid/v1';
 
-import * as validators from '_server/utils/validators';
 import splitIdTracks from '_server/utils/splitIdTracks';
 
 import { getConfig } from '_server/config';
@@ -17,8 +17,8 @@ export function init(db) {
   return db.prepareAll({
     getPlayLists: 'select * from PlayLists',
     getPlayList: 'select * from PlayLists where idPlayList = $idPlayList',
-    addPlayList: 'insert into PlayLists (name) values ($name)',
-    updatePlayList: 'update PlayLists set lastPlayed = $lastPlayed, idTracks = $idTracks where idPlayList = $idPlayList',
+    addPlayList: 'insert into PlayLists (idPlayList, name) values ($idPlayList, $name)',
+    updatePlayList: 'update PlayLists set lastTrackPlayed = $lastTrackPlayed, idTracks = $idTracks where idPlayList = $idPlayList',
     renamePlayList: 'update PlayLists set name = $name where idPlayList = $idPlayList',
     deletePlayList: 'delete from PlayLists  where idPlayList = $idPlayList',
   })
@@ -39,17 +39,22 @@ export function getPlayList(o) {
   .then(splitIdTracks);
 }
 
-// addPlayList: 'insert into PlayLists (name) values ($name)',
+// addPlayList: 'insert into PlayLists (idPlayList, name) values ($idPlayList, $name)',
 export function addPlayList(o) {
-  return prepared.addPlayList.run(o.data);
+  const idPlayList = uuid();
+  return prepared.addPlayList.run({
+    idPlayList,
+    name: o.data.name,
+  })
+  .then(() => ({ idPlayList }));
 }
 
 // updatePlayList: 'update PlayLists
-// set lastPlayed = $lastPlayed, idTracks = $idTracks where idPlayList = $idPlayList',
+// set lastTrackPlayed = $lastTrackPlayed, idTracks = $idTracks where idPlayList = $idPlayList',
 export function updatePlayList(o) {
   return prepared.updatePlayList.run({
     idPlayList: o.keys.idPlayList,
-    lastPlayed: o.data.lastPlayed,
+    lastTrackPlayed: o.data.lastTrackPlayed,
     idTracks: o.data.idTracks.join(','),
   });
 }
@@ -108,15 +113,12 @@ export default db =>
       },
       '/:idPlayList': {
         read: [
-          validators.keyIsInteger('idPlayList'),
           getPlayList,
         ],
         update: [
-          validators.keyIsInteger('idPlayList'),
           updatePlayList,
         ],
         delete: [
-          validators.keyIsInteger('idPlayList'),
           deletePlayList,
         ],
       },
@@ -125,13 +127,11 @@ export default db =>
       },
       '/save/:idPlayList': {
         create: [
-          validators.keyIsInteger('idPlayList'),
           savePlayList,
         ],
       },
       '/rename/:idPlayList': {
         update: [
-          validators.keyIsInteger('idPlayList'),
           renamePlayList,
         ],
       },

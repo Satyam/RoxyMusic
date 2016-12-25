@@ -31,7 +31,7 @@ export const PlayListComponent = ({ idPlayList, name, idTracks }) =>
 
 
 PlayListComponent.propTypes = {
-  idPlayList: PropTypes.number,
+  idPlayList: PropTypes.string,
   name: PropTypes.string,
   idTracks: PropTypes.arrayOf(
     PropTypes.number

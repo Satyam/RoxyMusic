@@ -57,7 +57,7 @@ export default (
       return update(state, { hash: {
         [payload.lastID]: { $set: {
           name: original.name,
-          idPlayList: payload.lastID,
+          idPlayList: payload.idPlayList,
           idTracks: [],
         } },
       } });
