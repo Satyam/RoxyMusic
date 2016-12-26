@@ -72,12 +72,14 @@ CREATE TABLE `Devices` (
 	`uuid`	TEXT UNIQUE
 );
 
+INSERT INTO `Devices` (idDevice, uuid) values (0, 'local');
+
 DROP TABLE IF EXISTS `RemoteFiles`;
 CREATE TABLE `RemoteFiles` (
 	`idTrack`	INTEGER NOT NULL,
 	`idDevice`	INTEGER,
 	`location`	TEXT,
-	`timeSent`	TEXT,
+	`timeSent`	TEXT DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY(idTrack, idDevice),
 	FOREIGN KEY(`idTrack`) REFERENCES Tracks ( idTrack ),
 	FOREIGN KEY(`idDevice`) REFERENCES Devices(idDevice)
@@ -85,12 +87,12 @@ CREATE TABLE `RemoteFiles` (
 
 DROP TABLE IF EXISTS `PlayListsHistory`;
 CREATE TABLE `PlayListsHistory` (
-	`id`	INTEGER PRIMARY KEY AUTOINCREMENT,
+	`idPlayListHistory`	INTEGER PRIMARY KEY AUTOINCREMENT,
 	`idPlayList`	TEXT NOT NULL,
 	`idDevice`	INTEGER NOT NULL,
-	`timeChanged` TEXT,
-	`before` TEXT,
-	`after` TEXT,
+	`timeChanged` TEXT DEFAULT CURRENT_TIMESTAMP,
+	`name` TEXT,
+	`idTracks` TEXT,
 	FOREIGN KEY (`idPlayList`) REFERENCES PlayLists(idPlayList),
 	FOREIGN KEY (`idDevice`) REFERENCES Devices(idDevice)
 );
