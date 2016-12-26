@@ -14,9 +14,9 @@ export function init(db) {
       and (idDevice = $myIdDevice or idDevice is null)`,
     createHistory: `insert into PlayListsHistory
       (idPlayList, idDevice, timeChanged, name, idTracks)
-      values ($idPlayList, $idDevice, $timeChanged, $name, $idTracks)`,
+      values ($idPlayList, $idDevice, datetime('now'), $name, $idTracks)`,
     updateHistory: `update PlayListsHistory
-     set name = $name, idTracks = $idTracks
+     set name = $name, idTracks = $idTracks, timeChanged = datetime('now')
      where idPlayListHistory = $idPlayListHistory`,
   })
   .then((p) => {
