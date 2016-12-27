@@ -1,19 +1,20 @@
 import restAPI from '_platform/restAPI';
 import asyncActionCreator from '_utils/asyncActionCreator';
 
-const api = restAPI('playLists');
+const NAME = 'playlists';
+const api = restAPI(NAME);
 
-export const GET_PLAY_LISTS = 'playlists/get playlists';
-export const GET_PLAY_LIST = 'playlists/get single playlist';
-export const REPLACE_PLAY_LIST_TRACKS = 'playlists/replace playlist tracks';
-export const RENAME_PLAY_LIST = 'playlists/rename playlist';
-export const ADD_PLAY_LIST = 'playlists/replace playlist';
-export const DELETE_PLAY_LIST = 'playlists/delete playlist';
-export const ADD_TRACK_TO_PLAYLIST = 'playlists/add track to playlist';
-export const SELECT_PLAYLIST_FOR_TRACK = 'playlists/select playlist for track';
-export const CLOSE_ADD_TO_PLAYLIST = 'playlists/close add to playlist';
-export const SAVE_ALL_PLAYLISTS = 'playlists/save all playlists';
-export const SAVE_PLAYLIST = 'playlists/save playlist';
+export const GET_PLAY_LISTS = `${NAME}/get playlists`;
+export const GET_PLAY_LIST = `${NAME}/get single playlist`;
+export const REPLACE_PLAY_LIST_TRACKS = `${NAME}/replace playlist tracks`;
+export const RENAME_PLAY_LIST = `${NAME}/rename playlist`;
+export const ADD_PLAY_LIST = `${NAME}/replace playlist`;
+export const DELETE_PLAY_LIST = `${NAME}/delete playlist`;
+export const ADD_TRACK_TO_PLAYLIST = `${NAME}/add track to playlist`;
+export const SELECT_PLAYLIST_FOR_TRACK = `${NAME}/select playlist for track`;
+export const CLOSE_ADD_TO_PLAYLIST = `${NAME}/close add to playlist`;
+export const SAVE_ALL_PLAYLISTS = `${NAME}/save all playlists`;
+export const SAVE_PLAYLIST = `${NAME}/save playlist`;
 
 export function getPlayLists() {
   return asyncActionCreator(

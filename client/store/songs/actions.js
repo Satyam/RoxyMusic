@@ -2,10 +2,11 @@ import restAPI from '_platform/restAPI';
 import asyncActionCreator from '_utils/asyncActionCreator';
 import { getTrack } from '_store/tracks/actions';
 
-const api = restAPI('songs');
+const NAME = 'songs';
+const api = restAPI(NAME);
 
-export const GET_SONGS = 'songs/get songs';
-export const GET_MORE_SONGS = 'songs/get more songs';
+export const GET_SONGS = `${NAME}/get songs`;
+export const GET_MORE_SONGS = `${NAME}/get more songs`;
 
 export function getSongs(search) {
   return asyncActionCreator(

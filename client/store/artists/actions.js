@@ -1,11 +1,12 @@
 import restAPI from '_platform/restAPI';
 import asyncActionCreator from '_utils/asyncActionCreator';
 
-const api = restAPI('artists');
+const NAME = 'artists';
+const api = restAPI(NAME);
 
-export const GET_ARTISTS = 'artists/get artists';
-export const GET_MORE_ARTISTS = 'artists/get more artists';
-export const GET_ARTIST = 'artists/get artist';
+export const GET_ARTISTS = `${NAME}/get artists`;
+export const GET_MORE_ARTISTS = `${NAME}/get more artists`;
+export const GET_ARTIST = `${NAME}/get artist`;
 
 export function getArtists(search) {
   return asyncActionCreator(

@@ -1,11 +1,12 @@
 import restAPI from '_platform/restAPI';
 import asyncActionCreator from '_utils/asyncActionCreator';
 
-const api = restAPI('albums');
+const NAME = 'albums';
+const api = restAPI(NAME);
 
-export const GET_ALBUMS = 'albums/get albums';
-export const GET_MORE_ALBUMS = 'albums/get more albums';
-export const GET_ALBUM = 'albums/get album';
+export const GET_ALBUMS = `${NAME}/ get albums`;
+export const GET_MORE_ALBUMS = `${NAME}/ get more albums`;
+export const GET_ALBUM = `${NAME}/ get album`;
 
 export function getAlbums(search) {
   return asyncActionCreator(

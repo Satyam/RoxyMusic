@@ -1,10 +1,11 @@
 import restAPI from '_platform/restAPI';
 import asyncActionCreator from '_utils/asyncActionCreator';
 
-const api = restAPI('config');
+const NAME = 'config';
+const api = restAPI(NAME);
 
-export const GET_CONFIG = 'config/get config';
-export const SET_CONFIG = 'config/set config';
+export const GET_CONFIG = `${NAME}/get config`;
+export const SET_CONFIG = `${NAME}/set config`;
 
 export function getConfig(key) {
   return asyncActionCreator(

@@ -1,14 +1,15 @@
 import restAPI from '_platform/restAPI';
 import asyncActionCreator from '_utils/asyncActionCreator';
 
+const NAME = 'now playing';
 const api = restAPI('config');
 
-export const PLAY_NEXT_TRACK = 'now playing/play next track in now playing list';
-export const PLAY_NOW = 'now playing/play now';
-export const ADD_TO_NOW_PLAYING = 'now playing/add track to now playing list';
-export const CLEAR_NOW_PLAYING = 'now playing/clear now playing list';
-export const REPLACE_NOW_PLAYING = 'now playing/replace now playing list';
-export const LOAD_NOW_PLAYING = 'now playing/load now playing list';
+export const PLAY_NEXT_TRACK = `${NAME}/play next track in now playing list`;
+export const PLAY_NOW = `${NAME}/play now`;
+export const ADD_TO_NOW_PLAYING = `${NAME}/add track to now playing list`;
+export const CLEAR_NOW_PLAYING = `${NAME}/clear now playing list`;
+export const REPLACE_NOW_PLAYING = `${NAME}/replace now playing list`;
+export const LOAD_NOW_PLAYING = `${NAME}/load now playing list`;
 
 function update(action, idTracks = [], current = -1) {
   const what = {
