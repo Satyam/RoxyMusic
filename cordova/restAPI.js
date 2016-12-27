@@ -1,6 +1,10 @@
 import url from 'url';
 import { join } from 'path';
 import pathToRegexp from 'path-to-regexp';
+import dbg from 'debug';
+
+// dbg.enable('RoxyMusic:restAPI');
+const debug = dbg('RoxyMusic:restAPI');
 
 const clients = {};
 const routes = [];
@@ -21,7 +25,7 @@ export default (base) => {
   const restClient = method => (reqUrl, body) => {
     const parsedUrl = url.parse(reqUrl, true);
     const path = join('/', base, parsedUrl.pathname || '');
-    // console.log(`> ${method} ${path}`);
+    debug(`> ${method} ${path}`);
     const o = {
       options: parsedUrl.query,
       keys: {},
@@ -43,11 +47,11 @@ export default (base) => {
         Promise.resolve(o)
       )
       // .then((data) => {
-      //   console.log(`< ${method} ${path}, ${JSON.stringify(data)}`);
+      //   debug(`< ${method} ${path}, ${JSON.stringify(data)}`);
       //   return data;
       // })
       .catch((reason) => {
-        // console.log(`<!!! ${method} ${path}, ${reason}`);
+        debug(`<!!! ${method} ${path}, ${reason}`);
         return Promise.reject({
           status: (reason instanceof Error) ? 500 : reason.code,
           statusText: reason.message,
@@ -55,7 +59,7 @@ export default (base) => {
       });
     }
 
-    // console.log(`<!!! ${method} ${path}, no match found`);
+    debug(`<!!! ${method} ${path}, no match found`);
     return {
       status: 404,
       statusText: 'no match found',
