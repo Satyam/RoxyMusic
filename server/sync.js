@@ -3,9 +3,9 @@ let prepared = {};
 export function init(db) {
   return db.prepareAll({
     getMyId: 'select idDevice from Devices where uuid = $uuid',
-    setMyId: 'insert into idDevice (uuid) values ($uuid)',
+    setMyId: 'insert into Devices (uuid) values ($uuid)',
     getDifferences: `select
-        idPlayListHistory, timeChanged,
+        idPlayListHistory, timeChanged, PlayLists.idPlayList as idPlayList,
         PlayLists.name as currentName, PlayLists.idTracks as currentIdTracks,
         PlayListsHistory.name as oldName,  PlayListsHistory.idTracks as oldIdTracks
       from  PlayLists
@@ -25,13 +25,13 @@ export function init(db) {
 }
 
 export function getMyId(o) {
-  return prepared.getMyId.get(o.keys);
+  return prepared.getMyId.get(o.keys)
+  .then(data => data ||
+    prepared.setMyId.run(o.keys)
+    .then(res => ({ idDevice: res.lastID }))
+  );
 }
 
-export function setMyId(o) {
-  return prepared.setMyId.run(o.keys)
-    .then(res => ({ idDevice: res.lastID }));
-}
 
 export function getDifferences(o) {
   return prepared.getDifferences.all(o)
@@ -56,7 +56,6 @@ export default db =>
   .then(() => ({
     '/myId/:uuid': {
       read: getMyId,
-      create: setMyId,
     },
     '/differences/:idDevice': {
       read: getDifferences,
