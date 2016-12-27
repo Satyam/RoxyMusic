@@ -11,6 +11,7 @@ import nowPlaying from './nowPlaying';
 import requests from './requests';
 import dimensions from './dimensions';
 import config from './config';
+import sync from './sync';
 
 const reducers = combineReducers({
   albums,
@@ -21,6 +22,7 @@ const reducers = combineReducers({
   playLists,
   nowPlaying,
   config,
+  sync,
   dimensions,
   routing: routerReducer,
 });

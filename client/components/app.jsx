@@ -3,6 +3,10 @@ import { Link } from 'react-router';
 import Measure from 'react-measure';
 import { connect } from 'react-redux';
 import compose from 'recompose/compose';
+import Navbar from 'react-bootstrap/lib/Navbar';
+import Nav from 'react-bootstrap/lib/Nav';
+import NavItem from 'react-bootstrap/lib/NavItem';
+import Icon from '_components/misc/icon';
 
 import Errors from '_components/misc/errors';
 import Loading from '_components/misc/loading';
@@ -24,6 +28,21 @@ import styles from './app.css';
 const AppComponent = ({ width, children, onMeasureChange }) => (
   <Measure onMeasure={onMeasureChange}>
     <div className={styles.app}>
+      <Navbar>
+        <Navbar.Header>
+          <Navbar.Brand>
+            <Icon type="music" href="/" label="Roxy Music" />
+          </Navbar.Brand>
+        </Navbar.Header>
+        <Navbar.Toggle />
+        <Navbar.Collapse>
+          <Nav pullRight>
+            <NavItem href="/sync">
+              <Icon type="retweet" title="sync" />
+            </NavItem>
+          </Nav>
+        </Navbar.Collapse>
+      </Navbar>
       <Loading />
       <Errors />
       <SelectPlayList />
