@@ -31,15 +31,21 @@ const AppComponent = ({ width, children, onMeasureChange }) => (
       <Navbar>
         <Navbar.Header>
           <Navbar.Brand>
-            <Icon type="music" href="/" label="Roxy Music" />
+            <Icon type="music" label="Roxy Music" />
           </Navbar.Brand>
         </Navbar.Header>
         <Navbar.Toggle />
         <Navbar.Collapse>
           <Nav pullRight>
-            <NavItem href="/sync">
-              <Icon type="retweet" title="sync" />
-            </NavItem>
+            {
+              BUNDLE === 'cordova'
+              ? (
+                <NavItem>
+                  <Icon type="retweet" href="/sync" title="sync" />
+                </NavItem>
+              )
+              : null
+          }
           </Nav>
         </Navbar.Collapse>
       </Navbar>
