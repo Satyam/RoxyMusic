@@ -2,10 +2,11 @@ import { join } from 'path';
 
 const clients = {};
 
-export default (base) => {
-  if (clients[base]) return clients[base];
+export default (base, host = HOST, port = PORT) => {
+  const key = join(host, port, base);
+  if (clients[key]) return clients[key];
   const restClient = method => (path, body) => fetch(
-    `${HOST}:${PORT}${join(REST_API_PATH, base, String(path))}`,
+    `${host}:${port}${join(REST_API_PATH, base, String(path))}`,
     {
       method,
       headers: {
@@ -26,7 +27,7 @@ export default (base) => {
     })
   ))
   .then(response => response.json());
-  return (clients[base] = {
+  return (clients[key] = {
     create: restClient('post'),
     read: restClient('get'),
     update: restClient('put'),
