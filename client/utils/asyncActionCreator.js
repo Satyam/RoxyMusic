@@ -19,12 +19,15 @@ export default (type, asyncRequest, payload = {}, meta) =>
         payload: Object.assign({}, payload, response),
         meta,
       }),
-      error => dispatch({
-        type,
-        stage: FAILURE_RECEIVED,
-        payload,
-        error,
-        meta,
-      })
+      (error) => {
+        dispatch({
+          type,
+          stage: FAILURE_RECEIVED,
+          payload,
+          error,
+          meta,
+        });
+        return Promise.reject(error);
+      }
     );
   };
