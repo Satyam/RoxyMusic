@@ -29,7 +29,7 @@ export default (
   if (action.error) {
     if (action.type === GET_ARTIST) {
       const idArtist = payload.idArtist;
-      return update(state, { artists: { $merge: {
+      return update(state, { artistHash: { $merge: {
         [idArtist]: {
           idArtist,
           error: 404,

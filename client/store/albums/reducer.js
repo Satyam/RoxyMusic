@@ -29,7 +29,7 @@ export default (
   if (action.error) {
     if (action.type === GET_ALBUM) {
       const idAlbum = payload.idAlbum;
-      return update(state, { albums: { $merge: {
+      return update(state, { albumHash: { $merge: {
         [idAlbum]: {
           idAlbum,
           error: 404,
