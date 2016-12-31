@@ -24,7 +24,7 @@ export default (type, asyncRequest, payload = {}, meta) =>
           type,
           stage: FAILURE_RECEIVED,
           payload,
-          error,
+          error: error.toString(),
           meta,
         });
         return Promise.reject(error);

@@ -13,6 +13,15 @@ import dataServers from '_server';
 import openDatabase from '_server/utils/openWebSql';
 import DB from '_server/utils/webSqlP';
 
+import { diffArrays } from 'diff';
+
+console.log(diffArrays('1,3,5,7'.split(','), '3,4'.split(',')));
+
+// [ { count: 1, added: undefined, removed: true, value: [ '1' ] },
+//   { count: 1, value: [ '3' ] },
+//   { count: 2, added: undefined, removed: true, value: [ '5', '7' ] },
+//   { count: 1, added: true, removed: undefined, value: [ '4' ] } ]
+
 const absPath = relPath => join(ROOT_DIR, relPath);
 
 const unlink = denodeify(fs.unlink);
@@ -69,7 +78,7 @@ const handleRequest = actions => (req, res) => {
     return res.json(reply);
   })
   .catch((reason) => {
-    res.status((reason instanceof Error) ? 500 : reason.code).send(reason.message);
+    res.status(reason.code || 500).send(reason.toString());
   });
 };
 const equivalent = {

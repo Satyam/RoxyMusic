@@ -2,6 +2,7 @@ import url from 'url';
 import { join } from 'path';
 import pathToRegexp from 'path-to-regexp';
 import dbg from 'debug';
+import ServerError from '_utils/serverError';
 
 // dbg.enable('RoxyMusic:restAPI');
 const debug = dbg('RoxyMusic:restAPI');
@@ -52,18 +53,22 @@ export default (base) => {
       // })
       .catch((reason) => {
         debug(`<!!! ${method} ${path}, ${reason}`);
-        return Promise.reject({
-          status: (reason instanceof Error) ? 500 : reason.code,
-          statusText: reason.message,
-        });
+        return Promise.reject(new ServerError(
+          reason.code || '',
+          reason.message,
+          method,
+          path
+        ));
       });
     }
 
     debug(`<!!! ${method} ${path}, no match found`);
-    return {
-      status: 404,
-      statusText: 'no match found',
-    };
+    return Promise.reject(new ServerError(
+      404,
+      'no match found',
+      method,
+      path
+    ));
   };
   return (clients[base] = {
     create: restClient('create'),

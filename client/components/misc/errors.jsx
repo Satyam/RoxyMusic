@@ -19,7 +19,7 @@ export const ErrorsComponent = ({ errors, onCloseErrors }) => {
       {
         errors.map(
           process.env.NODE_ENV === 'production'
-          ? e => e.message
+          ? e => e.error.message
           : e => JSON.stringify(e, null, 2)
         ).join('\n')
       }

@@ -1,4 +1,5 @@
 import { join } from 'path';
+import ServerError from '_utils/serverError';
 import dbg from 'debug';
 
 // dbg.enable('RoxyMusic:restAPI');
@@ -19,11 +20,12 @@ export default (base) => {
       if (response.status < 300) {
         resolve(response.data);
       } else {
-        reject({
-          status: response.status,
-          statusText: response.statusText,
-          message: `${method}: ${path} ${response.status} ${response.statusText}`,
-        });
+        reject(new ServerError(
+          response.status,
+          response.statusText,
+          method,
+          path
+        ));
       }
     });
     debug('> %s %s %s \n%j',

@@ -1,4 +1,5 @@
 import { join } from 'path';
+import ServerError from '_utils/serverError';
 
 const clients = {};
 
@@ -20,11 +21,12 @@ export default (base, host = HOST, port = PORT) => {
   .then(response => (
     response.ok
     ? response
-    : Promise.reject({
-      status: response.status,
-      statusText: response.statusText,
-      message: `${method}: ${response.url} ${response.status} ${response.statusText}`,
-    })
+    : Promise.reject(new ServerError(
+      response.status,
+      response.statusText,
+      method,
+      join(base, String(path)
+    )))
   ))
   .then(response => response.json());
   return (clients[key] = {

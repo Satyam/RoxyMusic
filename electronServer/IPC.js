@@ -41,7 +41,7 @@ electron.ipcMain.on('restAPI', (event, msg) => {
     .catch((reason) => {
       debug('<!!! %s %j', msg.url, reason);
       event.sender.send(msg.channel, {
-        status: (reason instanceof Error) ? 500 : reason.code,
+        status: reason.code || 500,
         statusText: reason.message,
       });
     });
