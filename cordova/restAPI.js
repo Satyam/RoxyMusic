@@ -22,14 +22,14 @@ export function addRoute(method, route, actions) {
 
 export default (base) => {
   if (clients[base]) return clients[base];
-  const restClient = method => (reqUrl, body) => {
+  const restClient = method => (reqUrl, data) => {
     const parsedUrl = url.parse(reqUrl, true);
     const path = join('/', base, parsedUrl.pathname || '');
     debug(`> ${method} ${path}`);
     const o = {
       options: parsedUrl.query,
       keys: {},
-      body,
+      data,
     };
     const route = routes.find((rt) => {
       if (method !== rt.method) return false;
