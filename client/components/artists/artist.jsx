@@ -51,7 +51,7 @@ ArtistComponent.propTypes = {
 };
 
 export const storeInitializer = (dispatch, state, props) => {
-  const idArtist = props.params.idArtist;
+  const idArtist = parseInt(props.params.idArtist, 10);
   return state.artists.artistHash[idArtist] || dispatch(getArtist(idArtist));
 };
 
