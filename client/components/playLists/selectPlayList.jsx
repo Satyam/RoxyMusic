@@ -130,10 +130,8 @@ export const mapDispatchToProps = dispatch => ({
     && dispatch(addTrackToPlayList(idTrackToAdd, idPlayList))
     .then(() => dispatch(closeAddToPlayList())),
   onAddToNewPlayList: (idTrackToAdd, name) =>
-    dispatch(addPlayList(name))
-    .then(res => dispatch(addTrackToPlayList(idTrackToAdd, res.payload.lastID))
-    .then(() => dispatch(closeAddToPlayList()))
-  ),
+    dispatch(addPlayList(name, [idTrackToAdd]))
+    .then(() => dispatch(closeAddToPlayList())),
   onClose: ev => isPlainClick(ev) && dispatch(closeAddToPlayList()),
 });
 
