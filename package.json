@@ -16,7 +16,7 @@
     "electron": "electron bundles/electronServer.js",
     "updateModules": "updtr --test-stdout",
     "rebuildElectron": "electron-rebuild",
-    "precordova": "cp bundles/cordova.js cordova/www/index.js && cp bundles/cordova.css cordova/www/index.css && cp server/data.sql cordova/www/res && cp cordova/index.html cordova/www",
+    "precordova": "cp bundles/cordova.js cordova/www/index.js && cp bundles/cordova.css cordova/www/index.css && cp bundles/cordova.*.map cordova/www && cp server/data.sql cordova/www/res && cp cordova/index.html cordova/www",
     "cordova": "cd cordova && cordova build"
   },
   "author": "Daniel Barreiro",
