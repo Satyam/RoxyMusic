@@ -17,7 +17,7 @@ export function init(db) {
   return db.prepareAll({
     getPlayLists: 'select * from PlayLists',
     getPlayList: 'select * from PlayLists where idPlayList = $idPlayList',
-    addPlayList: 'insert into PlayLists (idPlayList, name) values ($idPlayList, $name)',
+    addPlayList: 'insert into PlayLists (idPlayList, name, idTracks) values ($idPlayList, $name, $idTracks)',
     updatePlayList: 'update PlayLists set lastTrackPlayed = $lastTrackPlayed, idTracks = $idTracks where idPlayList = $idPlayList',
     renamePlayList: 'update PlayLists set name = $name where idPlayList = $idPlayList',
     deletePlayList: 'delete from PlayLists  where idPlayList = $idPlayList',
@@ -39,12 +39,14 @@ export function getPlayList(o) {
   .then(splitIdTracks);
 }
 
-// addPlayList: 'insert into PlayLists (idPlayList, name) values ($idPlayList, $name)',
+// addPlayList: 'insert into PlayLists (idPlayList, name, idTracks)
+//               values ($idPlayList, $name, $idTracks)',
 export function addPlayList(o) {
-  const idPlayList = uuid();
+  const idPlayList = o.keys.idPlayList || uuid();
   return prepared.addPlayList.run({
     idPlayList,
     name: o.data.name,
+    idTracks: o.data.idTracks.join(','),
   })
   .then(() => ({ idPlayList }));
 }
@@ -112,15 +114,10 @@ export default db =>
         create: addPlayList,
       },
       '/:idPlayList': {
-        read: [
-          getPlayList,
-        ],
-        update: [
-          updatePlayList,
-        ],
-        delete: [
-          deletePlayList,
-        ],
+        read: getPlayList,
+        create: addPlayList,
+        update: updatePlayList,
+        delete: deletePlayList,
       },
       '/saveAll': {
         create: saveAllPlayLists,
