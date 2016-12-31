@@ -1,23 +1,27 @@
+import {
+  getPlayList,
+} from './playlists';
+
 let prepared = {};
 
 export function init(db) {
   return db.prepareAll({
     getMyId: 'select idDevice from Devices where uuid = $uuid',
     setMyId: 'insert into Devices (uuid) values ($uuid)',
-    getDifferences: `select
+    getHistory: `select
         idPlayListHistory, timeChanged, PlayLists.idPlayList as idPlayList,
         PlayLists.name as currentName, PlayLists.idTracks as currentIdTracks,
         PlayListsHistory.name as oldName,  PlayListsHistory.idTracks as oldIdTracks
       from  PlayLists
       left join PlayListsHistory using(idPlayList)
       where  (currentName != ifnull(oldName, '')  or currentIdTracks != ifnull(oldIdTracks, ''))
-      and (idDevice = $myIdDevice or idDevice is null)`,
+      and (idDevice = $idDevice or idDevice is null)`,
     createHistory: `insert into PlayListsHistory
       (idPlayList, idDevice, timeChanged, name, idTracks)
       values ($idPlayList, $idDevice, datetime('now'), $name, $idTracks)`,
     updateHistory: `update PlayListsHistory
-     set name = $name, idTracks = $idTracks, timeChanged = datetime('now')
-     where idPlayListHistory = $idPlayListHistory`,
+      set name = $name, idTracks = $idTracks, timeChanged = datetime('now')
+      where idPlayListHistory = $idPlayListHistory`,
   })
   .then((p) => {
     prepared = p;
@@ -32,9 +36,8 @@ export function getMyId(o) {
   );
 }
 
-
-export function getDifferences(o) {
-  return prepared.getDifferences.all(o)
+export function getHistory(o) {
+  return prepared.getHistory.all(o)
     .then(list => ({ list }));
 }
 
@@ -57,11 +60,14 @@ export default db =>
     '/myId/:uuid': {
       read: getMyId,
     },
-    '/differences/:idDevice': {
-      read: getDifferences,
-    },
     '/history/:idDevice': {
+      read: getHistory,
       create: createHistory,
+    },
+    '/history/:idPlayListHistory': {
       update: updateHistory,
+    },
+    '/playlist/:idPlayList': {
+      read: getPlayList,
     },
   }));

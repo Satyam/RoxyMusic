@@ -6,21 +6,28 @@ import {
 } from '_store/requests/actions';
 
 import {
+  GET_PLAY_LISTS,
+} from '_store/playLists/actions';
+
+import {
   START_SYNC,
-  GET_DIFFERENCES,
+  GET_HISTORY,
+  IMPORT_PLAYLIST,
+  CREATE_HISTORY,
+  UPDATE_HISTORY,
 } from './actions';
 
 export default (
   state = {
     uuid: null,
     idDevice: null,
-    list: [],
+    hash: {},
     stage: 0,
   },
   action
 ) => {
   const payload = action.payload;
-  // const list = payload && payload.list;
+  const list = payload && payload.list;
   switch (action.stage) {
     case REQUEST_SENT:
       switch (action.type) {
@@ -34,11 +41,37 @@ export default (
             $merge: payload,
             stage: { $set: 1 },
           });
-        case GET_DIFFERENCES:
+        case GET_HISTORY: {
           return update(state, {
-            $merge: payload,
+            hash: { $set: list.reduce(
+              (playLists, playList) =>
+                Object.assign({}, playLists, { [playList.idPlayList]: playList }),
+              state.hash
+            ) },
             stage: { $set: 2 },
           });
+        }
+        case GET_PLAY_LISTS: {
+          return update(state, {
+            hash: { $set: list.reduce(
+              (playLists, playList) =>
+                Object.assign({}, playLists, { [playList.idPlayList]: playList }),
+              state.hash
+            ) },
+          });
+        }
+        case IMPORT_PLAYLIST: {
+          console.log('IMPORT_PLAYLIST', payload, state);
+          return state;
+        }
+        case UPDATE_HISTORY: {
+          console.log('UPDATE_HISTORY', payload, state);
+          return state;
+        }
+        case CREATE_HISTORY: {
+          console.log('CREATE_HISTORY', payload, state);
+          return state;
+        }
         default:
           return state;
       }
