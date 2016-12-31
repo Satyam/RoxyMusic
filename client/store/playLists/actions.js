@@ -8,13 +8,14 @@ export const GET_PLAY_LISTS = `${NAME}/get playlists`;
 export const GET_PLAY_LIST = `${NAME}/get single playlist`;
 export const REPLACE_PLAY_LIST_TRACKS = `${NAME}/replace playlist tracks`;
 export const RENAME_PLAY_LIST = `${NAME}/rename playlist`;
-export const ADD_PLAY_LIST = `${NAME}/replace playlist`;
+export const ADD_PLAY_LIST = `${NAME}/add playlist`;
 export const DELETE_PLAY_LIST = `${NAME}/delete playlist`;
 export const ADD_TRACK_TO_PLAYLIST = `${NAME}/add track to playlist`;
 export const SELECT_PLAYLIST_FOR_TRACK = `${NAME}/select playlist for track`;
 export const CLOSE_ADD_TO_PLAYLIST = `${NAME}/close add to playlist`;
 export const SAVE_ALL_PLAYLISTS = `${NAME}/save all playlists`;
 export const SAVE_PLAYLIST = `${NAME}/save playlist`;
+export const IMPORT_PLAYLIST = `${NAME}/import playlist`;
 
 export function getPlayLists() {
   return asyncActionCreator(
@@ -47,11 +48,11 @@ export function renamePlayList(idPlayList, name) {
   );
 }
 
-export function addPlayList(name) {
+export function addPlayList(name, idTracks = [], idPlayList = '') {
   return asyncActionCreator(
     ADD_PLAY_LIST,
-    api.create('/', { name }),
-    { name }
+    api.create(`/${idPlayList}`, { name, idTracks }),
+    { name, idTracks }
   );
 }
 
