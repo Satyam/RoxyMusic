@@ -42,16 +42,21 @@ export function getHistory(o) {
 }
 
 export function createHistory(o) {
-  return prepared.createHistory.run(
-    Object.assign(o.keys, o.data)
-  )
+  return prepared.createHistory.run({
+    idDevice: o.keys.idDevice,
+    idPlayList: o.data.idPlayList,
+    name: o.data.name,
+    idTracks: o.data.idTracks.join(','),
+  })
   .then(res => ({ idPlayListHistory: res.lastID }));
 }
 
 export function updateHistory(o) {
-  return prepared.updateHistory.run(
-    Object.assign(o.keys, o.data)
-  );
+  return prepared.updateHistory.run({
+    idPlayListHistory: o.keys.idPlayListHistory,
+    name: o.data.name,
+    idTracks: o.data.idTracks.join(','),
+  });
 }
 
 export default db =>
