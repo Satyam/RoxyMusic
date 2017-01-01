@@ -31,16 +31,13 @@ export function AlbumListComponent({
             <Icon type="arrow-up" href="/" label="Albums" />
           </Navbar.Brand>
         </Navbar.Header>
-        <Navbar.Toggle />
-        <Navbar.Collapse>
-          <Navbar.Form pullLeft>
-            <SearchField
-              search={search}
-              onChangeHandler={onSearchChangeHandler}
-              onClearHandler={onSearchClearHandler}
-            />
-          </Navbar.Form>
-        </Navbar.Collapse>
+        <Navbar.Form pullLeft>
+          <SearchField
+            search={search}
+            onChangeHandler={onSearchChangeHandler}
+            onClearHandler={onSearchClearHandler}
+          />
+        </Navbar.Form>
       </Navbar>
       <ListGroup>
         {

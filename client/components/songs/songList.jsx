@@ -31,16 +31,13 @@ export function SongListComponent({
             <Icon type="arrow-up" href="/" label="Songs" />
           </Navbar.Brand>
         </Navbar.Header>
-        <Navbar.Toggle />
-        <Navbar.Collapse>
-          <Navbar.Form pullLeft>
-            <SearchField
-              search={search}
-              onChangeHandler={onSearchChangeHandler}
-              onClearHandler={onSearchClearHandler}
-            />
-          </Navbar.Form>
-        </Navbar.Collapse>
+        <Navbar.Form pullLeft>
+          <SearchField
+            search={search}
+            onChangeHandler={onSearchChangeHandler}
+            onClearHandler={onSearchClearHandler}
+          />
+        </Navbar.Form>
       </Navbar>
       <TrackList
         idTracks={songList.map(song => song.idTrack)}

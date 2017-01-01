@@ -21,14 +21,11 @@ export const ArtistComponent = ({ idArtist, artist, numTracks, idTracks, error }
               <Icon type="user" label={artist} />
             </Navbar.Brand>
           </Navbar.Header>
-          <Navbar.Toggle />
-          <Navbar.Collapse>
-            <div className={styles.artistInfo}>
-              <div className={styles.artistNumTracks}>
-                {numTracks} {numTracks === 1 ? 'track' : 'tracks'}
-              </div>
+          <div className={styles.artistInfo}>
+            <div className={styles.artistNumTracks}>
+              {numTracks} {numTracks === 1 ? 'track' : 'tracks'}
             </div>
-          </Navbar.Collapse>
+          </div>
         </Navbar>
         <TrackList
           idTracks={idTracks}

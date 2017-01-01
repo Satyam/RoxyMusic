@@ -21,7 +21,6 @@ export const NowPlayingComponent = ({ idTracks, current, router }) =>
             Now Playing {current === -1 ? ' (none) ' : ''}
           </Navbar.Brand>
         </Navbar.Header>
-        <Navbar.Toggle />
       </Navbar>
       <TrackList
         idTracks={idTracks}

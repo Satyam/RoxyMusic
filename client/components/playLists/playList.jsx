@@ -18,12 +18,9 @@ export const PlayListComponent = ({ idPlayList, name, idTracks }) =>
             <Icon type="list" label={name} />
           </Navbar.Brand>
         </Navbar.Header>
-        <Navbar.Toggle />
-        <Navbar.Collapse>
-          <div className={styles.playListnumTracks}>
-            {idTracks.length} {idTracks.length === 1 ? 'track' : 'tracks'}
-          </div>
-        </Navbar.Collapse>
+        <div className={styles.playListnumTracks}>
+          {idTracks.length} {idTracks.length === 1 ? 'track' : 'tracks'}
+        </div>
       </Navbar>
       <TrackList idTracks={idTracks} />
     </div>

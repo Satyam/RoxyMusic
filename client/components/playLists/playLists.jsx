@@ -27,7 +27,6 @@ export function PlayListsComponent({
             <Icon type="arrow-up" href="/" label="Play Lists" />
           </Navbar.Brand>
         </Navbar.Header>
-        <Navbar.Toggle />
         <FoldingToolbar>
           <Button onClick={onPlayListSave} title="Save all playlists">
             <Icon type="save" />
