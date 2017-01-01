@@ -4,11 +4,13 @@ import { compose } from 'recompose';
 import map from 'lodash/map';
 
 import Icon from '_components/misc/icon';
-import Alert from 'react-bootstrap/lib/Alert';
 import ListGroup from 'react-bootstrap/lib/ListGroup';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
+import FoldingToolbar from '_components/misc/foldingToolbar';
+
 import initStore from '_utils/initStore';
 import { storeInitializer } from '_components/playLists/playLists';
+
 
 import {
   startSync,
@@ -19,55 +21,48 @@ import {
   addPlayList,
 } from '_store/actions';
 
-
-const messages = [
-  '',
-  'idDevice received',
-  'Current server playlists received',
-];
+import styles from './sync.css';
 
 export function SyncComponent({
-  stage,
-  uuid,
   idDevice,
   hash,
   onSyncStart,
   onListImport,
 }) {
+  const hasHash = !!Object.keys(hash).length;
   return (<div>
     <Icon
       type="retweet"
       className="btn btn-default"
       onClick={onSyncStart}
       label="Start"
-      disabled={stage !== 0}
+      disabled={hasHash}
     />
-    <Alert bsStyle="info">{messages[stage]}</Alert>
     {
-      stage > 0
-      ? (<p>{`uuid: ${uuid}, idDevice: ${idDevice}`}</p>)
-      : null
-    }
-    {
-      stage === 2
+      hasHash
       ? (
         <ListGroup>
           {map(hash, (playList, idPlayList) => {
             if (playList.currentName && !playList.oldName && !playList.name) {
               return (
                 <ListGroupItem
+                  className={styles.listGroupItem}
                   key={idPlayList}
-                  header={playList.currentName}
                   bsStyle="success"
                 >
-                  Playlist in server is new
-                  <Icon
-                    className="btn btn-default"
-                    type="import"
-                    onClick={onListImport(idPlayList, idDevice, playList.idPlayListHistory)}
-                    title="Import from server"
-                    label="Import"
-                  />
+                  <div className={styles.info}>
+                    <div className={styles.name}>{playList.currentName}</div>
+                    <div className={styles.status}>Playlist in server is new</div>
+                  </div>
+                  <FoldingToolbar>
+                    <Icon
+                      className="btn btn-default"
+                      type="import"
+                      onClick={onListImport(idPlayList, idDevice, playList.idPlayListHistory)}
+                      title="Import from server"
+                      label="Import"
+                    />
+                  </FoldingToolbar>
                 </ListGroupItem>
               );
             }
@@ -81,6 +76,14 @@ export function SyncComponent({
               </ListGroupItem>
             );
           })}
+          <ListGroupItem>
+            <Icon
+              className="btn btn-default btn-block"
+              type="ok"
+              href="/"
+              label="Done"
+            />
+          </ListGroupItem>
         </ListGroup>
      )
      : null
@@ -89,9 +92,7 @@ export function SyncComponent({
 }
 
 SyncComponent.propTypes = {
-  uuid: PropTypes.string,
   idDevice: PropTypes.number,
-  stage: PropTypes.number,
   hash: PropTypes.object,
   onSyncStart: PropTypes.func,
   onListImport: PropTypes.func,

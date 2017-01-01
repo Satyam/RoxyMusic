@@ -1,0 +1,11 @@
+.list-group-item {
+  overflow: hidden;
+}
+
+.info {
+  float:left;
+}
+.name {
+  font-size: large;
+  font-weight: bold;
+}
