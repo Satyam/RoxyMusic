@@ -16,7 +16,7 @@ import styles from './artistList.css';
 import ArtistListItem from './artistListItem';
 
 export function ArtistListComponent({
-  artistList,
+  list,
   search,
   nextOffset,
   onSearchChangeHandler,
@@ -41,7 +41,7 @@ export function ArtistListComponent({
       </Navbar>
       <ListGroup>
         {
-          artistList.map(artist => (
+          list.map(artist => (
             artist.error
             ? null
             : (<ArtistListItem
@@ -62,7 +62,7 @@ export function ArtistListComponent({
 }
 
 ArtistListComponent.propTypes = {
-  artistList: PropTypes.array,
+  list: PropTypes.array,
   search: PropTypes.string,
   nextOffset: PropTypes.number,
   onSearchChangeHandler: PropTypes.func,

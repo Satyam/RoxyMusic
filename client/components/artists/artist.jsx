@@ -49,11 +49,11 @@ ArtistComponent.propTypes = {
 
 export const storeInitializer = (dispatch, state, props) => {
   const idArtist = parseInt(props.params.idArtist, 10);
-  return state.artists.artistHash[idArtist] || dispatch(getArtist(idArtist));
+  return state.artists.hash[idArtist] || dispatch(getArtist(idArtist));
 };
 
 export const mapStateToProps =
-  (state, props) => state.artists.artistHash[props.params.idArtist] || {};
+  (state, props) => state.artists.hash[props.params.idArtist] || {};
 
 export default compose(
   initStore(storeInitializer),

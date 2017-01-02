@@ -18,9 +18,9 @@ const indexArtists = (payload, oldIndex = {}) => payload.reduce(
 export default (
   state = {
     search: '',
-    artistList: [],
+    list: [],
     nextOffset: 0,
-    artistHash: {},
+    hash: {},
   },
   action
 ) => {
@@ -29,7 +29,7 @@ export default (
   if (action.error) {
     if (action.type === GET_ARTIST) {
       const idArtist = payload.idArtist;
-      return update(state, { artistHash: { $merge: {
+      return update(state, { hash: { $merge: {
         [idArtist]: {
           idArtist,
           error: 404,
@@ -44,23 +44,23 @@ export default (
       return {
         search: payload.search || '',
         nextOffset: list.length,
-        artistList: list,
-        artistHash: indexArtists(list),
+        list,
+        hash: indexArtists(list),
       };
     }
     case GET_MORE_ARTISTS: {
       return update(state, {
         nextOffset: { $apply: offset => offset + list.length },
-        artistList: { $push: list },
-        artistHash: { $set: indexArtists(list, state.artistHash) },
+        list: { $push: list },
+        hash: { $set: indexArtists(list, state.hash) },
       });
     }
     case GET_ARTIST: {
       return {
         search: '',
         nextOffset: 0,
-        artistList: [payload],
-        artistHash: indexArtists([payload]),
+        list: [payload],
+        hash: indexArtists([payload]),
       };
     }
     default:

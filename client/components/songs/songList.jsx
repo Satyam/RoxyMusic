@@ -16,7 +16,7 @@ import { getSongs, getMoreSongs } from '_store/actions';
 import styles from './songList.css';
 
 export function SongListComponent({
-  songList,
+  list,
   search,
   nextOffset,
   onSearchChangeHandler,
@@ -40,7 +40,7 @@ export function SongListComponent({
         </Navbar.Form>
       </Navbar>
       <TrackList
-        idTracks={songList.map(song => song.idTrack)}
+        idTracks={list.map(song => song.idTrack)}
         Toolbar="default"
         After={(
           <ListGroupItem>
@@ -56,7 +56,7 @@ export function SongListComponent({
 }
 
 SongListComponent.propTypes = {
-  songList: PropTypes.array,
+  list: PropTypes.array,
   search: PropTypes.string,
   nextOffset: PropTypes.number,
   onSearchChangeHandler: PropTypes.func,

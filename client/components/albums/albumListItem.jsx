@@ -38,7 +38,7 @@ AlbumListItemComponent.propTypes = {
   idArtist: PropTypes.number,
 };
 
-export const mapStateToProps = (state, props) => state.albums.albumHash[props.idAlbum] || {};
+export const mapStateToProps = (state, props) => state.albums.hash[props.idAlbum] || {};
 
 export default connect(
   mapStateToProps

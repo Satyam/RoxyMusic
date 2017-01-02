@@ -51,10 +51,10 @@ AlbumComponent.propTypes = {
 
 export const storeInitializer = (dispatch, state, props) => {
   const idAlbum = parseInt(props.params.idAlbum, 10);
-  return state.albums.albumHash[idAlbum] || dispatch(getAlbum(idAlbum));
+  return state.albums.hash[idAlbum] || dispatch(getAlbum(idAlbum));
 };
 
-export const mapStateToProps = (state, props) => state.albums.albumHash[props.params.idAlbum] || {};
+export const mapStateToProps = (state, props) => state.albums.hash[props.params.idAlbum] || {};
 
 export default compose(
   initStore(storeInitializer),

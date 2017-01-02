@@ -18,9 +18,9 @@ const indexAlbums = (payload, oldIndex = {}) => payload.reduce(
 export default (
   state = {
     search: '',
-    albumList: [],
+    list: [],
     nextOffset: 0,
-    albumHash: {},
+    hash: {},
   },
   action
 ) => {
@@ -29,7 +29,7 @@ export default (
   if (action.error) {
     if (action.type === GET_ALBUM) {
       const idAlbum = payload.idAlbum;
-      return update(state, { albumHash: { $merge: {
+      return update(state, { hash: { $merge: {
         [idAlbum]: {
           idAlbum,
           error: 404,
@@ -44,23 +44,23 @@ export default (
       return {
         search: payload.search || '',
         nextOffset: list.length,
-        albumList: list,
-        albumHash: indexAlbums(list),
+        list,
+        hash: indexAlbums(list),
       };
     }
     case GET_MORE_ALBUMS: {
       return update(state, {
         nextOffset: { $apply: offset => offset + list.length },
-        albumList: { $push: list },
-        albumHash: { $set: indexAlbums(list, state.albumHash) },
+        list: { $push: list },
+        hash: { $set: indexAlbums(list, state.hash) },
       });
     }
     case GET_ALBUM: {
       return {
         search: '',
         nextOffset: 0,
-        albumList: [payload],
-        albumHash: indexAlbums([payload]),
+        list: [payload],
+        hash: indexAlbums([payload]),
       };
     }
     default:

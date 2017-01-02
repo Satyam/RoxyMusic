@@ -19,7 +19,7 @@ export default (
     search: '',
     songList: [],
     nextOffset: 0,
-    songHash: {},
+    hash: {},
   },
   action
 ) => {
@@ -32,14 +32,14 @@ export default (
         search: payload.search || '',
         nextOffset: list.length,
         songList: list,
-        songHash: indexSongs(list),
+        hash: indexSongs(list),
       };
     }
     case GET_MORE_SONGS: {
       return update(state, {
         nextOffset: { $apply: offset => offset + list.length },
         songList: { $push: list },
-        songHash: { $set: indexSongs(list, state.songHash) },
+        hash: { $set: indexSongs(list, state.hash) },
       });
     }
     default:

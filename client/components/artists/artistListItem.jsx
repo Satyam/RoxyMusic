@@ -37,7 +37,7 @@ ArtistListItemComponent.propTypes = {
   numTracks: PropTypes.number,
 };
 
-export const mapStateToProps = (state, props) => state.artists.artistHash[props.idArtist] || {};
+export const mapStateToProps = (state, props) => state.artists.hash[props.idArtist] || {};
 
 export default connect(
   mapStateToProps

@@ -16,7 +16,7 @@ import styles from './albumList.css';
 import AlbumListItem from './albumListItem';
 
 export function AlbumListComponent({
-  albumList,
+  list,
   search,
   nextOffset,
   onSearchChangeHandler,
@@ -41,7 +41,7 @@ export function AlbumListComponent({
       </Navbar>
       <ListGroup>
         {
-          albumList.map(album => (
+          list.map(album => (
             album.error
             ? null
             : (<AlbumListItem
@@ -62,7 +62,7 @@ export function AlbumListComponent({
 }
 
 AlbumListComponent.propTypes = {
-  albumList: PropTypes.array,
+  list: PropTypes.array,
   search: PropTypes.string,
   nextOffset: PropTypes.number,
   onSearchChangeHandler: PropTypes.func,
