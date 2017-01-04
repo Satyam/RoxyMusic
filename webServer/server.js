@@ -10,8 +10,8 @@ import fs from 'fs';
 import { getConfig } from '_server/config';
 import dataServers from '_server';
 
-import openDatabase from '_server/utils/openWebSql';
-import DB from '_server/utils/webSqlP';
+import openDatabase from '_server/utils/openSqlite';
+import DB from '_server/utils/sqliteP';
 
 import { diffArrays } from 'diff';
 
