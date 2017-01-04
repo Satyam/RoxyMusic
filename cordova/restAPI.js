@@ -4,8 +4,8 @@ import pathToRegexp from 'path-to-regexp';
 import dbg from 'debug';
 import ServerError from '_utils/serverError';
 
-// dbg.enable('RoxyMusic:restAPI');
-const debug = dbg('RoxyMusic:restAPI');
+dbg.enable('RoxyMusic:cordova/restAPI');
+const debug = dbg('RoxyMusic:cordova/restAPI');
 
 const clients = {};
 const routes = [];
@@ -47,10 +47,10 @@ export default (base) => {
         (p, next) => p.then(next),
         Promise.resolve(o)
       )
-      // .then((data) => {
-      //   debug(`< ${method} ${path}, ${JSON.stringify(data)}`);
-      //   return data;
-      // })
+      .then((d) => {
+        debug(`< ${method} ${path}, ${JSON.stringify(d)}`);
+        return d;
+      })
       .catch((reason) => {
         debug(`<!!! ${method} ${path}, ${reason}`);
         return Promise.reject(new ServerError(
