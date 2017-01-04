@@ -19,6 +19,8 @@ import {
   updateHistory,
   createHistory,
   addPlayList,
+  getMissingTracks,
+  getConfig,
 } from '_store/actions';
 
 import styles from './sync.css';
@@ -26,83 +28,95 @@ import styles from './sync.css';
 export function SyncComponent({
   idDevice,
   hash,
+  stage,
   onSyncStart,
   onListImport,
+  onDone,
 }) {
   const hasHash = !!Object.keys(hash).length;
   return (<div>
-    <Icon
-      type="retweet"
-      className="btn btn-default"
-      onClick={onSyncStart}
-      label="Start"
-      disabled={hasHash}
-    />
-    {
-      hasHash
-      ? (
-        <ListGroup>
-          {map(hash, (playList, idPlayList) => {
-            if (playList.currentName && !playList.oldName && !playList.name) {
+    <ListGroup>
+      <ListGroupItem>
+        <Icon
+          type="retweet"
+          className="btn btn-default btn-block"
+          onClick={onSyncStart}
+          label="Start"
+          disabled={stage > 0}
+        />
+      </ListGroupItem>
+      {
+        (stage >= 2 || null)
+        && (
+            (hasHash || null)
+            && map(hash, (playList, idPlayList) => {
+              if (playList.serverName && !playList.previousName && !playList.name) {
+                return (
+                  <ListGroupItem
+                    className={styles.listGroupItem}
+                    key={idPlayList}
+                    bsStyle="success"
+                  >
+                    <div className={styles.info}>
+                      <div className={styles.name}>{playList.serverName}</div>
+                      <div className={styles.status}>Playlist in server is new</div>
+                    </div>
+                    <FoldingToolbar>
+                      <Icon
+                        className="btn btn-default"
+                        type="import"
+                        onClick={onListImport(idPlayList, idDevice, playList.idPlayListHistory)}
+                        title="Import from server"
+                        label="Import"
+                      />
+                    </FoldingToolbar>
+                  </ListGroupItem>
+                );
+              }
               return (
                 <ListGroupItem
-                  className={styles.listGroupItem}
                   key={idPlayList}
-                  bsStyle="success"
+                  header={playList.name}
+                  bsStyle="warning"
                 >
-                  <div className={styles.info}>
-                    <div className={styles.name}>{playList.currentName}</div>
-                    <div className={styles.status}>Playlist in server is new</div>
-                  </div>
-                  <FoldingToolbar>
-                    <Icon
-                      className="btn btn-default"
-                      type="import"
-                      onClick={onListImport(idPlayList, idDevice, playList.idPlayListHistory)}
-                      title="Import from server"
-                      label="Import"
-                    />
-                  </FoldingToolbar>
+                  {JSON.stringify(playList)}
                 </ListGroupItem>
               );
-            }
-            return (
-              <ListGroupItem
-                key={idPlayList}
-                header={playList.name}
-                bsStyle="warning"
-              >
-                {JSON.stringify(playList)}
-              </ListGroupItem>
-            );
-          })}
-          <ListGroupItem>
-            <Icon
-              className="btn btn-default btn-block"
-              type="ok"
-              href="/"
-              label="Done"
-            />
-          </ListGroupItem>
-        </ListGroup>
-     )
-     : null
+            })
+          )
+      }
+      {
+        (stage >= 2 || null)
+        && (<ListGroupItem>
+          <Icon
+            className="btn btn-default btn-block"
+            type="ok"
+            onClick={onDone}
+            label="Done"
+            disabled={stage >= 12}
+          />
+        </ListGroupItem>
+      )
     }
+    </ListGroup>
   </div>);
 }
 
 SyncComponent.propTypes = {
   idDevice: PropTypes.number,
   hash: PropTypes.object,
+  stage: PropTypes.number,
   onSyncStart: PropTypes.func,
   onListImport: PropTypes.func,
+  onDone: PropTypes.func,
 };
 
 export const mapStateToProps = state => state.sync;
 
 export const mapDispatchToProps = dispatch => ({
   onSyncStart: () =>
-    dispatch(startSync())
+    dispatch(getConfig('remoteHost'))
+    .then(remoteHost => dispatch(startSync(remoteHost)))
     .then(action => dispatch(getHistory(action.payload.idDevice))),
   onListImport: (idPlayList, idDevice, idPlayListHistory) => () =>
     dispatch(importPlayList(idPlayList))
@@ -115,6 +129,7 @@ export const mapDispatchToProps = dispatch => ({
           : createHistory(idDevice, idPlayList, name, idTracks)
         ));
     }),
+  onDone: () => dispatch(getMissingTracks()),
 });
 
 
