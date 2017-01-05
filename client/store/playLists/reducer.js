@@ -29,7 +29,7 @@ export default (
   if (action.type === GET_PLAY_LISTS && action.stage === REQUEST_SENT) {
     return update(state, { status: { $set: 1 } });
   }
-  if (action.stage !== REPLY_RECEIVED) return state;
+  if (action.stage && action.stage !== REPLY_RECEIVED) return state;
   const payload = action.payload;
   const list = payload && payload.list;
   const idPlayList = payload && payload.idPlayList;

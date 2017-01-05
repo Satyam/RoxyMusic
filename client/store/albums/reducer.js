@@ -38,7 +38,7 @@ export default (
     }
     return state;
   }
-  if (action.stage !== REPLY_RECEIVED) return state;
+  if (action.stage && action.stage !== REPLY_RECEIVED) return state;
   switch (action.type) {
     case GET_ALBUMS: {
       return {

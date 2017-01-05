@@ -25,7 +25,7 @@ export default (
 ) => {
   const payload = action.payload;
   const list = payload && payload.list;
-  if (action.stage !== REPLY_RECEIVED) return state;
+  if (action.stage && action.stage !== REPLY_RECEIVED) return state;
   switch (action.type) {
     case GET_SONGS: {
       return {
