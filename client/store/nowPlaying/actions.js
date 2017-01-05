@@ -29,16 +29,16 @@ export function playNow(idTrack) {
     const index = idTracks.indexOf(idTrack);
     return (
       index === -1
-      ? update(PLAY_NOW, idTracks.concat(idTrack), idTracks.length)
-      : update(PLAY_NOW, idTracks, index)
-    )(dispatch);
+      ? dispatch(update(PLAY_NOW, idTracks.concat(idTrack), idTracks.length))
+      : dispatch(update(PLAY_NOW, idTracks, index))
+    );
   };
 }
 
 export function addToNowPlaying(idTrack) {
   return (dispatch, getState) => {
     const nowPlaying = getState().nowPlaying;
-    return update(PLAY_NOW, nowPlaying.idTracks.concat(idTrack), nowPlaying.current)(dispatch);
+    return dispatch(update(PLAY_NOW, nowPlaying.idTracks.concat(idTrack), nowPlaying.current));
   };
 }
 
@@ -58,7 +58,7 @@ export function playNextTrack() {
       ? nowPlaying.current + 1
       : -1
     );
-    return update(PLAY_NEXT_TRACK, nowPlaying.idTracks, next)(dispatch);
+    return dispatch(update(PLAY_NEXT_TRACK, nowPlaying.idTracks, next));
   };
 }
 

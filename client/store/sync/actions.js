@@ -100,16 +100,16 @@ export function getMissingAlbums() {
     const currentIdAlbums = Object.keys(state.albums.hash).map(id => parseInt(id, 10));
     const missingIdAlbums = difference(neededIdAlbums, currentIdAlbums);
     if (missingIdAlbums.length === 0) return null;
-    return asyncActionCreator(
+    return dispatch(asyncActionCreator(
       IMPORT_ALBUMS,
       remote.read(`/albums/${missingIdAlbums.join(',')}`),
       { missingIdAlbums }
-    )(dispatch)
-    .then(() => asyncActionCreator(
+    ))
+    .then(() => dispatch(asyncActionCreator(
       SAVE_IMPORTED_ALBUMS,
       local.create('/albums', getState().sync.albums),
       { tracks: getState().sync.albums }
-    )(dispatch));
+    )));
   };
 }
 
@@ -123,16 +123,16 @@ export function getMissingArtists() {
       unique(neededIdArtists, neededIdAlbumArtists), currentIdArtists
     );
     if (missingIdArtists.length === 0) return null;
-    return asyncActionCreator(
+    return dispatch(asyncActionCreator(
       IMPORT_ARTISTS,
       remote.read(`/artists/${missingIdArtists.join(',')}`),
       { missingIdArtists }
-    )(dispatch)
-    .then(() => asyncActionCreator(
+    ))
+    .then(() => dispatch(asyncActionCreator(
       SAVE_IMPORTED_ARTISTS,
       local.create('/artists', getState().sync.artists),
       { tracks: getState().sync.artists }
-    )(dispatch));
+    )));
   };
 }
 
@@ -159,16 +159,16 @@ export function getMissingTracks() {
     const currentIdTracks = Object.keys(getState().tracks).map(id => parseInt(id, 10));
     const missingIdTracks = difference(neededIdTracks, currentIdTracks);
     if (missingIdTracks.length === 0) return clearAll();
-    return asyncActionCreator(
+    return dispatch(asyncActionCreator(
       IMPORT_TRACKS,
       remote.read(`/tracks/${missingIdTracks.join(',')}`),
       { missingIdTracks }
-    )(dispatch)
-    .then(() => asyncActionCreator(
+    ))
+    .then(() => dispatch(asyncActionCreator(
       SAVE_IMPORTED_TRACKS,
       local.create('/tracks', getState().sync.tracks),
       { tracks: getState().sync.tracks }
-    )(dispatch))
+    )))
     .then(() => dispatch(getMissingAlbums()))
     .then(() => dispatch(getMissingArtists()))
     .then(() => dispatch(updateAlbumArtistMap()))

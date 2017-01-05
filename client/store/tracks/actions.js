@@ -11,14 +11,14 @@ export function getTracks(idTracks) {
     const currentIds = Object.keys(getState().tracks).map(id => parseInt(id, 10));
     const missing = difference(idTracks, currentIds);
     if (missing.length === 0) return null;
-    return asyncActionCreator(
+    return dispatch(asyncActionCreator(
       GET_TRACKS,
       api.read(missing),
       {
         requested: idTracks,
         missing,
       }
-    )(dispatch);
+    ));
   };
 }
 
