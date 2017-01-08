@@ -70,10 +70,16 @@ CREATE TABLE "PlayLists" (
 DROP TABLE IF EXISTS `Devices`;
 CREATE TABLE `Devices` (
 	`idDevice`	INTEGER PRIMARY KEY AUTOINCREMENT,
-	`uuid`	TEXT UNIQUE
+	`uuid`	TEXT UNIQUE,
+	`musicDir` TEXT
 );
 
 INSERT INTO `Devices` (idDevice, uuid) values (0, 'local');
+INSERT INTO `Devices` (idDevice, uuid, musicDir) values (
+	1,
+	'Android SDK built for x86_64 : 1c0ca6e5a8f452bb',
+	'file:///storage/sdcard/Music'
+);
 
 DROP TABLE IF EXISTS `RemoteFiles`;
 CREATE TABLE `RemoteFiles` (
