@@ -10,11 +10,14 @@ import { join } from 'path';
 
 import {
   IMPORT_PLAYLIST,
+  getConfig,
+  push,
+  addPlayList,
 } from '_store/actions';
 
-const REMOTE_HOST = 'http://192.168.0.101';
 const NAME = 'sync';
-const remote = remoteAPI(NAME, REMOTE_HOST);
+let remote;
+let downloadMusic;
 const local = restAPI(NAME);
 
 const UUID = window.device && `${window.device.model} : ${window.device.uuid}`;
@@ -31,19 +34,21 @@ export const IMPORT_ARTISTS = `${NAME}/import artists`;
 export const SAVE_IMPORTED_ARTISTS = `${NAME}/save imported artists`;
 export const UPDATE_ALBUM_ARTIST_MAP = `${NAME}/update album-artist map`;
 export const CLEAR_ALL = `${NAME}/clear all`;
+export const FIND_TRANSFER_PENDING = `${NAME}/find pending transfer`;
+
 
 // console.log('cordova.file', cordova.file);
 
-export function downloadMusic(idTrack, localName) {
-  return new Promise((resolve, reject) => {
+export function downloadMusicFactory(remoteHost, musicDir) {
+  return (remoteLocation, localLocation) => new Promise((resolve, reject) => {
     if (!(window && window.FileTransfer)) {
       return reject(new Error('Cordova FileTransfer not found'));
     }
     const fileTransfer = new window.FileTransfer();
 
     return fileTransfer.download(
-        encodeURI(join(REMOTE_HOST, 'track', idTrack)),
-        join('file:///storage/sdcard/', 'Music', localName),
+        encodeURI(join(remoteHost, 'music', remoteLocation)),
+        join(musicDir, localLocation),
         resolve,
         reject,
         true,
@@ -52,12 +57,11 @@ export function downloadMusic(idTrack, localName) {
   });
 }
 
-export function startSync(remoteHost) {
-  console.log(remoteHost);
+export function getDeviceInfo(uuid) {
   return asyncActionCreator(
     START_SYNC,
-    remote.read(`/myId/${UUID}`),
-    { uuid: UUID }
+    remote.read(`/myId/${uuid}`),
+    { uuid }
   );
 }
 
@@ -67,6 +71,26 @@ export function getHistory(idDevice) {
     remote.read(`/history/${idDevice}`),
     { idDevice }
   );
+}
+
+
+export function startSync() {
+  // "file:///storage/sdcard/"
+  let remoteHost;
+  return dispatch =>
+    dispatch(getConfig('remoteHost'))
+    .then((action) => {
+      remoteHost = action.payload.value;
+      remote = remoteAPI(NAME, remoteHost);
+    })
+    .then(() => dispatch(getDeviceInfo(UUID)))
+    .then((action) => {
+      const { idDevice, musicDir } = action.payload;
+      downloadMusic = downloadMusicFactory(remoteHost, musicDir);
+      return dispatch(getHistory(idDevice));
+    })
+    .then(() => dispatch(push('/sync/1')))
+    ;
 }
 
 export function importPlayList(idPlayList) {
@@ -91,6 +115,20 @@ export function createHistory(idDevice, idPlayList, name, idTracks) {
     remote.create(`/history/${idDevice}`, { name, idTracks, idPlayList }),
     { name, idTracks, idPlayList }
   );
+}
+
+export function importNewPlayList(idDevice, playList) {
+  return dispatch =>
+    dispatch(importPlayList(playList.idPlayList))
+    .then((action) => {
+      const { name, idTracks } = action.payload;
+      return dispatch(addPlayList(name, idTracks, playList.idPlayList))
+      .then(() => dispatch(
+          playList.idPlayListHistory
+          ? updateHistory(playList.idPlayListHistory, name, idTracks)
+          : createHistory(idDevice, playList.idPlayList, name, idTracks)
+        ));
+    });
 }
 
 export function getMissingAlbums() {
@@ -149,6 +187,12 @@ export function clearAll() {
   };
 }
 
+export function getTransferPending() {
+  return asyncActionCreator(
+    FIND_TRANSFER_PENDING,
+    local.read('/pending'),
+  );
+}
 export function getMissingTracks() {
   return (dispatch, getState) => {
     const neededIdTracks = reduce(
@@ -173,6 +217,7 @@ export function getMissingTracks() {
     .then(() => dispatch(getMissingArtists()))
     .then(() => dispatch(updateAlbumArtistMap()))
     .then(() => dispatch(clearAll()))
+    .then(() => dispatch(getTransferPending()))
     ;
   };
 }

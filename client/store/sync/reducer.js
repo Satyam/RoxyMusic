@@ -6,7 +6,6 @@ import {
 
 import {
   GET_PLAY_LISTS,
-  IMPORT_PLAYLIST,
 } from '_store/playLists/actions';
 
 import {
@@ -17,11 +16,8 @@ import {
   IMPORT_TRACKS,
   IMPORT_ALBUMS,
   IMPORT_ARTISTS,
-  SAVE_IMPORTED_TRACKS,
-  SAVE_IMPORTED_ALBUMS,
-  SAVE_IMPORTED_ARTISTS,
-  UPDATE_ALBUM_ARTIST_MAP,
   CLEAR_ALL,
+  FIND_TRANSFER_PENDING,
 } from './actions';
 
 export default (
@@ -29,7 +25,6 @@ export default (
     uuid: null,
     idDevice: null,
     hash: {},
-    stage: 0,
     tracks: [],
     albums: [],
     artists: [],
@@ -43,7 +38,6 @@ export default (
     case START_SYNC:
       return update(state, {
         $merge: payload,
-        stage: { $set: 1 },
       });
     case GET_HISTORY: {
       return update(state, {
@@ -52,7 +46,6 @@ export default (
             Object.assign({}, playLists, { [playList.idPlayList]: playList }),
           state.hash
         ) },
-        stage: { $set: 2 },
       });
     }
     case GET_PLAY_LISTS: {
@@ -64,9 +57,6 @@ export default (
         ) },
       });
     }
-    case IMPORT_PLAYLIST: {
-      return update(state, { stage: { $set: 3 } });
-    }
     case UPDATE_HISTORY: {
       return update(state, {
         hash: {
@@ -75,7 +65,6 @@ export default (
             previousIdTracks: { $set: payload.idTracks },
           },
         },
-        stage: { $set: 4 },
       });
     }
     case CREATE_HISTORY: {
@@ -87,52 +76,34 @@ export default (
             previousIdTracks: { $set: payload.idTracks },
           },
         },
-        stage: { $set: 4 },
       });
     }
     case IMPORT_TRACKS: {
       return update(state, {
         tracks: { $set: list },
-        stage: { $set: 5 },
       });
     }
     case IMPORT_ALBUMS: {
       return update(state, {
         albums: { $set: list },
-        stage: { $set: 6 },
       });
     }
     case IMPORT_ARTISTS: {
       return update(state, {
         artists: { $set: list },
-        stage: { $set: 7 },
       });
     }
-
-    case SAVE_IMPORTED_TRACKS:
-      return update(state, {
-        stage: { $set: 8 },
-      });
-    case SAVE_IMPORTED_ALBUMS:
-      return update(state, {
-        stage: { $set: 9 },
-      });
-    case SAVE_IMPORTED_ARTISTS:
-      return update(state, {
-        stage: { $set: 10 },
-      });
-    case UPDATE_ALBUM_ARTIST_MAP:
-      return update(state, {
-        stage: { $set: 11 },
-      });
     case CLEAR_ALL: {
       return update(state, {
         tracks: { $set: [] },
         albums: { $set: [] },
         artists: { $set: [] },
-        stage: { $set: 12 },
       });
     }
+    case FIND_TRANSFER_PENDING:
+      return update(state, {
+        pending: { $set: list },
+      });
     default:
       return state;
   }
