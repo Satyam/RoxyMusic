@@ -9,7 +9,7 @@ let $db;
 export function init(db) {
   $db = db;
   return db.prepareAll({
-    getMyId: 'select idDevice from Devices where uuid = $uuid',
+    getMyId: 'select idDevice, musicDir from Devices where uuid = $uuid',
     setMyId: 'insert into Devices (uuid) values ($uuid)',
     getHistory: `select
         idPlayListHistory, timeChanged, PlayLists.idPlayList as idPlayList,
@@ -38,7 +38,7 @@ export function init(db) {
     updateAlbumArtist: `insert into AlbumArtistMap (idArtist, idAlbum)
       select distinct idAlbumArtist as idArtist, idAlbum
       from Tracks where idAlbumArtist is not null and idAlbum is not null`,
-    notYetTransfered: `select
+    transferPending: `select
         idTrack,
         coalesce(albumArtist, artist, 'unknown artist') as artist,
         coalesce(album, 'unknown album') as album,
@@ -140,6 +140,12 @@ export function updateAlbumArtistMap() {
   return prepared.truncateAlbumArtist.run()
   .then(() => prepared.updateAlbumArtist.run());
 }
+
+export function transferPending() {
+  return prepared.transferPending.all()
+  .then(list => ({ list }));
+}
+
 export default db =>
   init(db)
   .then(() => ({
@@ -176,5 +182,8 @@ export default db =>
     },
     '/albumArtistMap': {
       update: updateAlbumArtistMap,
+    },
+    '/pending': {
+      read: transferPending,
     },
   }));
