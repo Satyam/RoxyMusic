@@ -31,7 +31,7 @@ const AppComponent = ({ width, children, onMeasureChange }) => (
       <Navbar>
         <Navbar.Header>
           <Navbar.Brand>
-            <Icon type="music" label="Roxy Music" />
+            <Icon type="music" label="Roxy Music" href="/" title="home" />
           </Navbar.Brand>
         </Navbar.Header>
         <Nav pullRight>
