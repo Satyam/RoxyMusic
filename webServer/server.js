@@ -1,11 +1,13 @@
 import http from 'http';
-import { join } from 'path';
+import { join, extname } from 'path';
 import express, { Router as createRouter } from 'express';
 import dbg from 'debug';
 
 import bodyParser from 'body-parser';
 import denodeify from 'denodeify';
 import fs from 'fs';
+
+import ffmpeg from 'fluent-ffmpeg';
 
 import { getConfig } from '_server/config';
 import dataServers from '_server';
@@ -40,6 +42,7 @@ const debug = dbg('RoxyMusic:server/server');
 //   next();
 // }
 
+let getLocationStatement;
 
 const dataRouter = createRouter();
 app.use(REST_API_PATH, bodyParser.json(), /* showRequest, */ dataRouter);
@@ -54,6 +57,27 @@ app.get(musicRegExp, (req, res) => {
   debug('requested music file', filename);
   res.sendFile(join(getConfig('musicDir'), filename));
 });
+
+app.get('/tracks/:idTrack', (req, res) => {
+  getLocationStatement.get({ idTrack: req.params.idTrack })
+  .then((result) => {
+    const audioExtensions = getConfig('portableAudioExtensions').split(',');
+    const file = join(getConfig('musicDir'), result.location);
+    const ext = extname(result.location);
+    if (audioExtensions.indexOf(ext.substr(1)) > -1) {
+      res.sendFile(file);
+    } else {
+      ffmpeg(file)
+      .audioCodec('libmp3lame')
+      .toFormat('mp3')
+      .on('error', (err) => {
+        console.log(`Error ${err.message} on ${result.location}`);
+      })
+      .pipe(res, { end: true });
+    }
+  });
+});
+
 app.get('/kill', (req, res) => {
   res.send('I am dead');
   close();
@@ -109,6 +133,13 @@ export function start() {
       : db
     ))
   )
+  .then((db) => {
+    db.prepare('select location from Tracks where idTrack = $idTrack')
+    .then((st) => {
+      getLocationStatement = st;
+    });
+    return db;
+  })
   .then(db => dataServers(db, addRoute))
   .then(() => listen(PORT));
 }
