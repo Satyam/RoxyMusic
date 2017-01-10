@@ -18,6 +18,8 @@ import {
   IMPORT_ARTISTS,
   CLEAR_ALL,
   FIND_TRANSFER_PENDING,
+  UPDATE_DOWNLOAD_STATUS,
+  INCREMENT_PENDING,
 } from './actions';
 
 export default (
@@ -28,6 +30,8 @@ export default (
     tracks: [],
     albums: [],
     artists: [],
+    pending: [],
+    i: 0,
   },
   action
 ) => {
@@ -103,6 +107,18 @@ export default (
     case FIND_TRANSFER_PENDING:
       return update(state, {
         pending: { $set: list },
+      });
+    case UPDATE_DOWNLOAD_STATUS:
+      return update(state, {
+        pending: {
+          [payload.i]: {
+            status: { $set: payload.status },
+          },
+        },
+      });
+    case INCREMENT_PENDING:
+      return update(state, {
+        i: { $apply: i => i + 1 },
       });
     default:
       return state;
