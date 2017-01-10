@@ -6,7 +6,6 @@ import playlists from './playlists';
 import artists from './artists';
 import songs from './songs';
 import tracks from './tracks';
-import refreshDb from './refreshDb';
 import sync from './sync';
 
 import config from './config';
@@ -27,7 +26,14 @@ export default function (db, routeAdd) {
     artists(db).then(routes => addToDataRouter('/artists', routes)),
     songs(db).then(routes => addToDataRouter('/songs', routes)),
     tracks(db).then(routes => addToDataRouter('/tracks', routes)),
-    refreshDb(db).then(routes => addToDataRouter('/refreshDb', routes)),
     sync(db).then(routes => addToDataRouter('/sync', routes)),
-  ]));
+  ]))
+  .then(() => {
+    if (BUNDLE !== 'cordova') {
+      /* eslint-disable global-require */
+      const refreshDb = require('./refreshDb').default;
+      /* eslint-enable global-require */
+      refreshDb(db).then(routes => addToDataRouter('/refreshDb', routes));
+    }
+  });
 }

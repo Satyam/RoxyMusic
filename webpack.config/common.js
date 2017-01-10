@@ -79,11 +79,7 @@ module.exports = version => [
       }),
     ],
     resolve: {
-      alias: (
-        bundle === 'cordova'
-        ? Object.assign(aliases, { fs: absPath('node_modules/html5-fs') })
-        : aliases
-      ),
+      alias: aliases,
       extensions: ['', '.js', '.jsx'],
     },
     externals: [

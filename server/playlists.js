@@ -1,13 +1,16 @@
 import { join } from 'path';
 import denodeify from 'denodeify';
-import fs from 'fs';
 import uuid from 'uuid/v1';
 
 import splitIdTracks from '_server/utils/splitIdTracks';
 
 import { getConfig } from '_server/config';
 
-const writeFile = denodeify(fs.writeFile);
+const writeFile = (
+  BUNDLE === 'cordova'
+  ? () => Promise.reject('Filesystem not available')
+  : denodeify(require('fs').writeFile)
+);
 
 let prepared = {};
 let $db;
