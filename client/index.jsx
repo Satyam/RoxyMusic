@@ -8,7 +8,7 @@ import createStore from '_store/createStore';
 
 import routes from '_components/routes';
 
-export default function () {
+export default function (initialState) {
   if (process.env.NODE_ENV !== 'production' && BUNDLE !== 'cordova') {
     /* eslint-disable import/no-extraneous-dependencies, global-require */
     window.Perf = require('react-addons-perf');
@@ -21,7 +21,7 @@ export default function () {
     : browserHistory
   );
 
-  const store = createStore(baseHistory);
+  const store = createStore(baseHistory, initialState);
 
   const history = syncHistoryWithStore(baseHistory, store);
 
