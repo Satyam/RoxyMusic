@@ -1,5 +1,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { compose } from 'recompose';
+
 import map from 'lodash/map';
 
 import Icon from '_components/misc/icon';
@@ -8,7 +10,10 @@ import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 
 import {
   getMissingTracks,
+  getHistory,
 } from '_store/actions';
+
+import initStore from '_utils/initStore';
 
 import PlayListOnServerIsNew from './playListOnServerIsNew';
 
@@ -59,13 +64,19 @@ PlayListCompareComponent.propTypes = {
   onDone: PropTypes.func,
 };
 
+export const storeInitializer = (dispatch, state) =>
+  Object.keys(state.sync.hash).length || dispatch(getHistory(state.sync.idDevice));
+
 export const mapStateToProps = state => state.sync;
 
 export const mapDispatchToProps = dispatch => ({
   onDone: () => dispatch(getMissingTracks()),
 });
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
+export default compose(
+  initStore(storeInitializer),
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )
 )(PlayListCompareComponent);
