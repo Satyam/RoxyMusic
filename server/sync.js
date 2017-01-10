@@ -48,6 +48,8 @@ export function init(db) {
       left join (select artist as albumArtist, idPerson as idAlbumArtist from People) using (idAlbumArtist)
       left join People on idArtist = idPerson
       where location is null`,
+    updateTrackLocation: `update Tracks set location = $location
+      where idTrack = $idTrack`,
   })
   .then((p) => {
     prepared = p;
@@ -146,6 +148,12 @@ export function transferPending() {
   .then(list => ({ list }));
 }
 
+export function updateTrackLocation(o) {
+  return prepared.updateTrackLocation.run(
+    Object.assign(o.keys, o.data)
+  );
+}
+
 export default db =>
   init(db)
   .then(() => ({
@@ -185,5 +193,8 @@ export default db =>
     },
     '/pending': {
       read: transferPending,
+    },
+    '/track/:idTrack': {
+      update: updateTrackLocation,
     },
   }));
