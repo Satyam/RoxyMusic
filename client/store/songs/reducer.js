@@ -17,7 +17,7 @@ const indexSongs = (payload, oldIndex = {}) => payload.reduce(
 export default (
   state = {
     search: '',
-    songList: [],
+    list: [],
     nextOffset: 0,
     hash: {},
   },
@@ -31,14 +31,14 @@ export default (
       return {
         search: payload.search || '',
         nextOffset: list.length,
-        songList: list,
+        list,
         hash: indexSongs(list),
       };
     }
     case GET_MORE_SONGS: {
       return update(state, {
         nextOffset: { $apply: offset => offset + list.length },
-        songList: { $push: list },
+        list: { $push: list },
         hash: { $set: indexSongs(list, state.hash) },
       });
     }
