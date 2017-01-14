@@ -11,7 +11,7 @@ INSERT INTO `config` (key, value, type) values
  ('audioExtensions', 'mp3,mp4,m4a,wav,wma,flac', 0),
  ('portableAudioExtensions', 'mp3,mp4,m4a,flac', 0),
  ('nowPlaying', '{"current": -1, "idTracks": []}', 5),
- ('remoteHost', 'http://192.168.0.101', 0);
+ ('remoteHost', 'http://192.168.0.101:8080', 0);
 
 DROP TABLE IF EXISTS `Tracks`;
 CREATE TABLE `Tracks` (
@@ -27,6 +27,7 @@ CREATE TABLE `Tracks` (
   `location` TEXT,
   `fileModified` TEXT,
 	`size` INTEGER,
+	`ext` TEXT,
 	`hasIssues` INTEGER,
   	FOREIGN KEY(`idArtist`) REFERENCES People(idPerson),
 		FOREIGN KEY(`idAlbumArtist`) REFERENCES People(idPerson),

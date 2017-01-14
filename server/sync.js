@@ -1,3 +1,5 @@
+import path from 'path';
+
 import {
   getPlayList,
 } from './playlists';
@@ -27,10 +29,10 @@ export function init(db) {
       where idPlayListHistory = $idPlayListHistory`,
     insertTrack: `insert into Tracks (
          idTrack,  title,  idArtist,  idAlbumArtist,  idAlbum,  track,
-         year,  duration,  idGenre,  location,  fileModified,  size)
-      values(
+         year,  duration,  idGenre,  location,  fileModified,  size, ext
+      ) values (
         $idTrack, $title, $idArtist, $idAlbumArtist, $idAlbum, $track,
-        $year, $duration, $idGenre, $location, $fileModified, $size
+        $year, $duration, $idGenre, $location, $fileModified, $size, $ext
       )`,
     insertAlbum: 'insert into Albums values ($idAlbum, $album)',
     insertArtist: 'insert into People values ($idPerson, $artist)',
@@ -42,7 +44,8 @@ export function init(db) {
         idTrack,
         coalesce(albumArtist, artist, 'unknown artist') as artist,
         coalesce(album, 'unknown album') as album,
-        title
+        title,
+        ext
       from Tracks
       left join Albums using(idAlbum)
       left join (select artist as albumArtist, idPerson as idAlbumArtist from People) using (idAlbumArtist)
@@ -98,7 +101,7 @@ export function updateHistory(o) {
 export function getTracks(o) {
   return $db.all(
     `select idTrack, title, idArtist, idAlbumArtist,idAlbum,
-        track, year, duration, idGenre
+        track, year, duration, idGenre, ext
         from Tracks where idTrack in (${o.keys.idTracks})`
   )
   .then(list => ({ list }));

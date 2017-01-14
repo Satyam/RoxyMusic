@@ -61,6 +61,7 @@ export function init(db) {
         "location",
         "fileModified",
         "size",
+        "ext",
         "hasIssues"
       ) values (
         $title,
@@ -74,6 +75,7 @@ export function init(db) {
         $location,
         $fileModified,
         $size,
+        $ext,
         $hasIssues
       )
     `,
@@ -274,6 +276,7 @@ export function scan(dir) {
               .then(t => insertTrack(
                 Object.assign(t, {
                   location: relName,
+                  ext: path.extname(relName),
                   fileModified: st.mtime.toISOString(),
                   size: st.size,
                 })
