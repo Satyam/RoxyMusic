@@ -39,7 +39,14 @@ export function TransferFilesComponent({
       </thead>
       <tbody>
         {pending.map(file => (
-          <tr key={file.idTrack}>
+          <tr
+            key={file.idTrack}
+            className={[
+              '',
+              'bg-primary',
+              'bg-info',
+            ][file.status || 0]}
+          >
             <td>{file.artist}</td>
             <td>{file.album}</td>
             <td>{file.title}</td>
