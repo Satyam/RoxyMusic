@@ -6,10 +6,9 @@ import union from 'lodash/union';
 import compact from 'lodash/compact';
 import unique from 'lodash/uniq';
 import reduce from 'lodash/reduce';
-import { join } from 'path';
 
 import {
-  IMPORT_PLAYLIST,
+  GET_PLAY_LIST,
   getConfig,
   push,
   addPlayList,
@@ -17,7 +16,9 @@ import {
 
 const NAME = 'sync';
 let remote;
-let downloadTrack;
+let remoteHost;
+let musicDir;
+
 const local = restAPI(NAME);
 
 export const START_SYNC = `${NAME}/Start Synchronization`;
@@ -40,22 +41,36 @@ export const INCREMENT_PENDING = `${NAME}/increment pending`;
 
 // console.log('cordova.file', cordova.file);
 
-export function downloadTrackFactory(remoteHost, musicDir) {
-  return (idTrack, localLocation) => new Promise((resolve, reject) => {
-    if (!(window && window.FileTransfer)) {
-      return reject(new Error('Cordova FileTransfer not found'));
-    }
-    const fileTransfer = new window.FileTransfer();
-
-    return fileTransfer.download(
-        encodeURI(join(remoteHost, 'tracks', String(idTrack))),
-        join(musicDir, localLocation),
-        resolve,
-        reject,
-        true,
-        {}
-    );
-  });
+export function downloadTrack({ idTrack, artist, album, title, ext }) {
+  return new Promise((resolve, reject) =>
+    window.resolveLocalFileSystemURL(
+      musicDir,
+      musicDirEntry => musicDirEntry.getDirectory(
+        artist,
+        { create: true },
+        artistDirEntry => artistDirEntry.getDirectory(
+          album,
+          { create: true },
+          albumDirEntry => albumDirEntry.getFile(
+            `${title}${ext}`,
+            { create: true },
+            fileEntry => (new window.FileTransfer()).download(
+              `${remoteHost}/tracks/${idTrack}`,
+              fileEntry.toURL(),
+              resolve,
+              err => reject(`${JSON.stringify(err)}  on fileTransfer of  ${idTrack}`),
+              true,
+              { headers: { Connection: 'close' } }
+            ),
+            err => reject(`${JSON.stringify(err)}  on getFile ${title} in ${albumDirEntry.fullPath}`)
+          ),
+          err => reject(`${JSON.stringify(err)}  on getDirectory ${album} in ${artistDirEntry.fullPath}`)
+        ),
+        err => reject(`${JSON.stringify(err)}  on getDirectory ${artist} in ${musicDirEntry.fullPath}`)
+      ),
+      err => reject(`${JSON.stringify(err)}  on resolveLocalFileSystemURL ${musicDir}`)
+    )
+  );
 }
 
 export function getDeviceInfo(uuid) {
@@ -78,7 +93,6 @@ export function getHistory(idDevice) {
 export function startSync() {
   // "file:///storage/sdcard/"
   const UUID = window.device && `${window.device.model} : ${window.device.uuid}`;
-  let remoteHost;
   return dispatch =>
     dispatch(getConfig('remoteHost'))
     .then((action) => {
@@ -87,7 +101,7 @@ export function startSync() {
     })
     .then(() => dispatch(getDeviceInfo(UUID)))
     .then((action) => {
-      downloadTrack = downloadTrackFactory(remoteHost, action.payload.musicDir);
+      musicDir = action.payload.musicDir;
     })
     .then(() => dispatch(push('/sync/1')))
     ;
@@ -95,7 +109,7 @@ export function startSync() {
 
 export function importPlayList(idPlayList) {
   return asyncActionCreator(
-    IMPORT_PLAYLIST,
+    GET_PLAY_LIST,
     remote.read(`/playlist/${idPlayList}`),
     { idPlayList }
   );
@@ -220,15 +234,18 @@ export function incrPending() {
 
 export function importOneTrack() {
   return (dispatch, getState) => {
-    const state = getState().sync;
-    const i = state.i;
-    const total = state.pending.length;
-    if (i === total) return Promise.resolve('done');
+    const sync = getState().sync;
+    const i = sync.i;
+    if (i === sync.pending.length) return Promise.resolve('done');
+    const pending = sync.pending[i];
     dispatch(updateDownloadStatus(i, 1));
-    const { idTrack, artist, album, title } = state.pending[i];
-    const localName = join(artist, album, title);
-    return downloadTrack(idTrack, localName)
-    .then(fileEntry => dispatch(updateTrackLocation(idTrack, fileEntry.toURL())))
+    return downloadTrack(pending)
+    .then(fileEntry =>
+      dispatch(updateTrackLocation(
+        pending.idTrack,
+        fileEntry.toURL().replace(musicDir, '')
+      ))
+    )
     .then(() => dispatch(updateDownloadStatus(i, 2)))
     .then(() => dispatch(incrPending()))
     .then(() => dispatch(importOneTrack()))
@@ -238,27 +255,30 @@ export function importOneTrack() {
 
 export function getMissingTracks() {
   return (dispatch, getState) => {
+    const state = getState();
     const neededIdTracks = reduce(
-      getState().sync.hash,
-      (m, pl) => union(m, pl.serverIdTracks),
+      state.playLists.hash,
+      (m, pl) => union(m, pl.idTracks),
       []
     );
-    const currentIdTracks = Object.keys(getState().tracks).map(id => parseInt(id, 10));
+    const currentIdTracks = Object.keys(state.tracks).map(id => parseInt(id, 10));
     const missingIdTracks = difference(neededIdTracks, currentIdTracks);
-    if (missingIdTracks.length === 0) return dispatch(clearAll());
-    return dispatch(asyncActionCreator(
-      IMPORT_TRACKS,
-      remote.read(`/tracks/${missingIdTracks.join(',')}`),
-      { missingIdTracks }
-    ))
-    .then(() => dispatch(asyncActionCreator(
-      SAVE_IMPORTED_TRACKS,
-      local.create('/tracks', getState().sync.tracks),
-      { tracks: getState().sync.tracks }
-    )))
-    .then(() => dispatch(getMissingAlbums()))
-    .then(() => dispatch(getMissingArtists()))
-    .then(() => dispatch(updateAlbumArtistMap()))
+    return Promise.resolve(
+      missingIdTracks.length &&
+      dispatch(asyncActionCreator(
+        IMPORT_TRACKS,
+        remote.read(`/tracks/${missingIdTracks.join(',')}`),
+        { missingIdTracks }
+      ))
+      .then(() => dispatch(asyncActionCreator(
+        SAVE_IMPORTED_TRACKS,
+        local.create('/tracks', getState().sync.tracks),
+        { tracks: getState().sync.tracks }
+      )))
+      .then(() => dispatch(getMissingAlbums()))
+      .then(() => dispatch(getMissingArtists()))
+      .then(() => dispatch(updateAlbumArtistMap()))
+    )
     .then(() => dispatch(clearAll()))
     .then(() => dispatch(push('/sync/2')))
     ;
