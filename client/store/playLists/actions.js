@@ -15,7 +15,6 @@ export const SELECT_PLAYLIST_FOR_TRACK = `${NAME}/select playlist for track`;
 export const CLOSE_ADD_TO_PLAYLIST = `${NAME}/close add to playlist`;
 export const SAVE_ALL_PLAYLISTS = `${NAME}/save all playlists`;
 export const SAVE_PLAYLIST = `${NAME}/save playlist`;
-export const IMPORT_PLAYLIST = `${NAME}/import playlist`;
 
 export function getPlayLists() {
   return asyncActionCreator(
