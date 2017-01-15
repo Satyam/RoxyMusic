@@ -3,7 +3,7 @@ import ReactAudioPlayer from 'react-audio-player';
 import { connect } from 'react-redux';
 import compose from 'recompose/compose';
 import initStore from '_utils/initStore';
-import path from 'path';
+import { join } from 'path';
 
 import {
   playNextTrack,
@@ -50,11 +50,11 @@ export function mapStateToProps(state) {
       if (state.tracks[idTrack] && state.config.musicDir) {
         return {
           idTrack,
-          src: path.join(
+          src: join(
             (
-              BUNDLE === 'electronClient'
-              ? state.config.musicDir
-              : '/music'
+              BUNDLE === 'webClient'
+              ? '/music'
+              : state.config.musicDir
             ),
             state.tracks[idTrack].location
           ),
