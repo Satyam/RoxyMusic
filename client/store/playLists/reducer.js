@@ -43,7 +43,7 @@ export default (
         status: { $set: 2 },
       });
     case GET_PLAY_LIST:
-      return update(state, { hash: { $merge: { [idPlayList]: list } } });
+      return update(state, { hash: { $merge: { [idPlayList]: payload } } });
     case REPLACE_PLAY_LIST_TRACKS:
       return update(state, { hash: {
         [idPlayList]: {
@@ -62,7 +62,7 @@ export default (
         [idPlayList]: { $set: {
           name: payload.name,
           idPlayList,
-          idTracks: [],
+          idTracks: payload.idTracks || [],
         } },
       } });
     case DELETE_PLAY_LIST:
