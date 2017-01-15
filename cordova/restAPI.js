@@ -24,7 +24,7 @@ export function addRoute(method, route, actions) {
 export default (base) => {
   if (clients[base]) return clients[base];
   const restClient = method => (reqUrl, data) => {
-    const parsedUrl = url.parse(reqUrl, true);
+    const parsedUrl = url.parse(String(reqUrl), true);
     const path = join('/', base, parsedUrl.pathname || '');
     debug(`> ${method} ${path}`);
     const o = {
