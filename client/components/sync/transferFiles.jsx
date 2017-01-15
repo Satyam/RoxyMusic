@@ -28,7 +28,7 @@ export function TransferFilesComponent({
       striped
       bsStyle="info"
     />
-    <Table striped bordered condensed hover responsive>
+    <Table bordered condensed hover responsive>
       <thead>
         <tr>
           <th>Artist</th>
