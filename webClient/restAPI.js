@@ -8,11 +8,11 @@ const debug = dbg('RoxyMusic:webClient/restAPI');
 
 const clients = {};
 
-export default (base, host = HOST, port = PORT) => {
-  const key = join(host, port, base);
+export default (base, host = `${HOST}:${PORT}`) => {
+  const key = join(host, base);
   if (clients[key]) return clients[key];
   const restClient = method => (path, body) => fetch(
-    `${host}:${port}${join(REST_API_PATH, base, String(path))}`,
+    `${host}${join(REST_API_PATH, base, String(path))}`,
     {
       method,
       headers: {
