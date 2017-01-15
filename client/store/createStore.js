@@ -28,15 +28,23 @@ const reducers = combineReducers({
 });
 
 export default (history, initialState) => {
-  const mw = applyMiddleware(reduxThunk, routerMiddleware(history));
+  let enhancer = applyMiddleware(reduxThunk, routerMiddleware(history));
+  if (process.env.NODE_ENV !== 'production') {
+    if (BUNDLE === 'cordova') {
+      enhancer = applyMiddleware(
+        reduxThunk,
+        routerMiddleware(history),
+        /* eslint-disable global-require */
+        require('_utils/reduxLogger').default
+        /* eslint-enable global-require */
+      );
+    } else if (typeof window !== 'undefined' && window.devToolsExtension) {
+      enhancer = compose(enhancer, window.devToolsExtension());
+    }
+  }
   return createStore(
     reducers,
     initialState,
-    process.env.NODE_ENV !== 'production' &&
-    BUNDLE !== 'cordova' &&
-    typeof window !== 'undefined' &&
-    window.devToolsExtension
-    ? compose(mw, window.devToolsExtension())
-    : mw
+    enhancer
   );
 };
