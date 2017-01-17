@@ -11,7 +11,7 @@ const clients = {};
 export default (base, host = `${HOST}:${PORT}`) => {
   const key = join(host, base);
   if (clients[key]) return clients[key];
-  const restClient = method => (path, body) => fetch(
+  const restClient = method => (path = '/', body) => fetch(
     `${host}${join(REST_API_PATH, base, String(path))}`,
     {
       method,

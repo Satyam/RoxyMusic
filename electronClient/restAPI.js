@@ -13,7 +13,7 @@ export default (base) => {
   /* eslint-disable import/no-extraneous-dependencies, global-require */
   const ipc = require('electron').ipcRenderer;
   /* eslint-enable import/no-extraneous-dependencies, global-require */
-  const restClient = method => (path, body) => new Promise((resolve, reject) => {
+  const restClient = method => (path = '/', body) => new Promise((resolve, reject) => {
     const channel = `${base}-${count += 1}`;
     ipc.once(channel, (event, response) => {
       debug('< %s \n%j', channel, response.data);
