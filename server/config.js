@@ -108,4 +108,7 @@ export default db =>
       create: o => setConfig(o.keys.key, o.data).then(value => ({ value })),
       update: o => setConfig(o.keys.key, o.data).then(value => ({ value })),
     },
+    '/': {
+      read: () => config,
+    },
   }));
