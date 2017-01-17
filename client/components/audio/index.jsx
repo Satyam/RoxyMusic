@@ -3,12 +3,11 @@ import ReactAudioPlayer from 'react-audio-player';
 import { connect } from 'react-redux';
 import compose from 'recompose/compose';
 import initStore from '_utils/initStore';
-import { join } from 'path';
+import plainJoin from '_utils/plainJoin';
 
 import {
   playNextTrack,
   getTrack,
-  getConfig,
 } from '_store/actions';
 
 export function AudioComponent({ src, autoPlay, onEnded }) {
@@ -25,8 +24,7 @@ AudioComponent.propTypes = {
 };
 
 export function storeInitializer(dispatch, state) {
-  const mDirP = state.config.musicDir || dispatch(getConfig('musicDir'));
-  let trackP = null;
+  let trackP = false;
   if (state.nowPlaying.status === 2) {
     const nowPlaying = state.nowPlaying;
     const current = nowPlaying.current;
@@ -35,10 +33,7 @@ export function storeInitializer(dispatch, state) {
       trackP = state.tracks[idTrack] || dispatch(getTrack(idTrack));
     }
   }
-  return Promise.all([
-    trackP,
-    mDirP,
-  ]);
+  return trackP;
 }
 
 export function mapStateToProps(state) {
@@ -50,12 +45,11 @@ export function mapStateToProps(state) {
       if (state.tracks[idTrack] && state.config.musicDir) {
         return {
           idTrack,
-          src: join(
-            (
+          src: plainJoin(
               BUNDLE === 'webClient'
               ? '/music'
               : state.config.musicDir
-            ),
+            ,
             state.tracks[idTrack].location
           ),
           autoPlay: true,
@@ -78,5 +72,5 @@ export default compose(
   connect(
     mapStateToProps,
     mapDispatchToProps
-  )
+  ),
 )(AudioComponent);

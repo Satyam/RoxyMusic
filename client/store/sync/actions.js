@@ -6,10 +6,11 @@ import union from 'lodash/union';
 import compact from 'lodash/compact';
 import unique from 'lodash/uniq';
 import reduce from 'lodash/reduce';
+import plainJoin from '_utils/plainJoin';
 
 import {
   GET_PLAY_LIST,
-  getConfig,
+  setConfig,
   push,
   addPlayList,
 } from '_store/actions';
@@ -55,7 +56,7 @@ export function downloadTrack({ idTrack, artist, album, title, ext }) {
             `${title}${ext}`,
             { create: true },
             fileEntry => (new window.FileTransfer()).download(
-              `${remoteHost}/tracks/${idTrack}`,
+              plainJoin(remoteHost, 'tracks', idTrack),
               fileEntry.toURL(),
               resolve,
               err => reject(`${JSON.stringify(err)}  on fileTransfer of  ${idTrack}`),
@@ -93,18 +94,21 @@ export function getHistory(idDevice) {
 export function startSync() {
   // "file:///storage/sdcard/"
   const UUID = window.device && `${window.device.model} : ${window.device.uuid}`;
-  return dispatch =>
-    dispatch(getConfig('remoteHost'))
-    .then((action) => {
-      remoteHost = action.payload.value;
-      remote = remoteAPI(NAME, remoteHost);
-    })
-    .then(() => dispatch(getDeviceInfo(UUID)))
+  return (dispatch, getState) => {
+    const config = getState().config;
+    remoteHost = config.remoteHost;
+    remote = remoteAPI(NAME, remoteHost);
+    return dispatch(getDeviceInfo(UUID))
     .then((action) => {
       musicDir = action.payload.musicDir;
+      return (
+        musicDir !== config.musicDir &&
+        dispatch(setConfig('musicDir', musicDir))
+      );
     })
     .then(() => dispatch(push('/sync/1')))
     ;
+  };
 }
 
 export function importPlayList(idPlayList) {
