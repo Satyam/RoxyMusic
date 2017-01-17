@@ -243,6 +243,10 @@ export function importOneTrack() {
     if (i === sync.pending.length) return Promise.resolve('done');
     const pending = sync.pending[i];
     dispatch(updateDownloadStatus(i, 1));
+    const audioExtensions = getState().config.portableAudioExtensions.split(',');
+    if (audioExtensions.indexOf(pending.ext.substr(1)) === -1) {
+      pending.ext = '.mp3';
+    }
     return downloadTrack(pending)
     .then(fileEntry =>
       dispatch(updateTrackLocation(
