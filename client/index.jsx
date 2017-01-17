@@ -7,6 +7,7 @@ import { Provider } from 'react-redux';
 import createStore from '_store/createStore';
 
 import routes from '_components/routes';
+import { getAllConfig } from '_store/actions';
 
 export default function (initialState) {
   if (process.env.NODE_ENV !== 'production' && BUNDLE !== 'cordova') {
@@ -25,14 +26,17 @@ export default function (initialState) {
 
   const history = syncHistoryWithStore(baseHistory, store);
 
-  const dest = document.getElementById('contents');
-  render((
-    <Provider store={store}>
-      <Router history={history}>
-        {routes('/')}
-      </Router>
-    </Provider>
-  ), dest);
+  store.dispatch(getAllConfig())
+  .then(() => render(
+    (
+      <Provider store={store}>
+        <Router history={history}>
+          {routes('/')}
+        </Router>
+      </Provider>
+    ),
+    document.getElementById('contents')
+  ));
 
   return store;
 }

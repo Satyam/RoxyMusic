@@ -6,6 +6,7 @@ import {
 
 import {
   GET_CONFIG,
+  GET_ALL_CONFIG,
   SET_CONFIG,
 } from './actions';
 
@@ -16,6 +17,8 @@ export default (
   const payload = action.payload;
   if (action.stage && action.stage !== REPLY_RECEIVED) return state;
   switch (action.type) {
+    case GET_ALL_CONFIG:
+      return payload;
     case GET_CONFIG:
     case SET_CONFIG:
       return update(state, { [payload.key]: { $set: payload.value } });
