@@ -31,10 +31,10 @@ export function TransferFilesComponent({
     <Table bordered condensed hover responsive>
       <thead>
         <tr>
+          <th />
           <th>Artist</th>
           <th>Album</th>
           <th>Title</th>
-          <th>Done</th>
         </tr>
       </thead>
       <tbody>
@@ -47,9 +47,6 @@ export function TransferFilesComponent({
               'bg-info',
             ][file.status || 0]}
           >
-            <td>{file.artist}</td>
-            <td>{file.album}</td>
-            <td>{file.title}</td>
             <td><Icon
               type={[
                 'option-horizontal',
@@ -57,6 +54,9 @@ export function TransferFilesComponent({
                 'ok',
               ][file.status || 0]}
             /></td>
+            <td>{file.artist}</td>
+            <td>{file.album}</td>
+            <td>{file.title}</td>
           </tr>
         ))}
       </tbody>
@@ -66,6 +66,7 @@ export function TransferFilesComponent({
       type="ok"
       onClick={onDone}
       label="Done"
+      disabled={i !== pending.length}
     />
   </div>);
 }
