@@ -1,3 +1,4 @@
+// based on: http://redux.js.org/docs/advanced/Middleware.html
 /* eslint-disable no-console */
 /**
  * Logs all actions and states after they are dispatched.
