@@ -1,5 +1,5 @@
-import { join } from 'path';
 import ServerError from '_utils/serverError';
+import plainJoin from '_utils/plainJoin';
 import dbg from 'debug';
 
 // dbg.enable('RoxyMusic:restAPI');
@@ -31,12 +31,12 @@ export default (base) => {
     debug('> %s %s %s \n%j',
       channel,
       method,
-      join(base, String(path)),
+      plainJoin(base, path),
       body,
     );
     ipc.send('restAPI', {
       channel,
-      url: join(base, String(path)),
+      url: plainJoin(base, path),
       method,
       data: body,
     });

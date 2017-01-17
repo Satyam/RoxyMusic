@@ -1,6 +1,6 @@
-import { join } from 'path';
 import ServerError from '_utils/serverError';
 import dbg from 'debug';
+import plainJoin from '_utils/plainJoin';
 
 const DEBUG = true;
 if (DEBUG) dbg.enable('RoxyMusic:webClient/restAPI');
@@ -9,10 +9,10 @@ const debug = dbg('RoxyMusic:webClient/restAPI');
 const clients = {};
 
 export default (base, host = `${HOST}:${PORT}`) => {
-  const key = join(host, base);
+  const key = plainJoin(host, base);
   if (clients[key]) return clients[key];
   const restClient = method => (path = '/', body) => fetch(
-    `${host}${join(REST_API_PATH, base, String(path))}`,
+    plainJoin(host, REST_API_PATH, base, path),
     {
       method,
       headers: {
@@ -30,18 +30,18 @@ export default (base, host = `${HOST}:${PORT}`) => {
       response.status,
       response.statusText,
       method,
-      join(base, String(path)
-    )))
+      plainJoin(base, path)
+    ))
   ))
   .then(response => response.json())
   // ----- when debugging
   .then(
     (response) => {
-      debug(`${method.toUpperCase()} ${join(base, String(path))}: ${JSON.stringify(response, null, 2)}`);
+      debug(`${method.toUpperCase()} ${plainJoin(base, path)}: ${JSON.stringify(response, null, 2)}`);
       return response;
     },
     (error) => {
-      debug(`${method.toUpperCase()} ${join(base, String(path))}: ${JSON.stringify(error, null, 2)}`);
+      debug(`${method.toUpperCase()} ${plainJoin(base, path)}: ${JSON.stringify(error, null, 2)}`);
       return Promise.reject(error);
     }
   )

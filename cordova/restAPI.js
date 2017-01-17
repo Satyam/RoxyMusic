@@ -1,8 +1,8 @@
 import url from 'url';
-import { join } from 'path';
 import pathToRegexp from 'path-to-regexp';
 import dbg from 'debug';
 import ServerError from '_utils/serverError';
+import plainJoin from '_utils/plainJoin';
 
 dbg.enable('RoxyMusic:cordova/restAPI');
 const debug = dbg('RoxyMusic:cordova/restAPI');
@@ -25,7 +25,7 @@ export default (base) => {
   if (clients[base]) return clients[base];
   const restClient = method => (reqUrl = '/', data) => {
     const parsedUrl = url.parse(String(reqUrl), true);
-    const path = join('/', base, parsedUrl.pathname || '');
+    const path = plainJoin('/', base, parsedUrl.pathname || '');
     debug(`> ${method} ${path}`);
     const o = {
       options: parsedUrl.query,
