@@ -3,5 +3,5 @@ const final = /\/$/;
 
 export default (...paths) =>
   paths.map(
-    path => path.replace(initial, '').replace(final, '')
+    path => String(path).replace(initial, '').replace(final, '')
   ).join('/');
