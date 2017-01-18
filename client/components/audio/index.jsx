@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import compose from 'recompose/compose';
 import initStore from '_utils/initStore';
@@ -31,8 +32,6 @@ export class AudioComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      idTrack: props.idTrack,
-      src: props.src,
       playing: false,
       currentTime: 0,
     };
@@ -44,6 +43,16 @@ export class AudioComponent extends Component {
     audio.ontimeupdate = this.onTimeUpdateHandler;
     audio.onpause = this.onPauseHandler;
     audio.onended = this.onEndedHandler;
+    const pgEl = ReactDOM.findDOMNode(this.pgBar);
+    this.pgLeft = pgEl.offsetLeft;
+    this.pgWidth = pgEl.offsetWidth;
+  }
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.src && this.props.src) {
+      this.setState({
+        currentTime: 0,
+      });
+    }
   }
   onPlayPauseClickHandler(ev) {
     if (isPlainClick(ev)) {
@@ -68,14 +77,21 @@ export class AudioComponent extends Component {
     this.setState({ playing: false });
   }
   onEndedHandler() {
-    this.setState({ playing: false });
+    this.setState({
+      playing: false,
+      currentTime: 0,
+    });
     this.props.onEnded();
   }
   onRewindHandler() {
     this.audio.currentTime = 0;
   }
+  onProgressBarClickHandler(ev) {
+    this.audio.currentTime = (ev.clientX - this.pgLeft) / this.pgWidth * this.state.duration
+  }
   render() {
     const state = this.state;
+    const disabled = !this.props.src;
     return (<Well className={styles.audio} >
       <audio
         ref={(el) => { this.audio = el; }}
@@ -88,6 +104,7 @@ export class AudioComponent extends Component {
         title="Rewind"
         onClick={this.onRewindHandler}
         className={styles.left}
+        disabled={disabled}
       />
       <Icon
         button
@@ -103,12 +120,15 @@ export class AudioComponent extends Component {
         )}
         onClick={this.onPlayPauseClickHandler}
         className={styles.left}
+        disabled={disabled}
       />
       <ProgressBar
+        ref={(el) => { this.pgBar = el; }}
         now={state.currentTime}
         max={state.duration}
         label={secsToHHMMSS(state.currentTime)}
         className={styles.bar}
+        onClick={this.onProgressBarClickHandler}
       />
       <Icon
         button
@@ -116,6 +136,7 @@ export class AudioComponent extends Component {
         title="Rewind"
         onClick={this.onEndedHandler}
         className={styles.right}
+        disabled={!this.props.hasNext}
       />
     </Well>);
   }
@@ -123,7 +144,7 @@ export class AudioComponent extends Component {
 
 AudioComponent.propTypes = {
   // idTrack: PropTypes.number,
-  idTrack: PropTypes.number,
+  hasNext: PropTypes.bool,
   src: PropTypes.string,
   onEnded: PropTypes.func,
 };
@@ -149,7 +170,7 @@ export function mapStateToProps(state) {
       const idTrack = nowPlaying.idTracks[current];
       if (state.tracks[idTrack] && state.config.musicDir) {
         return {
-          idTrack,
+          hasNext: !!nowPlaying.idTracks[current + 1],
           src: plainJoin(
               BUNDLE === 'webClient'
               ? '/music'
@@ -163,7 +184,6 @@ export function mapStateToProps(state) {
   }
   return {
     src: '',
-    autoPlay: false,
   };
 }
 
