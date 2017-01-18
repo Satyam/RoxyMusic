@@ -48,7 +48,8 @@ export function PlayListCompareComponent({
       }
       <ListGroupItem>
         <Icon
-          className="btn btn-default btn-block"
+          button
+          block
           type="ok"
           onClick={onDone}
           label="Done"

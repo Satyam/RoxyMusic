@@ -3,13 +3,9 @@
 }
 .left {
   float: left;
-  composes: global(btn);
-  composes: global(btn-default);
 }
 .right {
   float:right;
-  composes: global(btn);
-  composes: global(btn-default);
 }
 .bar {
   flex: auto;

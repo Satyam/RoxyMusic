@@ -5,8 +5,6 @@ import initStore from '_utils/initStore';
 import plainJoin from '_utils/plainJoin';
 import Icon from '_components/misc/icon';
 import ProgressBar from 'react-bootstrap/lib/ProgressBar';
-import ButtonGroup from 'react-bootstrap/lib/ButtonGroup';
-import Button from 'react-bootstrap/lib/Button';
 import Well from 'react-bootstrap/lib/Well';
 import bindHandlers from '_utils/bindHandlers';
 import isPlainClick from '_utils/isPlainClick';
@@ -86,11 +84,13 @@ export class AudioComponent extends Component {
       />
       <Icon
         type="step-backward"
+        button
         title="Rewind"
         onClick={this.onRewindHandler}
         className={styles.left}
       />
       <Icon
+        button
         type={(
           state.playing
           ? 'pause'
@@ -111,12 +111,13 @@ export class AudioComponent extends Component {
         className={styles.bar}
       />
       <Icon
+        button
         type="step-forward"
         title="Rewind"
         onClick={this.onEndedHandler}
         className={styles.right}
       />
-  </Well>);
+    </Well>);
   }
 }
 

@@ -18,7 +18,8 @@ export function SyncComponent({
   return (<div>
     <Icon
       type="retweet"
-      className="btn btn-default btn-block"
+      button
+      block
       onClick={onSyncStart}
       label="Start"
     />

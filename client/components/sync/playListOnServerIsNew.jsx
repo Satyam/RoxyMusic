@@ -27,7 +27,7 @@ export function PLOnServerIsNewComponent({
       </div>
       <FoldingToolbar>
         <Icon
-          className="btn btn-default"
+          button
           type="import"
           onClick={onListImport}
           title="Import from server"

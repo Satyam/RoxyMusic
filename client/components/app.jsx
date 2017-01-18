@@ -25,7 +25,7 @@ const AppComponent = ({ wide, children }) => (
     <Navbar>
       <Navbar.Header>
         <Navbar.Brand>
-          <Icon type="music" label="Roxy Music" href="/" title="home" />
+          <Icon type="heart,music" label="Roxy Music" href="/" title="home" />
         </Navbar.Brand>
       </Navbar.Header>
       <Nav pullRight>
@@ -51,10 +51,34 @@ const AppComponent = ({ wide, children }) => (
             <div className={styles.wideLeftPanel}>
               { children || (
                 <div className={styles.menu}>
-                  <Link className={styles.menuItem} to="/albums">Albums</Link>
-                  <Link className={styles.menuItem} to="/artists">Artists</Link>
-                  <Link className={styles.menuItem} to="/songs">Songs</Link>
-                  <Link className={styles.menuItem} to="/playLists">Play Lists</Link>
+                  <Icon
+                    button="primary"
+                    block
+                    type="cd"
+                    className={styles.menuItem}
+                    href="/albums"
+                  >Albums</Icon>
+                  <Icon
+                    button="primary"
+                    block
+                    type="user"
+                    className={styles.menuItem}
+                    href="/artists"
+                  >Artists</Icon>
+                  <Icon
+                    button="primary"
+                    block
+                    type="music"
+                    className={styles.menuItem}
+                    href="/songs"
+                  >Songs</Icon>
+                  <Icon
+                    button="primary"
+                    block
+                    type="list"
+                    className={styles.menuItem}
+                    href="/playLists"
+                  >Play Lists</Icon>
                 </div>
               )}
             </div>
@@ -68,11 +92,41 @@ const AppComponent = ({ wide, children }) => (
           <div className={styles.narrow}>
             { children || (
               <ul className={styles.menu}>
-                <Link className={styles.menuItem} to="/albums">Albums</Link>
-                <Link className={styles.menuItem} to="/artists">Artists</Link>
-                <Link className={styles.menuItem} to="/songs">Songs</Link>
-                <Link className={styles.menuItem} to="/playLists">Play Lists</Link>
-                <Link className={styles.menuItem} to="/now">Now Playing</Link>
+                <Icon
+                  button="primary"
+                  block
+                  type="cd"
+                  className={styles.menuItem}
+                  href="/albums"
+                >Albums</Icon>
+                <Icon
+                  button="primary"
+                  block
+                  type="user"
+                  className={styles.menuItem}
+                  href="/artists"
+                >Artists</Icon>
+                <Icon
+                  button="primary"
+                  block
+                  type="music"
+                  className={styles.menuItem}
+                  href="/songs"
+                >Songs</Icon>
+                <Icon
+                  button="primary"
+                  block
+                  type="list"
+                  className={styles.menuItem}
+                  href="/playLists"
+                >Play Lists</Icon>
+                <Icon
+                  button="primary"
+                  block
+                  type="play"
+                  className={styles.menuItem}
+                  href="/now"
+                >Now Playing</Icon>
               </ul>
             )}
             <Audio />
