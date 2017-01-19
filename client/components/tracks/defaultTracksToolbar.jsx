@@ -18,14 +18,15 @@ export const TracksToolbarComponent = ({
   onAddToPlayList,
 }) => (
   <FoldingToolbar>
-    <Icon type="play" label="!" onClick={onPlayNowClick} title="play now" />
-    <Icon type="play,plus" onClick={onAddToPlayNowClick} title="Play later" />
+    <Icon button type="play" label="!" onClick={onPlayNowClick} title="play now" />
+    <Icon button type="play,plus" onClick={onAddToPlayNowClick} title="Play later" />
     <Icon
+      button
       type="remove-sign,play"
       onClick={onReplacePlayNowClick}
       title="Clear list and play this"
     />
-    <Icon type="indent-left" onClick={onAddToPlayList} title="add to PlayList" />
+    <Icon button type="indent-left" onClick={onAddToPlayList} title="add to PlayList" />
   </FoldingToolbar>
 );
 
@@ -43,7 +44,7 @@ export const mapStateToProps = (state, props) =>
 export const mapDispatchToProps = (dispatch, props) => ({
   onPlayNowClick: ev => isPlainClick(ev) && dispatch(playNow(props.idTrack)),
   onAddToPlayNowClick: ev => isPlainClick(ev) && dispatch(addToNowPlaying(props.idTrack)),
-  onReplacePlayNowClick: ev => isPlainClick(ev) && dispatch(replaceNowPlaying(props.idTrack)),
+  onReplacePlayNowClick: ev => isPlainClick(ev) && dispatch(replaceNowPlaying([props.idTrack])),
   onAddToPlayList: ev => isPlainClick(ev) && dispatch(addTracksToPlayList(props.idTrack)),
 });
 

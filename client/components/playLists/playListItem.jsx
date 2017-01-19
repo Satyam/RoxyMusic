@@ -2,7 +2,6 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
-import Button from 'react-bootstrap/lib/Button';
 import FoldingToolbar from '_components/misc/foldingToolbar';
 import Icon from '_components/misc/icon';
 
@@ -33,12 +32,8 @@ export const PlayListItemComponent = ({
       </div>
     </div>
     <FoldingToolbar>
-      <Button onClick={onDeleteClick} title="delete" >
-        <Icon type="trash" />
-      </Button>
-      <Button onClick={onSaveClick} title="save" >
-        <Icon type="save" />
-      </Button>
+      <Icon button type="trash" onClick={onDeleteClick} title="delete" />
+      <Icon button type="save" onClick={onSaveClick} title="save" />
     </FoldingToolbar>
   </ListGroupItem>
 );

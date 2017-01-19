@@ -5,7 +5,6 @@ import sortBy from 'lodash/sortBy';
 
 import Navbar from 'react-bootstrap/lib/Navbar';
 import ListGroup from 'react-bootstrap/lib/ListGroup';
-import Button from 'react-bootstrap/lib/Button';
 import Icon from '_components/misc/icon';
 import FoldingToolbar from '_components/misc/foldingToolbar';
 
@@ -28,9 +27,7 @@ export function PlayListsComponent({
           </Navbar.Brand>
         </Navbar.Header>
         <FoldingToolbar>
-          <Button onClick={onPlayListSave} title="Save all playlists">
-            <Icon type="save" />
-          </Button>
+          <Icon button type="save" onClick={onPlayListSave} title="Save all playlists" />
         </FoldingToolbar>
       </Navbar>
       <ListGroup>
