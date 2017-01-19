@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react';
-import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import compose from 'recompose/compose';
 import Navbar from 'react-bootstrap/lib/Navbar';
@@ -33,11 +32,14 @@ const AppComponent = ({ wide, children }) => (
           BUNDLE === 'cordova'
           ? (
             <NavItem>
-              <Icon type="retweet" href="/sync" title="sync" />
+              <Icon type="retweet" href="/sync" title="Synchonize" />
             </NavItem>
           )
           : null
-      }
+        }
+        <NavItem>
+          <Icon type="cog" href="/config" title="Configure" />
+        </NavItem>
       </Nav>
     </Navbar>
     <Loading />

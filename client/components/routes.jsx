@@ -10,6 +10,7 @@ import songs from './songs/routes';
 import playLists from './playLists/routes';
 import nowPlaying from './nowPlaying/routes';
 import sync from './sync/routes';
+import config from './config/routes';
 
 export default path => (
   <Route path={path} component={App}>
@@ -19,6 +20,7 @@ export default path => (
     {playLists('playLists')}
     {nowPlaying('now')}
     {sync('sync')}
+    {config('config')}
     <Route path="*" component={NotFound} />
   </Route>
 );
