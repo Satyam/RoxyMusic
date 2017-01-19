@@ -26,7 +26,7 @@ export function getAllConfig() {
 export function setConfig(key, value) {
   return asyncActionCreator(
     SET_CONFIG,
-    api.update(key, value),
+    api.update(key, { value }),
     { key, value }
   );
 }
