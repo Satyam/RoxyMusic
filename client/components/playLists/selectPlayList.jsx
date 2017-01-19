@@ -15,7 +15,7 @@ import Button from 'react-bootstrap/lib/Button';
 import Icon from '_components/misc/icon';
 
 import initStore from '_utils/initStore';
-import { addTrackToPlayList, closeAddToPlayList, addPlayList } from '_store/actions';
+import { addTracksToPlayList, closeAddToPlayList, addPlayList } from '_store/actions';
 import isPlainClick from '_utils/isPlainClick';
 import bindHandlers from '_utils/bindHandlers';
 
@@ -44,24 +44,24 @@ export class SelectPlayListComponent extends Component {
   onSubmitHandler(ev) {
     if (isPlainClick(ev)) {
       const {
-        idTrackToAdd,
+        idTracksToAdd,
         onAddToNewPlayList,
       } = this.props;
-      onAddToNewPlayList(idTrackToAdd, this.state.newName);
+      onAddToNewPlayList(idTracksToAdd, this.state.newName);
       this.setState({ newName: '' });
     }
   }
 
   render() {
     const {
-      idTrackToAdd,
+      idTracksToAdd,
       hash,
       onClose,
       onPlayListClick,
     } = this.props;
 
     return (
-      <Modal show={idTrackToAdd !== null} onHide={onClose}>
+      <Modal show={idTracksToAdd !== null} onHide={onClose}>
         <Modal.Header>
           <Modal.Title>Select Playlist</Modal.Title>
         </Modal.Header>
@@ -72,7 +72,7 @@ export class SelectPlayListComponent extends Component {
               sortBy(hash, playList => playList.name).map(playList => (
                 <ListGroupItem
                   key={playList.idPlayList}
-                  onClick={onPlayListClick(idTrackToAdd, playList.idPlayList)}
+                  onClick={onPlayListClick(idTracksToAdd, playList.idPlayList)}
                 >
                   {playList.name}
                 </ListGroupItem>
@@ -117,7 +117,7 @@ export class SelectPlayListComponent extends Component {
 }
 
 SelectPlayListComponent.propTypes = {
-  idTrackToAdd: PropTypes.number,
+  idTracksToAdd: PropTypes.number,
   hash: PropTypes.objectOf(PropTypes.object),
   onPlayListClick: PropTypes.func,
   onAddToNewPlayList: PropTypes.func,
@@ -125,12 +125,12 @@ SelectPlayListComponent.propTypes = {
 };
 
 export const mapDispatchToProps = dispatch => ({
-  onPlayListClick: (idTrackToAdd, idPlayList) => ev =>
+  onPlayListClick: (idTracksToAdd, idPlayList) => ev =>
     isPlainClick(ev)
-    && dispatch(addTrackToPlayList(idTrackToAdd, idPlayList))
+    && dispatch(addTracksToPlayList(idTracksToAdd, idPlayList))
     .then(() => dispatch(closeAddToPlayList())),
-  onAddToNewPlayList: (idTrackToAdd, name) =>
-    dispatch(addPlayList(name, [idTrackToAdd]))
+  onAddToNewPlayList: (idTracksToAdd, name) =>
+    dispatch(addPlayList(name, [idTracksToAdd]))
     .then(() => dispatch(closeAddToPlayList())),
   onClose: ev => isPlainClick(ev) && dispatch(closeAddToPlayList()),
 });

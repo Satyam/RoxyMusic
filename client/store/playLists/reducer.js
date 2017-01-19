@@ -22,7 +22,7 @@ export default (
   state = {
     status: 0,
     hash: {},
-    idTrackToAdd: null,
+    idTracksToAdd: null,
   },
   action
 ) => {
@@ -68,9 +68,9 @@ export default (
     case DELETE_PLAY_LIST:
       return update(state, { hash: { $set: omit(state.hash, idPlayList) } });
     case SELECT_PLAYLIST_FOR_TRACK:
-      return update(state, { idTrackToAdd: { $set: action.idTrack } });
+      return update(state, { idTracksToAdd: { $set: action.idTracks } });
     case CLOSE_ADD_TO_PLAYLIST:
-      return update(state, { idTrackToAdd: { $set: null } });
+      return update(state, { idTracksToAdd: { $set: null } });
     default:
       return state;
   }

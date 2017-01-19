@@ -63,20 +63,20 @@ export function deletePlayList(idPlayList) {
   );
 }
 
-export function addTrackToPlayList(idTrack, idPlayList) {
+export function addTracksToPlayList(idTracks, idPlayList) {
   if (arguments.length === 1) {
     return {
       type: SELECT_PLAYLIST_FOR_TRACK,
-      idTrack,
+      idTracks,
     };
   }
   return (dispatch, getState) => {
     const playList = getState().playLists.hash[idPlayList];
-    return replacePlayListTracks(
+    return dispatch(replacePlayListTracks(
       idPlayList,
-      playList.idTracks.concat(idTrack),
+      playList.idTracks.concat(idTracks),
       playList.lastPlayed
-    )(dispatch, getState);
+    ));
   };
 }
 
