@@ -100,3 +100,8 @@ export function savePlayList(idPlayList) {
     { idPlayList }
   );
 }
+
+export function addAlbumToPlayList(idAlbum) {
+  return (dispatch, getState) =>
+    dispatch(addTracksToPlayList(getState().albums.hash[idAlbum].idTracks));
+}

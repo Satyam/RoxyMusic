@@ -10,12 +10,15 @@ export const ADD_TO_NOW_PLAYING = `${NAME}/add track to now playing list`;
 export const CLEAR_NOW_PLAYING = `${NAME}/clear now playing list`;
 export const REPLACE_NOW_PLAYING = `${NAME}/replace now playing list`;
 export const LOAD_NOW_PLAYING = `${NAME}/load now playing list`;
+export const PLAY_ALBUM_NOW = `${NAME}/play album now`;
+export const ADD_ALBUM_TO_NOW_PLAYING = `${NAME}/add album to now playing list`;
+export const REPLACE_ALBUM_NOW_PLAYING = `${NAME}/replace album in now playing list`;
 
 function update(action, idTracks = [], current = -1) {
-  const what = {
+  const what = { value: {
     current,
     idTracks,
-  };
+  } };
   return asyncActionCreator(
     action,
     api.update('nowPlaying', what),
@@ -35,10 +38,10 @@ export function playNow(idTrack) {
   };
 }
 
-export function addToNowPlaying(idTrack) {
+export function addToNowPlaying(idTracks) {
   return (dispatch, getState) => {
     const nowPlaying = getState().nowPlaying;
-    return dispatch(update(PLAY_NOW, nowPlaying.idTracks.concat(idTrack), nowPlaying.current));
+    return dispatch(update(PLAY_NOW, nowPlaying.idTracks.concat(idTracks), nowPlaying.current));
   };
 }
 
@@ -46,8 +49,8 @@ export function clearNowPlaying() {
   return update(CLEAR_NOW_PLAYING, [], -1);
 }
 
-export function replaceNowPlaying(idTrack) {
-  return update(REPLACE_NOW_PLAYING, [idTrack], 0);
+export function replaceNowPlaying(idTracks) {
+  return update(REPLACE_NOW_PLAYING, idTracks, 0);
 }
 
 export function playNextTrack() {
@@ -67,4 +70,23 @@ export function loadPlayingList() {
     LOAD_NOW_PLAYING,
     api.read('nowPlaying')
   );
+}
+
+export function playAlbumNow(idAlbum) {
+  return (dispatch, getState) => {
+    const state = getState();
+    const idTracks = state.albums.hash[idAlbum].idTracks;
+    return dispatch(playNow(idTracks.shift()))
+      .then(() => idTracks.length && dispatch(addToNowPlaying(idTracks)));
+  };
+}
+
+export function addAlbumToPlayNow(idAlbum) {
+  return (dispatch, getState) =>
+    dispatch(addToNowPlaying(getState().albums.hash[idAlbum].idTracks));
+}
+
+export function replaceAlbumInPlayNow(idAlbum) {
+  return (dispatch, getState) =>
+    dispatch(replaceNowPlaying(getState().albums.hash[idAlbum].idTracks));
 }
