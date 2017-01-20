@@ -22,7 +22,6 @@ export default (
   },
   action
 ) => {
-  if (action.stage && action.stage !== REPLY_RECEIVED) return state;
   const payload = action.payload;
   switch (action.type) {
     case PLAY_NEXT_TRACK:
