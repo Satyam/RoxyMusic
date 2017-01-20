@@ -117,7 +117,9 @@ export class SelectPlayListComponent extends Component {
 }
 
 SelectPlayListComponent.propTypes = {
-  idTracksToAdd: PropTypes.number,
+  idTracksToAdd: PropTypes.arrayOf(
+    PropTypes.number
+  ),
   hash: PropTypes.objectOf(PropTypes.object),
   onPlayListClick: PropTypes.func,
   onAddToNewPlayList: PropTypes.func,
