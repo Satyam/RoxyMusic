@@ -3,12 +3,18 @@ import { connect } from 'react-redux';
 import { compose } from 'recompose';
 import { getTracks } from '_store/actions';
 import initStore from '_utils/initStore';
-import renderAttr from '_components/misc/renderAttr';
 import pick from 'lodash/pick';
 import sortBy from 'lodash/sortBy';
 import map from 'lodash/map';
 
 import ListGroup from 'react-bootstrap/lib/ListGroup';
+
+import {
+  SortableContainer as DragContainer,
+  SortableElement as DragElement,
+  arrayMove,
+} from 'react-sortable-hoc';
+
 import styles from './trackList.css';
 import Track from './track';
 
@@ -24,30 +30,44 @@ function sortIdTracks(sorted, idTracks, tracks) {
   );
 }
 
+const DraggableTrack = DragElement(Track);
+const DraggableTrackList = DragContainer(({
+  idTracks,
+  Toolbar,
+  background,
+  after,
+}) => (
+  <ListGroup>
+    {idTracks.map((idTrack, index) => (
+      <DraggableTrack
+        key={idTrack}
+        index={index}
+        idTrack={idTrack}
+        Toolbar={Toolbar}
+        background={background && background[idTrack]}
+      />
+    ))}
+    {after}
+  </ListGroup>
+));
+
 export function TrackListComponent({
   idTracks,
   tracks,
   Toolbar,
   background,
-  Before,
-  After,
+  children,
   sorted,
 }) {
   const idt = sortIdTracks(sorted, idTracks, tracks);
-  return (idt || null) && (
+  return (idt.length || null) && (
     <div className={styles.trackList}>
-      <ListGroup>
-        {renderAttr(Before)}
-        {idt.map(idTrack => (
-          <Track
-            key={idTrack}
-            idTrack={idTrack}
-            Toolbar={Toolbar}
-            background={background && background[idTrack]}
-          />
-        ))}
-        {renderAttr(After)}
-      </ListGroup>
+      <DraggableTrackList
+        idTracks={idt}
+        Toolbar={Toolbar}
+        background={background}
+        after={children}
+      />
     </div>
   );
 }
@@ -65,9 +85,8 @@ TrackListComponent.propTypes = {
     PropTypes.oneOf(['default']),
   ]),
   background: PropTypes.objectOf(PropTypes.string),
-  Before: PropTypes.element,
-  After: PropTypes.element,
   sorted: PropTypes.bool,
+  children: PropTypes.node,
 };
 
 export const storeInitializer = (dispatch, state, props) => dispatch(getTracks(props.idTracks));
