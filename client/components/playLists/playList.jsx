@@ -4,11 +4,16 @@ import Navbar from 'react-bootstrap/lib/Navbar';
 import Icon from '_components/misc/icon';
 import TrackList from '_components/tracks/trackList';
 import compose from 'recompose/compose';
-import { getPlayList, getPlayLists } from '_store/actions';
+import {
+  getPlayList,
+  getPlayLists,
+  replacePlayListTracks,
+} from '_store/actions';
+
 import initStore from '_utils/initStore';
 import styles from './playList.css';
 
-export const PlayListComponent = ({ idPlayList, name, idTracks }) =>
+export const PlayListComponent = ({ idPlayList, name, idTracks, onDragEnd }) =>
   (typeof idPlayList !== 'undefined' || null) && (
     <div className={styles.playList}>
       <Navbar>
@@ -22,7 +27,10 @@ export const PlayListComponent = ({ idPlayList, name, idTracks }) =>
           {idTracks.length} {idTracks.length === 1 ? 'track' : 'tracks'}
         </div>
       </Navbar>
-      <TrackList idTracks={idTracks} />
+      <TrackList
+        idTracks={idTracks}
+        onDragEnd={onDragEnd}
+      />
     </div>
   );
 
@@ -34,6 +42,7 @@ PlayListComponent.propTypes = {
     PropTypes.number
   ),
   error: PropTypes.number,
+  onDragEnd: PropTypes.func,
 };
 
 export const storeInitializer = (dispatch, state, props) => {
@@ -50,10 +59,16 @@ export const storeInitializer = (dispatch, state, props) => {
 export const mapStateToProps =
   (state, props) => state.playLists.hash[props.params.idPlayList || 0] || {};
 
+export const mapDispatchToProps = (dispatch, props) => ({
+  onDragEnd: idTracks =>
+    dispatch(replacePlayListTracks(props.params.idPlayList, idTracks)),
+});
+
 const enhance = compose(
   initStore(storeInitializer),
   connect(
-    mapStateToProps
+    mapStateToProps,
+    mapDispatchToProps
   )
 );
 

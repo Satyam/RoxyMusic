@@ -12,6 +12,7 @@ import {
   CLEAR_NOW_PLAYING,
   REPLACE_NOW_PLAYING,
   LOAD_NOW_PLAYING,
+  REORDER_NOW_PLAYING_TRACKS,
 } from './actions';
 
 export default (
@@ -30,6 +31,7 @@ export default (
     case CLEAR_NOW_PLAYING:
     case REPLACE_NOW_PLAYING:
     case LOAD_NOW_PLAYING:
+    case REORDER_NOW_PLAYING_TRACKS:
       switch (action.stage) {
         case REPLY_RECEIVED:
           return Object.assign(payload.value, { status: 2 });

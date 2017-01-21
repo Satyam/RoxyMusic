@@ -58,8 +58,12 @@ export function TrackListComponent({
   background,
   children,
   sorted,
+  onDragEnd,
 }) {
   const idt = sortIdTracks(sorted, idTracks, tracks);
+  const onSortEnd = ({ oldIndex, newIndex }) =>
+    onDragEnd(arrayMove(idTracks, oldIndex, newIndex));
+
   return (idt.length || null) && (
     <div className={styles.trackList}>
       <DraggableTrackList
@@ -67,6 +71,9 @@ export function TrackListComponent({
         Toolbar={Toolbar}
         background={background}
         after={children}
+        pressDelay={200}
+        onSortEnd={onSortEnd}
+        shouldCancelStart={() => (sorted || typeof onDragEnd !== 'function')}
       />
     </div>
   );
@@ -87,6 +94,7 @@ TrackListComponent.propTypes = {
   background: PropTypes.objectOf(PropTypes.string),
   sorted: PropTypes.bool,
   children: PropTypes.node,
+  onDragEnd: PropTypes.func,
 };
 
 export const storeInitializer = (dispatch, state, props) => dispatch(getTracks(props.idTracks));

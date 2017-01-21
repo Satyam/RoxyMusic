@@ -7,12 +7,15 @@ import Navbar from 'react-bootstrap/lib/Navbar';
 import Icon from '_components/misc/icon';
 import TrackList from '_components/tracks/trackList';
 
-import { loadPlayingList } from '_store/actions';
+import {
+  loadPlayingList,
+  reorderNowPlayingTracks,
+ } from '_store/actions';
 
 import Toolbar from './nowPlayingTracksToolbar';
 
-export const NowPlayingComponent = ({ idTracks, current, router }) =>
-  (idTracks || null) && (
+export const NowPlayingComponent = ({ idTracks, current, router, onDragEnd }) =>
+  (idTracks.length || null) && (
     <div>
       <Navbar>
         <Navbar.Header>
@@ -26,6 +29,7 @@ export const NowPlayingComponent = ({ idTracks, current, router }) =>
         idTracks={idTracks}
         Toolbar={Toolbar}
         background={{ [idTracks[current]]: 'info' }}
+        onDragEnd={onDragEnd}
       />
     </div>
   );
@@ -35,6 +39,7 @@ NowPlayingComponent.propTypes = {
     PropTypes.number
   ),
   Toolbar: PropTypes.element,
+  onDragEnd: PropTypes.func,
 };
 
 export const storeInitializer = (dispatch, state) => (
@@ -43,9 +48,14 @@ export const storeInitializer = (dispatch, state) => (
 
 export const mapStateToProps = state => state.nowPlaying || {};
 
+export const mapDispatchToProps = dispatch => ({
+  onDragEnd: idTracks => dispatch(reorderNowPlayingTracks(idTracks)),
+});
+
 export default compose(
   initStore(storeInitializer),
   connect(
-    mapStateToProps
+    mapStateToProps,
+    mapDispatchToProps
   )
 )(NowPlayingComponent);

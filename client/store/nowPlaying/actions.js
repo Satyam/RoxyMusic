@@ -13,6 +13,7 @@ export const LOAD_NOW_PLAYING = `${NAME}/load now playing list`;
 export const PLAY_ALBUM_NOW = `${NAME}/play album now`;
 export const ADD_ALBUM_TO_NOW_PLAYING = `${NAME}/add album to now playing list`;
 export const REPLACE_ALBUM_NOW_PLAYING = `${NAME}/replace album in now playing list`;
+export const REORDER_NOW_PLAYING_TRACKS = `${NAME}/reorder tracks in now playing list`;
 
 function update(action, idTracks = [], current = -1) {
   const what = { value: {
@@ -89,4 +90,12 @@ export function addAlbumToPlayNow(idAlbum) {
 export function replaceAlbumInPlayNow(idAlbum) {
   return (dispatch, getState) =>
     dispatch(replaceNowPlaying(getState().albums.hash[idAlbum].idTracks));
+}
+
+export function reorderNowPlayingTracks(idTracks) {
+  return (dispatch, getState) => {
+    const nowPlaying = getState().nowPlaying;
+    const newCurrent = idTracks.indexOf(nowPlaying.idTracks[nowPlaying.current]);
+    return dispatch(update(REORDER_NOW_PLAYING_TRACKS, idTracks, newCurrent));
+  };
 }
