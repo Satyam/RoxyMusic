@@ -15,6 +15,7 @@ function Icon({
   title,
   button,
   block,
+  ...props
  }) {
   /* eslint-disable jsx-a11y/no-static-element-interactions */
   const actualOnClick = !disabled && onClick;
@@ -47,6 +48,7 @@ function Icon({
       to={href}
       title={title}
       style={{ opacity: (disabled ? 0.3 : 1) }}
+      {...props}
     >
       {span}
       {lbl}
@@ -61,6 +63,7 @@ function Icon({
       )}
       title={title}
       style={{ opacity: (disabled ? 0.3 : 1) }}
+      {...props}
     >
       {span}
       {lbl}
