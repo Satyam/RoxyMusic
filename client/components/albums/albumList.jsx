@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { compose } from 'recompose';
 
 import Navbar from 'react-bootstrap/lib/Navbar';
-import Button from 'react-bootstrap/lib/Button';
 import ListGroup from 'react-bootstrap/lib/ListGroup';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 
@@ -51,10 +50,13 @@ export function AlbumListComponent({
           ))
         }
         <ListGroupItem>
-          <Button
-            onClick={ev => isPlainClick(ev) && onMoreAlbumsHandler(search, nextOffset)}
+          <Icon
+            button
             block
-          ><Icon type="menu-down" label="More" /></Button>
+            type="menu-down"
+            label="More"
+            onClick={ev => isPlainClick(ev) && onMoreAlbumsHandler(search, nextOffset)}
+          />
         </ListGroupItem>
       </ListGroup>
     </div>

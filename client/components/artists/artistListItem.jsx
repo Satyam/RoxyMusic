@@ -2,9 +2,9 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Artist } from '_components/entries';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
-import FoldingToolbar from '_components/misc/foldingToolbar';
+// import FoldingToolbar from '_components/misc/foldingToolbar';
 // import Icon from '_components/misc/icon';
-// import Button from 'react-bootstrap/lib/Button';
+
 import styles from './artistListItem.css';
 
 export const ArtistListItemComponent = ({ idArtist, artist, numTracks }) => (
@@ -20,13 +20,6 @@ export const ArtistListItemComponent = ({ idArtist, artist, numTracks }) => (
         </div>
       </Artist>
     </div>
-    <FoldingToolbar>
-      {/*
-      <Button onClick={console.log.bind(console, 'play')}><Icon type="play" /></Button>
-      <Button onClick={console.log.bind(console, 'up')}><Icon type="arrow-up" /></Button>
-      <Button onClick={console.log.bind(console, 'otro')}>otro</Button>
-      */}
-    </FoldingToolbar>
   </ListGroupItem>
 );
 

@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import Button from 'react-bootstrap/lib/Button';
 import ButtonGroup from 'react-bootstrap/lib/ButtonGroup';
 import bindHandlers from '_utils/bindHandlers';
 import isPlainClick from '_utils/isPlainClick';
@@ -49,12 +48,12 @@ class FoldingToolbar extends Component {
         )
         : null
       }
-      <Button
+      <Icon
+        button
         onClick={this.onOpenHandler}
         style={{ visibility: (this.state.open ? 'hidden' : 'visible') }}
-      >
-        <Icon type="menu-hamburger" />
-      </Button>
+        type="menu-hamburger"
+      />
     </div>);
   }
 }
