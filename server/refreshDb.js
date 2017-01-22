@@ -27,8 +27,8 @@ export function init(db) {
     fetchByLocation: 'select * from AllTracks where location = $location',
     selectGenreId: 'select idGenre from Genres where genre = $genre',
     insertGenre: 'insert into Genres (genre) values ($genre)',
-    selectPersonId: 'select idPerson from People where artist = $artist',
-    insertPerson: 'insert into People (artist) values ($artist)',
+    selectPersonId: 'select idArtist from Artists where artist = $artist',
+    insertPerson: 'insert into Artists (artist) values ($artist)',
     selectAlbumId: 'select idAlbum from Albums where album = $album',
     insertAlbum: 'insert into Albums (album) values ($album)',
     hasAlbumArtistMap: 'select count(*) as `count` from AlbumArtistMap where idAlbum = $idAlbum and idArtist = $idArtist',
@@ -95,7 +95,7 @@ export function getPersonId(name) {
   .then(() => prepared.selectPersonId.get(who))
   .then(row => (
     row
-    ? row.idPerson
+    ? row.idArtist
     : prepared.insertPerson.run(who)
     .then(res => res.lastID)
   ))

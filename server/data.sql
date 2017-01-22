@@ -29,14 +29,14 @@ CREATE TABLE `Tracks` (
 	`size` INTEGER,
 	`ext` TEXT,
 	`hasIssues` INTEGER,
-  	FOREIGN KEY(`idArtist`) REFERENCES People(idPerson),
-		FOREIGN KEY(`idAlbumArtist`) REFERENCES People(idPerson),
+  	FOREIGN KEY(`idArtist`) REFERENCES Artists(idArtist),
+		FOREIGN KEY(`idAlbumArtist`) REFERENCES Artists(idArtist),
     FOREIGN KEY(`idAlbum`) REFERENCES Albums(idAlbum),
     FOREIGN KEY(`idGenre`) REFERENCES Genres(idGenre)
 );
-DROP TABLE IF EXISTS `People`;
-CREATE TABLE `People` (
-	`idPerson`	INTEGER PRIMARY KEY AUTOINCREMENT,
+DROP TABLE IF EXISTS `Artists`;
+CREATE TABLE `Artists` (
+	`idArtist`	INTEGER PRIMARY KEY AUTOINCREMENT,
 	`artist`	TEXT NOT NULL UNIQUE
 );
 
@@ -57,7 +57,7 @@ CREATE TABLE `AlbumArtistMap` (
 	`idAlbum` INTEGER,
 	`idArtist` INTEGER,
 	FOREIGN KEY(`idAlbum`) REFERENCES Album(idAlbum),
-	FOREIGN KEY(`idArtist`) REFERENCES People(idPerson)
+	FOREIGN KEY(`idArtist`) REFERENCES Artists(idArtist)
 );
 
 DROP TABLE IF EXISTS `PlayLists`;
@@ -108,7 +108,7 @@ CREATE TABLE `PlayListsHistory` (
 
 CREATE INDEX `track_title` ON `Tracks` (`title` ASC);
 CREATE INDEX `track_album` ON `Tracks` (`idAlbum` ASC);
-CREATE INDEX `artist_name` ON `People` (`artist` ASC);
+CREATE INDEX `artist_name` ON `Artists` (`artist` ASC);
 CREATE INDEX `album_name` ON `Albums` (`album` ASC);
 CREATE INDEX `genre_name` ON `Genres` (`genre` ASC);
 CREATE INDEX `track_location` ON `Tracks` (`location` ASC);
@@ -121,36 +121,36 @@ DROP VIEW IF EXISTS `AllTracks`;
 CREATE VIEW `AllTracks` AS
 	select *
 		from Tracks
-		left join Albums using(idAlbum)
-		left join (select artist as albumArtist, idPerson as idAlbumArtist from People) using (idAlbumArtist)
-		left join People on idArtist = idPerson
+		left join Albums using (idAlbum)
+		left join (select artist as albumArtist, idArtist as idAlbumArtist from Artists) using (idAlbumArtist)
+		left join Artists using (idArtist)
 		left join Genres using (idGenre);
 
 DROP VIEW IF EXISTS `AllAlbums`;
 CREATE VIEW `AllAlbums` AS
 select idAlbum,  album, group_concat(artist) as artists, idArtist, numTracks, idTracks
 	from Albums
-	left join AlbumArtistMap using(idAlbum)
-	left join People on People.idPerson = AlbumArtistMap.idArtist
+	left join AlbumArtistMap using (idAlbum)
+	left join Artists using (idArtist)
 	left join (
 		select idAlbum, count(*) as numTracks, group_concat(idTrack) as idTracks
 		from Tracks group by idAlbum
-	) using(idAlbum)
+	) using (idAlbum)
 	group by album
 	order by album;
 
 	DROP VIEW IF EXISTS `AllArtists`;
 	CREATE VIEW `AllArtists` as
-	select idArtist, artist, numTracks, idTracks from people
+	select idArtist, artist, numTracks, idTracks from Artists
 		left join (
 			select idArtist, count(*) as numTracks, group_concat(idTrack) as idTracks from (
 				select idArtist, idTrack from Tracks group by idArtist
 				union
 				select AlbumArtistMap.idArtist as idArtist, idTrack
 				from Tracks
-				left join AlbumArtistMap using(idAlbum)
+				left join AlbumArtistMap using (idAlbum)
 			) group by idArtist
-		)  on idPerson = idArtist
+		)  using (idArtist)
 		order by artist;
 
 INSERT INTO `Genres` (idGenre, genre) VALUES

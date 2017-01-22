@@ -83,8 +83,8 @@ function saveOnePlayList(playList) {
   return $db.all(
     `select title, duration, location, coalesce(AlbumArtist.artist, Artist.artist) as artist
       from Tracks
-      left join People as AlbumArtist on idAlbumArtist = AlbumArtist.idPerson
-      left join People as Artist on idAlbumArtist = Artist.idPerson
+      left join Artists as AlbumArtist on idAlbumArtist = AlbumArtist.idArtist
+      left join Artists as Artist on idAlbumArtist = Artist.idArtist
       where idTrack in (${playList.idTracks})`)
     .then(tracks => tracks.reduce((m3u, track) =>
       `${m3u}

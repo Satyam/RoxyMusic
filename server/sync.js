@@ -33,7 +33,7 @@ export function init(db) {
         $year, $duration, $idGenre, $location, $fileModified, $size, $ext
       )`,
     insertAlbum: 'insert into Albums values ($idAlbum, $album)',
-    insertArtist: 'insert into People values ($idPerson, $artist)',
+    insertArtist: 'insert into Artists values ($idArtist, $artist)',
     truncateAlbumArtist: 'delete from AlbumArtistMap',
     updateAlbumArtist: `insert into AlbumArtistMap (idArtist, idAlbum)
       select distinct idAlbumArtist as idArtist, idAlbum
@@ -46,8 +46,8 @@ export function init(db) {
         ext
       from Tracks
       left join Albums using(idAlbum)
-      left join (select artist as albumArtist, idPerson as idAlbumArtist from People) using (idAlbumArtist)
-      left join People on idArtist = idPerson
+      left join (select artist as albumArtist, idArtist as idAlbumArtist from Artists) using (idAlbumArtist)
+      left join Artists using (idArtist)
       where location is null`,
     updateTrackLocation: `update Tracks set location = $location
       where idTrack = $idTrack`,
@@ -128,7 +128,7 @@ export function saveImportedAlbums(o) {
 
 export function getArtists(o) {
   return $db.all(
-    `select * from People where idPerson in (${o.keys.idArtists})`
+    `select * from Artists where idArtist in (${o.keys.idArtists})`
   )
   .then(list => ({ list }));
 }
