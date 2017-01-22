@@ -17,7 +17,6 @@ import styles from './songList.css';
 export function SongListComponent({
   list,
   search,
-  nextOffset,
   onSearchChangeHandler,
   onSearchClearHandler,
   onMoreSongsHandler,
@@ -48,7 +47,7 @@ export function SongListComponent({
             block
             type="menu-down"
             label="More"
-            onClick={ev => isPlainClick(ev) && onMoreSongsHandler(search, nextOffset)}
+            onClick={onMoreSongsHandler}
           />
         </ListGroupItem>
       </TrackList>
@@ -59,7 +58,6 @@ export function SongListComponent({
 SongListComponent.propTypes = {
   list: PropTypes.array,
   search: PropTypes.string,
-  nextOffset: PropTypes.number,
   onSearchChangeHandler: PropTypes.func,
   onSearchClearHandler: PropTypes.func,
   onMoreSongsHandler: PropTypes.func,
@@ -74,8 +72,7 @@ export const mapStateToProps = state => state.songs;
 export const mapDispatchToProps = dispatch => ({
   onSearchChangeHandler: ev => dispatch(getSongs(ev.target.value)),
   onSearchClearHandler: ev => isPlainClick(ev) && dispatch(getSongs()),
-  onMoreSongsHandler:
-    (search, nextOffset) => dispatch(getMoreSongs(search, nextOffset)),
+  onMoreSongsHandler: ev => isPlainClick(ev) && dispatch(getMoreSongs()),
 });
 
 export default compose(

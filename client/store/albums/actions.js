@@ -16,12 +16,18 @@ export function getAlbums(search) {
   );
 }
 
-export function getMoreAlbums(search, offset) {
-  return asyncActionCreator(
-    GET_MORE_ALBUMS,
-    api.read(`?search=${search}&offset=${offset}`),
-    { search, offset }
-  );
+export function getMoreAlbums() {
+  return (dispatch, getState) => {
+    const albums = getState().albums;
+    return dispatch(asyncActionCreator(
+      GET_MORE_ALBUMS,
+      api.read(`?search=${albums.search}&offset=${albums.nextOffset}`),
+      {
+        search: albums.search,
+        offset: albums.nextOffset,
+      }
+    ));
+  };
 }
 
 export function getAlbum(idAlbum) {

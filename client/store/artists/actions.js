@@ -16,12 +16,19 @@ export function getArtists(search) {
   );
 }
 
-export function getMoreArtists(search, offset) {
-  return asyncActionCreator(
-    GET_MORE_ARTISTS,
-    api.read(`?search=${search}&offset=${offset}`),
-    { search, offset }
-  );
+export function getMoreArtists() {
+  return (dispatch, getState) => {
+    const artists = getState().artists;
+
+    return dispatch(asyncActionCreator(
+      GET_MORE_ARTISTS,
+      api.read(`?search=${artists.search}&offset=${artists.nextOffset}`),
+      {
+        search: artists.search,
+        offset: artists.nextOffset,
+      }
+    ));
+  };
 }
 
 export function getArtist(idArtist) {

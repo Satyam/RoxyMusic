@@ -17,7 +17,6 @@ import ArtistListItem from './artistListItem';
 export function ArtistListComponent({
   list,
   search,
-  nextOffset,
   onSearchChangeHandler,
   onSearchClearHandler,
   onMoreArtistsHandler,
@@ -55,7 +54,7 @@ export function ArtistListComponent({
             block
             type="menu-down"
             label="More"
-            onClick={ev => isPlainClick(ev) && onMoreArtistsHandler(search, nextOffset)}
+            onClick={onMoreArtistsHandler}
           />
         </ListGroupItem>
       </ListGroup>
@@ -66,7 +65,6 @@ export function ArtistListComponent({
 ArtistListComponent.propTypes = {
   list: PropTypes.array,
   search: PropTypes.string,
-  nextOffset: PropTypes.number,
   onSearchChangeHandler: PropTypes.func,
   onSearchClearHandler: PropTypes.func,
   onMoreArtistsHandler: PropTypes.func,
@@ -85,8 +83,7 @@ export const mapStateToProps = state => state.artists;
 export const mapDispatchToProps = dispatch => ({
   onSearchChangeHandler: ev => dispatch(getArtists(ev.target.value)),
   onSearchClearHandler: ev => isPlainClick(ev) && dispatch(getArtists()),
-  onMoreArtistsHandler:
-    (search, nextOffset) => dispatch(getMoreArtists(search, nextOffset)),
+  onMoreArtistsHandler: ev => isPlainClick(ev) && dispatch(getMoreArtists()),
 });
 
 export default compose(

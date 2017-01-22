@@ -17,7 +17,6 @@ import AlbumListItem from './albumListItem';
 export function AlbumListComponent({
   list,
   search,
-  nextOffset,
   onSearchChangeHandler,
   onSearchClearHandler,
   onMoreAlbumsHandler,
@@ -55,7 +54,7 @@ export function AlbumListComponent({
             block
             type="menu-down"
             label="More"
-            onClick={ev => isPlainClick(ev) && onMoreAlbumsHandler(search, nextOffset)}
+            onClick={onMoreAlbumsHandler}
           />
         </ListGroupItem>
       </ListGroup>
@@ -66,7 +65,6 @@ export function AlbumListComponent({
 AlbumListComponent.propTypes = {
   list: PropTypes.array,
   search: PropTypes.string,
-  nextOffset: PropTypes.number,
   onSearchChangeHandler: PropTypes.func,
   onSearchClearHandler: PropTypes.func,
   onMoreAlbumsHandler: PropTypes.func,
@@ -85,8 +83,7 @@ export const mapStateToProps = state => state.albums;
 export const mapDispatchToProps = dispatch => ({
   onSearchChangeHandler: ev => dispatch(getAlbums(ev.target.value)),
   onSearchClearHandler: ev => isPlainClick(ev) && dispatch(getAlbums()),
-  onMoreAlbumsHandler:
-    (search, nextOffset) => dispatch(getMoreAlbums(search, nextOffset)),
+  onMoreAlbumsHandler: ev => isPlainClick(ev) && dispatch(getMoreAlbums()),
 });
 
 export default compose(

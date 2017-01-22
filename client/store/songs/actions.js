@@ -16,12 +16,18 @@ export function getSongs(search) {
   );
 }
 
-export function getMoreSongs(search, offset) {
-  return asyncActionCreator(
-    GET_MORE_SONGS,
-    api.read(`?search=${search}&offset=${offset}`),
-    { search, offset }
-  );
+export function getMoreSongs() {
+  return (dispatch, getState) => {
+    const songs = getState().songs;
+    return dispatch(asyncActionCreator(
+      GET_MORE_SONGS,
+      api.read(`?search=${songs.search}&offset=${songs.nextOffset}`),
+      {
+        search: songs.search,
+        offset: songs.nextOffset,
+      }
+    ));
+  };
 }
 
 export const getSong = getTrack;
