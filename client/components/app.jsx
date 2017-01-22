@@ -2,9 +2,8 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import compose from 'recompose/compose';
 import Navbar from 'react-bootstrap/lib/Navbar';
-import Nav from 'react-bootstrap/lib/Nav';
-import NavItem from 'react-bootstrap/lib/NavItem';
 import Icon from '_components/misc/icon';
+import FoldingToolbar from '_components/misc/foldingToolbar';
 
 import Errors from '_components/misc/errors';
 import Loading from '_components/misc/loading';
@@ -27,20 +26,16 @@ const AppComponent = ({ wide, children }) => (
           <Icon type="heart,music" label="Roxy Music" href="/" title="home" />
         </Navbar.Brand>
       </Navbar.Header>
-      <Nav pullRight>
+      <FoldingToolbar>
         {
           BUNDLE === 'cordova'
           ? (
-            <NavItem>
-              <Icon type="retweet" href="/sync" title="Synchonize" />
-            </NavItem>
+            <Icon button type="retweet" href="/sync" title="Synchonize" />
           )
           : null
         }
-        <NavItem>
-          <Icon type="cog" href="/config" title="Configure" />
-        </NavItem>
-      </Nav>
+        <Icon button type="cog" href="/config" title="Configure" />
+      </FoldingToolbar>
     </Navbar>
     <Loading />
     <Errors />

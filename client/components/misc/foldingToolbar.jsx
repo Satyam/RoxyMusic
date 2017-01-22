@@ -37,10 +37,7 @@ class FoldingToolbar extends Component {
         this.state.open
         ? (
           <ButtonGroup
-            style={{
-              position: 'absolute',
-              right: '1em',
-            }}
+            className={styles.ButtonGroup}
             onClick={this.onClickHandler}
           >
             {this.props.children}
@@ -51,7 +48,7 @@ class FoldingToolbar extends Component {
       <Icon
         button
         onClick={this.onOpenHandler}
-        style={{ visibility: (this.state.open ? 'hidden' : 'visible') }}
+        className={(this.state.open ? styles.hidden : styles.visible)}
         type="menu-hamburger"
       />
     </div>);
