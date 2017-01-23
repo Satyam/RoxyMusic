@@ -9,7 +9,7 @@ import {
   importNewPlayList,
 } from '_store/actions';
 
-import styles from './playListsOnServerIsNew.css';
+import styles from './playListOnServerIsNew.css';
 
 
 export function PLOnServerIsNewComponent({
