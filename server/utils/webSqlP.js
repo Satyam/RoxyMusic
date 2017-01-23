@@ -144,7 +144,7 @@ export default class DB {
                   [],
                   solveOne,
                   (tx1, err) => {
-                    reject(`Error: ${JSON.stringify(err)} executing statement "${sql}`);
+                    reject(`Error: ${JSON.stringify(err)} executing statement "${s}`);
                   }
                 );
               }
