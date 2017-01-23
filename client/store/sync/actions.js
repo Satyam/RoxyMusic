@@ -43,17 +43,20 @@ export const INCREMENT_PENDING = `${NAME}/increment pending`;
 // console.log('cordova.file', cordova.file);
 
 export function downloadTrack({ idTrack, artist, album, title, ext }) {
+  function sanitize(name) {
+    return name.replace('/', '-').replace('<', '').replace('>', '');
+  }
   return new Promise((resolve, reject) =>
     window.resolveLocalFileSystemURL(
       musicDir,
       musicDirEntry => musicDirEntry.getDirectory(
-        artist,
+        sanitize(artist),
         { create: true },
         artistDirEntry => artistDirEntry.getDirectory(
-          album,
+          sanitize(album),
           { create: true },
           albumDirEntry => albumDirEntry.getFile(
-            `${title}${ext}`,
+            `${sanitize(title)}${ext}`,
             { create: true },
             fileEntry => (new window.FileTransfer()).download(
               plainJoin(remoteHost, 'tracks', idTrack),
