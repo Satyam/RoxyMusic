@@ -49,9 +49,9 @@ PlayListItemComponent.propTypes = {
 
 export const mapStateToProps = (state, props) => state.playLists.hash[props.idPlayList] || {};
 
-export const mapDispatchToProps = (dispatch, props) => ({
-  onDeleteClick: ev => isPlainClick(ev) && dispatch(deletePlayList(props.idPlayList)),
-  onSaveClick: ev => isPlainClick(ev) && dispatch(savePlayList(props.idPlayList)),
+export const mapDispatchToProps = (dispatch, { idPlayList }) => ({
+  onDeleteClick: ev => isPlainClick(ev) && dispatch(deletePlayList(idPlayList)),
+  onSaveClick: ev => isPlainClick(ev) && dispatch(savePlayList(idPlayList)),
 });
 
 export default connect(

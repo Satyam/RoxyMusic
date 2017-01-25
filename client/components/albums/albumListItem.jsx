@@ -65,11 +65,11 @@ AlbumListItemComponent.propTypes = {
 
 export const mapStateToProps = (state, props) => state.albums.hash[props.idAlbum] || {};
 
-export const mapDispatchToProps = (dispatch, props) => ({
-  onPlayNowClick: () => dispatch(playAlbumNow(props.idAlbum)),
-  onAddToPlayNowClick: () => dispatch(addAlbumToPlayNow(props.idAlbum)),
-  onReplacePlayNowClick: () => dispatch(replaceAlbumInPlayNow(props.idAlbum)),
-  onAddToPlayList: () => dispatch(addAlbumToPlayList(props.idAlbum)),
+export const mapDispatchToProps = (dispatch, { idAlbum }) => ({
+  onPlayNowClick: () => dispatch(playAlbumNow(idAlbum)),
+  onAddToPlayNowClick: () => dispatch(addAlbumToPlayNow(idAlbum)),
+  onReplacePlayNowClick: () => dispatch(replaceAlbumInPlayNow(idAlbum)),
+  onAddToPlayList: () => dispatch(addAlbumToPlayList(idAlbum)),
 });
 
 export default connect(

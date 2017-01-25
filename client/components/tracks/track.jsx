@@ -74,8 +74,8 @@ export const storeInitializer = (dispatch, state, props) => {
 
 export const mapStateToProps = (state, props) => state.tracks[props.idTrack] || {};
 
-export const mapDispatchToProps = (dispatch, props) => ({
-  onPlayClick: ev => isPlainClick(ev) && dispatch(playNow(props.idTrack)),
+export const mapDispatchToProps = (dispatch, { idTrack }) => ({
+  onPlayClick: ev => isPlainClick(ev) && dispatch(playNow(idTrack)),
 });
 
 export default compose(

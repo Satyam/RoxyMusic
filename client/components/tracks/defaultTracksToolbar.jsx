@@ -41,11 +41,11 @@ TracksToolbarComponent.propTypes = {
 export const mapStateToProps = (state, props) =>
   state.tracks[props.idTrack || props.params.idTrack] || {};
 
-export const mapDispatchToProps = (dispatch, props) => ({
-  onPlayNowClick: ev => isPlainClick(ev) && dispatch(playNow(props.idTrack)),
-  onAddToPlayNowClick: ev => isPlainClick(ev) && dispatch(addToNowPlaying(props.idTrack)),
-  onReplacePlayNowClick: ev => isPlainClick(ev) && dispatch(replaceNowPlaying([props.idTrack])),
-  onAddToPlayList: ev => isPlainClick(ev) && dispatch(addTracksToPlayList(props.idTrack)),
+export const mapDispatchToProps = (dispatch, { idTrack }) => ({
+  onPlayNowClick: ev => isPlainClick(ev) && dispatch(playNow(idTrack)),
+  onAddToPlayNowClick: ev => isPlainClick(ev) && dispatch(addToNowPlaying(idTrack)),
+  onReplacePlayNowClick: ev => isPlainClick(ev) && dispatch(replaceNowPlaying([idTrack])),
+  onAddToPlayList: ev => isPlainClick(ev) && dispatch(addTracksToPlayList(idTrack)),
 });
 
 export default compose(
