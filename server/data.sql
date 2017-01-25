@@ -1,4 +1,3 @@
-BEGIN TRANSACTION;
 DROP TABLE IF EXISTS `config`;
 CREATE TABLE `config` (
 	`key`	TEXT PRIMARY KEY,
@@ -24,16 +23,17 @@ CREATE TABLE `Tracks` (
 	`year`	INTEGER,
 	`duration` INTEGER,
 	`idGenre`	INTEGER,
-  `location` TEXT,
-  `fileModified` TEXT,
+	`location` TEXT,
+	`fileModified` TEXT,
 	`size` INTEGER,
 	`ext` TEXT,
 	`hasIssues` INTEGER,
-  	FOREIGN KEY(`idArtist`) REFERENCES Artists(idArtist),
-		FOREIGN KEY(`idAlbumArtist`) REFERENCES Artists(idArtist),
-    FOREIGN KEY(`idAlbum`) REFERENCES Albums(idAlbum),
-    FOREIGN KEY(`idGenre`) REFERENCES Genres(idGenre)
+	FOREIGN KEY(`idArtist`) REFERENCES Artists(idArtist),
+	FOREIGN KEY(`idAlbumArtist`) REFERENCES Artists(idArtist),
+	FOREIGN KEY(`idAlbum`) REFERENCES Albums(idAlbum),
+	FOREIGN KEY(`idGenre`) REFERENCES Genres(idGenre)
 );
+
 DROP TABLE IF EXISTS `Artists`;
 CREATE TABLE `Artists` (
 	`idArtist`	INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -105,16 +105,25 @@ CREATE TABLE `PlayListsHistory` (
 	FOREIGN KEY (`idPlayList`) REFERENCES PlayLists(idPlayList),
 	FOREIGN KEY (`idDevice`) REFERENCES Devices(idDevice)
 );
-
+DROP INDEX IF EXISTS `track_title`;
 CREATE INDEX `track_title` ON `Tracks` (`title` ASC);
+DROP INDEX IF EXISTS `track_album`;
 CREATE INDEX `track_album` ON `Tracks` (`idAlbum` ASC);
+DROP INDEX IF EXISTS `artist_name`;
 CREATE INDEX `artist_name` ON `Artists` (`artist` ASC);
+DROP INDEX IF EXISTS `album_name`;
 CREATE INDEX `album_name` ON `Albums` (`album` ASC);
+DROP INDEX IF EXISTS `genre_name`;
 CREATE INDEX `genre_name` ON `Genres` (`genre` ASC);
+DROP INDEX IF EXISTS `track_location`;
 CREATE INDEX `track_location` ON `Tracks` (`location` ASC);
+DROP INDEX IF EXISTS `album_artists`;
 CREATE INDEX `album_artists` ON `AlbumArtistMap` (`idAlbum` ASC);
+DROP INDEX IF EXISTS `device_uuid`;
 CREATE INDEX `device_uuid` ON `Devices` (`uuid` ASC);
+DROP INDEX IF EXISTS `playlist_name`;
 CREATE INDEX `playlist_name` ON `PlayLists` (`name` ASC);
+DROP INDEX IF EXISTS `playListsHistory_device`;
 CREATE INDEX `playListsHistory_device` ON `PlayListsHistory` (`idDevice` ASC);
 
 DROP VIEW IF EXISTS `AllTracks`;
@@ -139,19 +148,19 @@ select idAlbum,  album, group_concat(artist) as artists, idArtist, numTracks, id
 	group by album
 	order by album;
 
-	DROP VIEW IF EXISTS `AllArtists`;
-	CREATE VIEW `AllArtists` as
-	select idArtist, artist, numTracks, idTracks from Artists
-		left join (
-			select idArtist, count(*) as numTracks, group_concat(idTrack) as idTracks from (
-				select idArtist, idTrack from Tracks group by idArtist
-				union
-				select AlbumArtistMap.idArtist as idArtist, idTrack
-				from Tracks
-				left join AlbumArtistMap using (idAlbum)
-			) group by idArtist
-		)  using (idArtist)
-		order by artist;
+DROP VIEW IF EXISTS `AllArtists`;
+CREATE VIEW `AllArtists` as
+select idArtist, artist, numTracks, idTracks from Artists
+	left join (
+		select idArtist, count(*) as numTracks, group_concat(idTrack) as idTracks from (
+			select idArtist, idTrack from Tracks group by idArtist
+			union
+			select AlbumArtistMap.idArtist as idArtist, idTrack
+			from Tracks
+			left join AlbumArtistMap using (idAlbum)
+		) group by idArtist
+	)  using (idArtist)
+	order by artist;
 
 INSERT INTO `Genres` (idGenre, genre) VALUES
  (0, 'Blues'),
@@ -280,5 +289,3 @@ INSERT INTO `Genres` (idGenre, genre) VALUES
 (123, 'A capella'),
 (124, 'Euro-House'),
 (125, 'Dance Hall');
-
-COMMIT;
