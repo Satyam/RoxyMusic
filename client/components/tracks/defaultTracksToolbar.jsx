@@ -8,7 +8,7 @@ import {
   playNow,
   addToNowPlaying,
   replaceNowPlaying,
-  addTracksToPlayList,
+  selectPlayListToAddTracksTo,
 } from '_store/actions';
 
 export const TracksToolbarComponent = ({
@@ -45,7 +45,7 @@ export const mapDispatchToProps = (dispatch, { idTrack }) => ({
   onPlayNowClick: ev => isPlainClick(ev) && dispatch(playNow(idTrack)),
   onAddToPlayNowClick: ev => isPlainClick(ev) && dispatch(addToNowPlaying(idTrack)),
   onReplacePlayNowClick: ev => isPlainClick(ev) && dispatch(replaceNowPlaying([idTrack])),
-  onAddToPlayList: ev => isPlainClick(ev) && dispatch(addTracksToPlayList(idTrack)),
+  onAddToPlayList: ev => isPlainClick(ev) && dispatch(selectPlayListToAddTracksTo(idTrack)),
 });
 
 export default compose(

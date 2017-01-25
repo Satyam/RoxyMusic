@@ -63,26 +63,39 @@ export function deletePlayList(idPlayList) {
   );
 }
 
-export function addTracksToPlayList(idTracks, idPlayList) {
-  if (arguments.length === 1) {
-    return {
-      type: SELECT_PLAYLIST_FOR_TRACK,
-      idTracks,
-    };
-  }
-  return (dispatch, getState) => {
-    const playList = getState().playLists.hash[idPlayList];
-    return dispatch(replacePlayListTracks(
-      idPlayList,
-      playList.idTracks.concat(idTracks),
-      playList.lastPlayed
-    ));
+export function selectPlayListToAddTracksTo(idTracks) {
+  return {
+    type: SELECT_PLAYLIST_FOR_TRACK,
+    idTracks: (Array.isArray(idTracks) ? idTracks : [idTracks]),
   };
 }
 
 export function closeAddToPlayList() {
   return {
     type: CLOSE_ADD_TO_PLAYLIST,
+  };
+}
+
+export function addTracksToPlayList(idPlayList) {
+  return (dispatch, getState) => {
+    const playLists = getState().playLists;
+    const playList = playLists.hash[idPlayList];
+    const idTracks = playLists.idTracksToAdd;
+    return dispatch(replacePlayListTracks(
+      idPlayList,
+      playList.idTracks.concat(idTracks),
+      playList.lastPlayed
+    ))
+    .then(() => dispatch(closeAddToPlayList()));
+  };
+}
+
+export function addTracksToNewPLaylist(name) {
+  return (dispatch, getState) => {
+    const playLists = getState().playLists;
+    const idTracks = playLists.idTracksToAdd;
+    dispatch(addPlayList(name, idTracks))
+    .then(() => dispatch(closeAddToPlayList()));
   };
 }
 
@@ -103,5 +116,5 @@ export function savePlayList(idPlayList) {
 
 export function addAlbumToPlayList(idAlbum) {
   return (dispatch, getState) =>
-    dispatch(addTracksToPlayList(getState().albums.hash[idAlbum].idTracks));
+    dispatch(selectPlayListToAddTracksTo(getState().albums.hash[idAlbum].idTracks));
 }
