@@ -51,6 +51,7 @@ export function init(db) {
       where location is null`,
     updateTrackLocation: `update Tracks set location = $location
       where idTrack = $idTrack`,
+    deleteHistory: 'delete from PlayListsHistory', // just for testing
   })
   .then((p) => {
     prepared = p;
@@ -155,6 +156,10 @@ export function updateTrackLocation(o) {
   );
 }
 
+export function deleteHistory() {
+  return prepared.deleteHistory.run();
+}
+
 export default db =>
   init(db)
   .then(() => ({
@@ -197,5 +202,8 @@ export default db =>
     },
     '/track/:idTrack': {
       update: updateTrackLocation,
+    },
+    '/': {
+      delete: deleteHistory,
     },
   }));

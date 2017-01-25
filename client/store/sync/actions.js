@@ -38,6 +38,7 @@ export const CLEAR_ALL = `${NAME}/clear all`;
 export const FIND_TRANSFER_PENDING = `${NAME}/find pending transfer`;
 export const UPDATE_DOWNLOAD_STATUS = `${NAME}/update download status`;
 export const INCREMENT_PENDING = `${NAME}/increment pending`;
+export const DELETE_HISTORY = `${NAME}/delete history`;
 
 
 // console.log('cordova.file', cordova.file);
@@ -294,4 +295,11 @@ export function getMissingTracks() {
     .then(() => dispatch(push('/sync/2')))
     ;
   };
+}
+
+export function deleteHistory() {
+  return asyncActionCreator(
+    DELETE_HISTORY,
+    remote.delete()
+  );
 }
