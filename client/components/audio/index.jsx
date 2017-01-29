@@ -87,7 +87,7 @@ export class AudioComponent extends Component {
     this.audio.currentTime = 0;
   }
   onProgressBarClickHandler(ev) {
-    this.audio.currentTime = (ev.clientX - this.pgLeft) / this.pgWidth * this.state.duration
+    this.audio.currentTime = ((ev.clientX - this.pgLeft) / this.pgWidth) * this.state.duration;
   }
   render() {
     const state = this.state;

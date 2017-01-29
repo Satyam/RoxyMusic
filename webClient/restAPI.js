@@ -1,10 +1,9 @@
 import ServerError from '_utils/serverError';
-import dbg from 'debug';
+// import dbg from 'debug';
 import plainJoin from '_utils/plainJoin';
 
-const DEBUG = true;
-if (DEBUG) dbg.enable('RoxyMusic:webClient/restAPI');
-const debug = dbg('RoxyMusic:webClient/restAPI');
+// dbg.enable('RoxyMusic:webClient/restAPI');
+// const debug = dbg('RoxyMusic:webClient/restAPI');
 
 const clients = {};
 
@@ -35,16 +34,16 @@ export default (base, host = `${HOST}:${PORT}`) => {
   ))
   .then(response => response.json())
   // ----- when debugging
-  .then(
-    (response) => {
-      debug(`${method.toUpperCase()} ${plainJoin(base, path)}: ${JSON.stringify(response, null, 2)}`);
-      return response;
-    },
-    (error) => {
-      debug(`${method.toUpperCase()} ${plainJoin(base, path)}: ${JSON.stringify(error, null, 2)}`);
-      return Promise.reject(error);
-    }
-  )
+  // .then(
+  //   (response) => {
+  //     debug(`${method} ${plainJoin(base, path)}: ${JSON.stringify(response, null, 2)}`);
+  //     return response;
+  //   },
+  //   (error) => {
+  //     debug(`${method} ${plainJoin(base, path)}: ${JSON.stringify(error, null, 2)}`);
+  //     return Promise.reject(error);
+  //   }
+  // )
   // --
   ;
   return (clients[key] = {
