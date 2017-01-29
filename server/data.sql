@@ -85,17 +85,6 @@ INSERT INTO `Devices` (idDevice, uuid, musicDir) values (
 	'file:///storage/sdcard/Music'
 );
 
-DROP TABLE IF EXISTS `RemoteFiles`;
-CREATE TABLE `RemoteFiles` (
-	`idTrack`	INTEGER NOT NULL,
-	`idDevice`	INTEGER,
-	`location`	TEXT,
-	`timeSent`	TEXT DEFAULT CURRENT_TIMESTAMP,
-	PRIMARY KEY(idTrack, idDevice),
-	FOREIGN KEY(`idTrack`) REFERENCES Tracks ( idTrack ),
-	FOREIGN KEY(`idDevice`) REFERENCES Devices(idDevice)
-);
-
 DROP INDEX IF EXISTS `track_title`;
 CREATE INDEX `track_title` ON `Tracks` (`title` ASC);
 DROP INDEX IF EXISTS `track_album`;
