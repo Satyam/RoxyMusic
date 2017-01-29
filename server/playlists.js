@@ -20,9 +20,12 @@ export function init(db) {
   return db.prepareAll({
     getPlayLists: 'select * from PlayLists',
     getPlayList: 'select * from PlayLists where idPlayList = $idPlayList',
-    addPlayList: 'insert into PlayLists (idPlayList, name, idTracks) values ($idPlayList, $name, $idTracks)',
-    updatePlayList: 'update PlayLists set lastTrackPlayed = $lastTrackPlayed, idTracks = $idTracks where idPlayList = $idPlayList',
-    renamePlayList: 'update PlayLists set name = $name where idPlayList = $idPlayList',
+    addPlayList:
+      `insert into PlayLists (idPlayList,  name,  idTracks, lastUpdated,        idDevice)
+                     values ($idPlayList, $name, $idTracks, CURRENT_TIMESTAMP, $idDevice)`,
+    updatePlayList: `update PlayLists set name = $name,
+        idTracks = $idTracks, lastUpdated = CURRENT_TIMESTAMP, idDevice = $idDevice
+        where idPlayList = $idPlayList`,
     deletePlayList: 'delete from PlayLists  where idPlayList = $idPlayList',
   })
   .then((p) => {
@@ -42,36 +45,32 @@ export function getPlayList(o) {
   .then(splitIdTracks);
 }
 
-// addPlayList: 'insert into PlayLists (idPlayList, name, idTracks)
-//               values ($idPlayList, $name, $idTracks)',
+// addPlayList:
+//   `insert into PlayLists (idPlayList,  name,  idTracks, lastUpdated,        idDevice)
+//                  values ($idPlayList, $name, $idTracks, CURRENT_TIMESTAMP, $idDevice)`
 export function addPlayList(o) {
   const idPlayList = o.keys.idPlayList || uuid();
   return prepared.addPlayList.run({
     idPlayList,
     name: o.data.name,
     idTracks: o.data.idTracks.join(','),
+    idDevice: o.data.idDevice || 0,
   })
   .then(() => ({ idPlayList }));
 }
 
-// updatePlayList: 'update PlayLists
-// set lastTrackPlayed = $lastTrackPlayed, idTracks = $idTracks where idPlayList = $idPlayList',
+// updatePlayList: `update PlayLists set name = $name,
+//     idTracks = $idTracks, lastUpdated = CURRENT_TIMESTAMP, idDevice = $idDevice
+//     where idPlayList = $idPlayList`,
 export function updatePlayList(o) {
   return prepared.updatePlayList.run({
     idPlayList: o.keys.idPlayList,
-    lastTrackPlayed: o.data.lastTrackPlayed,
-    idTracks: o.data.idTracks.join(','),
-  });
-}
-
-// renamePlayList: 'update PlayLists set name = $name where idPlayList = $idPlayList',
-
-export function renamePlayList(o) {
-  return prepared.renamePlayList.run({
-    idPlayList: o.keys.idPlayList,
     name: o.data.name,
+    idTracks: o.data.idTracks.join(','),
+    idDevice: o.data.idDevice || 0,
   });
 }
+
 // deletePlayList: 'delete from PlayLists  where idPlayList = $idPlayList',
 export function deletePlayList(o) {
   return prepared.deletePlayList.run(o.keys);
@@ -128,11 +127,6 @@ export default db =>
       '/save/:idPlayList': {
         create: [
           savePlayList,
-        ],
-      },
-      '/rename/:idPlayList': {
-        update: [
-          renamePlayList,
         ],
       },
     })

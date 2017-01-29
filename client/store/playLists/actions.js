@@ -6,8 +6,7 @@ const api = restAPI(NAME);
 
 export const GET_PLAY_LISTS = `${NAME}/get playlists`;
 export const GET_PLAY_LIST = `${NAME}/get single playlist`;
-export const REPLACE_PLAY_LIST_TRACKS = `${NAME}/replace playlist tracks`;
-export const RENAME_PLAY_LIST = `${NAME}/rename playlist`;
+export const UPDATE_PLAYLIST = `${NAME}/update playlist`;
 export const ADD_PLAY_LIST = `${NAME}/add playlist`;
 export const DELETE_PLAY_LIST = `${NAME}/delete playlist`;
 export const ADD_TRACK_TO_PLAYLIST = `${NAME}/add track to playlist`;
@@ -31,35 +30,31 @@ export function getPlayList(idPlayList) {
   );
 }
 
-export function replacePlayListTracks(idPlayList, idTracks, lastPlayed = -1) {
+// The idDevice is only used on operations involving remote synchronization
+// all local operations are done without it.
+
+export function updatePlayList(idPlayList, name, idTracks, idDevice = 0) {
   return asyncActionCreator(
-    REPLACE_PLAY_LIST_TRACKS,
-    api.update(idPlayList, { lastPlayed, idTracks }),
-    { idPlayList, idTracks },
+    UPDATE_PLAYLIST,
+    api.update(idPlayList, { name, idTracks, idDevice }),
+    { idPlayList, name, idTracks, idDevice },
   );
 }
 
-export function renamePlayList(idPlayList, name) {
-  return asyncActionCreator(
-    RENAME_PLAY_LIST,
-    api.update(`/rename/${idPlayList}`, { name }),
-    { idPlayList, name }
-  );
-}
 
-export function addPlayList(name, idTracks = [], idPlayList = '') {
+export function addPlayList(name, idTracks = [], idPlayList = '', idDevice = 0) {
   return asyncActionCreator(
     ADD_PLAY_LIST,
-    api.create(`/${idPlayList}`, { name, idTracks }),
-    { name, idTracks }
+    api.create(`/${idPlayList}`, { name, idTracks, idDevice }),
+    { name, idTracks, idDevice }
   );
 }
 
-export function deletePlayList(idPlayList) {
+export function deletePlayList(idPlayList, idDevice = 0) {
   return asyncActionCreator(
     DELETE_PLAY_LIST,
-    api.delete(idPlayList),
-    { idPlayList }
+    api.delete(idPlayList, { idDevice }),
+    { idPlayList, idDevice }
   );
 }
 
@@ -81,10 +76,10 @@ export function addTracksToPlayList(idPlayList) {
     const playLists = getState().playLists;
     const playList = playLists.hash[idPlayList];
     const idTracks = playLists.idTracksToAdd;
-    return dispatch(replacePlayListTracks(
+    return dispatch(updatePlayList(
       idPlayList,
-      playList.idTracks.concat(idTracks),
-      playList.lastPlayed
+      playList.name,
+      playList.idTracks.concat(idTracks)
     ))
     .then(() => dispatch(closeAddToPlayList()));
   };

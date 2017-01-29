@@ -9,8 +9,7 @@ import {
 import {
   GET_PLAY_LISTS,
   GET_PLAY_LIST,
-  REPLACE_PLAY_LIST_TRACKS,
-  RENAME_PLAY_LIST,
+  UPDATE_PLAYLIST,
   ADD_PLAY_LIST,
   DELETE_PLAY_LIST,
   SELECT_PLAYLIST_FOR_TRACK,
@@ -44,17 +43,11 @@ export default (
       });
     case GET_PLAY_LIST:
       return update(state, { hash: { $merge: { [idPlayList]: payload } } });
-    case REPLACE_PLAY_LIST_TRACKS:
-      return update(state, { hash: {
-        [idPlayList]: {
-          lastTrackPlayed: { $set: payload.lastTrackPlayed },
-          idTracks: { $set: payload.idTracks },
-        },
-      } });
-    case RENAME_PLAY_LIST:
+    case UPDATE_PLAYLIST:
       return update(state, { hash: {
         [idPlayList]: {
           name: { $set: payload.name },
+          idTracks: { $set: payload.idTracks },
         },
       } });
     case ADD_PLAY_LIST:

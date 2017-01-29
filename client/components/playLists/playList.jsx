@@ -7,7 +7,7 @@ import compose from 'recompose/compose';
 import {
   getPlayList,
   getPlayLists,
-  replacePlayListTracks,
+  updatePlayList,
 } from '_store/actions';
 
 import initStore from '_utils/initStore';
@@ -61,7 +61,7 @@ export const mapStateToProps =
 
 export const mapDispatchToProps = (dispatch, props) => ({
   onDragEnd: idTracks =>
-    dispatch(replacePlayListTracks(props.params.idPlayList, idTracks)),
+    dispatch(updatePlayList(props.params.idPlayList, props.params.name, idTracks)),
 });
 
 const enhance = compose(
