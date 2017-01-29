@@ -6,26 +6,39 @@ import union from 'lodash/union';
 import compact from 'lodash/compact';
 import unique from 'lodash/uniq';
 import reduce from 'lodash/reduce';
+import map from 'lodash/map';
 import plainJoin from '_utils/plainJoin';
 
 import {
-  GET_PLAY_LIST,
+  UPDATE_PLAYLIST,
+  DELETE_PLAY_LIST,
   setConfig,
-  push,
+  getPlayLists,
   addPlayList,
+  deletePlayList,
 } from '_store/actions';
 
 const NAME = 'sync';
 let remote;
 let remoteHost;
 let musicDir;
+let idDevice;
 
 const local = restAPI(NAME);
 
 export const START_SYNC = `${NAME}/Start Synchronization`;
-export const GET_HISTORY = `${NAME}/get history`;
-export const CREATE_HISTORY = `${NAME}/create history`;
-export const UPDATE_HISTORY = `${NAME}/update history`;
+export const GET_SERVER_PLAYLISTS = `${NAME}/Get Server Playlists`;
+export const GET_CLIENT_PLAYLISTS = `${NAME}/Get CLient Playlists`;
+export const SET_ACTION_FOR_SYNC = `${NAME}/Set Transfer action for sync`;
+export const TRANSFER_ACTION = {
+  SEND: 1,
+  IMPORT: 2,
+  DEL_CLIENT: 3,
+  DEL_SERVER: 4,
+  DO_NOTHING: 0,
+};
+
+export const PLAYLIST_TRANSFER_DONE = `${NAME}/signal playlist transfer done`;
 export const IMPORT_TRACKS = `${NAME}/import tracks`;
 export const SAVE_IMPORTED_TRACKS = `${NAME}/save imported tracks`;
 export const UPDATE_TRACK_LOCATION = `${NAME}/update track location`;
@@ -38,46 +51,10 @@ export const CLEAR_ALL = `${NAME}/clear all`;
 export const FIND_TRANSFER_PENDING = `${NAME}/find pending transfer`;
 export const UPDATE_DOWNLOAD_STATUS = `${NAME}/update download status`;
 export const INCREMENT_PENDING = `${NAME}/increment pending`;
-export const DELETE_HISTORY = `${NAME}/delete history`;
-
 
 // console.log('cordova.file', cordova.file);
 
-export function downloadTrack({ idTrack, artist, album, title, ext }) {
-  function sanitize(name) {
-    return name.replace('/', '-').replace('<', '').replace('>', '');
-  }
-  return new Promise((resolve, reject) =>
-    window.resolveLocalFileSystemURL(
-      musicDir,
-      musicDirEntry => musicDirEntry.getDirectory(
-        sanitize(artist),
-        { create: true },
-        artistDirEntry => artistDirEntry.getDirectory(
-          sanitize(album),
-          { create: true },
-          albumDirEntry => albumDirEntry.getFile(
-            `${sanitize(title)}${ext}`,
-            { create: true },
-            fileEntry => (new window.FileTransfer()).download(
-              plainJoin(remoteHost, 'tracks', idTrack),
-              fileEntry.toURL(),
-              resolve,
-              err => reject(`${JSON.stringify(err)}  on fileTransfer of  ${idTrack}`),
-              true,
-              { headers: { Connection: 'close' } }
-            ),
-            err => reject(`${JSON.stringify(err)}  on getFile ${title} in ${albumDirEntry.fullPath}`)
-          ),
-          err => reject(`${JSON.stringify(err)}  on getDirectory ${album} in ${artistDirEntry.fullPath}`)
-        ),
-        err => reject(`${JSON.stringify(err)}  on getDirectory ${artist} in ${musicDirEntry.fullPath}`)
-      ),
-      err => reject(`${JSON.stringify(err)}  on resolveLocalFileSystemURL ${musicDir}`)
-    )
-  );
-}
-
+// These action creators workwith startSync (below)
 export function getDeviceInfo(uuid) {
   return asyncActionCreator(
     START_SYNC,
@@ -86,15 +63,7 @@ export function getDeviceInfo(uuid) {
   );
 }
 
-export function getHistory(idDevice) {
-  return asyncActionCreator(
-    GET_HISTORY,
-    remote.read(`/history/${idDevice}`),
-    { idDevice }
-  );
-}
-
-
+// startSync is called from sync/sync.jsx
 export function startSync() {
   // "file:///storage/sdcard/"
   const UUID = window.device && `${window.device.model} : ${window.device.uuid}`;
@@ -105,54 +74,109 @@ export function startSync() {
     return dispatch(getDeviceInfo(UUID))
     .then((action) => {
       musicDir = action.payload.musicDir;
+      idDevice = action.payload.idDevice;
       return (
         musicDir !== config.musicDir &&
         dispatch(setConfig('musicDir', musicDir))
       );
     })
-    .then(() => dispatch(push('/sync/1')))
     ;
   };
 }
 
-export function importPlayList(idPlayList) {
+// These action creators work with playListsCompare.jsx
+
+export function getServerPlayLists() {
   return asyncActionCreator(
-    GET_PLAY_LIST,
-    remote.read(`/playlist/${idPlayList}`),
-    { idPlayList }
+    GET_SERVER_PLAYLISTS,
+    remote.read('/playlists')
   );
 }
 
-export function updateHistory(idPlayListHistory, name, idTracks) {
+export function getClientPlayLists() {
+  return (dispatch, getState) => {
+    const playLists = getState().playLists;
+    return Promise.resolve(playLists.status === 2 || dispatch(getPlayLists()))
+    .then(() => Object.values(getState().playLists.hash))
+    .then(list => dispatch({
+      type: GET_CLIENT_PLAYLISTS,
+      payload: { list },
+    }));
+  };
+}
+
+// This works with playListItemCompare.jsx
+export function setActionForSync(idPlayList, action) {
+  return {
+    type: SET_ACTION_FOR_SYNC,
+    payload: {
+      idPlayList,
+      action,
+    },
+  };
+}
+
+// these are called by startPlayListTransfer, below
+export function sendPlaylist(idPlayList, playList) {
   return asyncActionCreator(
-    UPDATE_HISTORY,
-    remote.update(`/history/${idPlayListHistory}`, { name, idTracks }),
-    { name, idTracks }
+    UPDATE_PLAYLIST,
+    remote.update(idPlayList, {
+      name: playList.client.name,
+      idTracks: playList.client.idTracks,
+      idDevice,
+    }),
+    {
+      idPlayList,
+      name: playList.client.name,
+      idTracks: playList.client.idTracks,
+      idDevice,
+    },
   );
 }
 
-export function createHistory(idDevice, idPlayList, name, idTracks) {
+export function importPlayList(idPlayList, playList) {
+  return addPlayList(playList.server.name, playList.server.idTracks, idPlayList);
+}
+
+export function delClientPlayList(idPlayList) {
+  return deletePlayList(idPlayList);
+}
+
+export function delServerPlayList(idPlayList) {
   return asyncActionCreator(
-    CREATE_HISTORY,
-    remote.create(`/history/${idDevice}`, { name, idTracks, idPlayList }),
-    { name, idTracks, idPlayList }
+    DELETE_PLAY_LIST,
+    remote.delete(idPlayList, { idDevice }),
+    { idPlayList, idDevice }
   );
 }
 
-export function importNewPlayList(idDevice, playList) {
-  return dispatch =>
-    dispatch(importPlayList(playList.idPlayList))
-    .then((action) => {
-      const { name, idTracks } = action.payload;
-      return dispatch(addPlayList(name, idTracks, playList.idPlayList))
-      .then(() => dispatch(
-          playList.idPlayListHistory
-          ? updateHistory(playList.idPlayListHistory, name, idTracks)
-          : createHistory(idDevice, playList.idPlayList, name, idTracks)
-        ));
-    });
+export function playListTransferDone(idPlayList) {
+  return {
+    type: PLAYLIST_TRANSFER_DONE,
+    payload: {
+      idPlayList,
+    },
+  };
 }
 
+// This is called by transferPlayLists.jsx
+export function startPlayListTransfer() {
+  return (dispatch, getState) => {
+    const hash = getState().sync.hash;
+    return Promise.all(map(hash, (playList, idPlayList) =>
+      dispatch([
+        null,
+        sendPlaylist,
+        importPlayList,
+        delClientPlayList,
+        delServerPlayList,
+      ][playList.action](idPlayList, playList))
+      .then(() => dispatch(playListTransferDone(idPlayList)))
+    ));
+  };
+}
+
+// The
 export function getMissingAlbums() {
   return (dispatch, getState) => {
     const state = getState();
@@ -240,6 +264,41 @@ export function incrPending() {
   };
 }
 
+export function downloadTrack({ idTrack, artist, album, title, ext }) {
+  function sanitize(name) {
+    return name.replace('/', '-').replace('<', '').replace('>', '');
+  }
+  return new Promise((resolve, reject) =>
+    window.resolveLocalFileSystemURL(
+      musicDir,
+      musicDirEntry => musicDirEntry.getDirectory(
+        sanitize(artist),
+        { create: true },
+        artistDirEntry => artistDirEntry.getDirectory(
+          sanitize(album),
+          { create: true },
+          albumDirEntry => albumDirEntry.getFile(
+            `${sanitize(title)}${ext}`,
+            { create: true },
+            fileEntry => (new window.FileTransfer()).download(
+              plainJoin(remoteHost, 'tracks', idTrack),
+              fileEntry.toURL(),
+              resolve,
+              err => reject(`${JSON.stringify(err)}  on fileTransfer of  ${idTrack}`),
+              true,
+              { headers: { Connection: 'close' } }
+            ),
+            err => reject(`${JSON.stringify(err)}  on getFile ${title} in ${albumDirEntry.fullPath}`)
+          ),
+          err => reject(`${JSON.stringify(err)}  on getDirectory ${album} in ${artistDirEntry.fullPath}`)
+        ),
+        err => reject(`${JSON.stringify(err)}  on getDirectory ${artist} in ${musicDirEntry.fullPath}`)
+      ),
+      err => reject(`${JSON.stringify(err)}  on resolveLocalFileSystemURL ${musicDir}`)
+    )
+  );
+}
+
 export function importOneTrack() {
   return (dispatch, getState) => {
     const sync = getState().sync;
@@ -292,14 +351,6 @@ export function getMissingTracks() {
       .then(() => dispatch(updateAlbumArtistMap()))
     )
     .then(() => dispatch(clearAll()))
-    .then(() => dispatch(push('/sync/2')))
     ;
   };
-}
-
-export function deleteHistory() {
-  return asyncActionCreator(
-    DELETE_HISTORY,
-    remote.delete()
-  );
 }

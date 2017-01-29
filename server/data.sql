@@ -63,9 +63,11 @@ CREATE TABLE `AlbumArtistMap` (
 DROP TABLE IF EXISTS `PlayLists`;
 CREATE TABLE "PlayLists" (
 	`idPlayList`	TEXT NOT NULL UNIQUE,
-	`name`	TEXT NOT NULL UNIQUE COLLATE NOCASE,
+	`name`	TEXT UNIQUE COLLATE NOCASE,
 	`lastTrackPlayed`	INTEGER,
 	`idTracks`	TEXT DEFAULT '',
+	`lastUpdated`	TEXT DEFAULT CURRENT_TIMESTAMP,
+	`idDevice` INTEGER,
 	PRIMARY KEY(idPlayList)
 );
 
@@ -94,17 +96,6 @@ CREATE TABLE `RemoteFiles` (
 	FOREIGN KEY(`idDevice`) REFERENCES Devices(idDevice)
 );
 
-DROP TABLE IF EXISTS `PlayListsHistory`;
-CREATE TABLE `PlayListsHistory` (
-	`idPlayListHistory`	INTEGER PRIMARY KEY AUTOINCREMENT,
-	`idPlayList`	TEXT NOT NULL,
-	`idDevice`	INTEGER NOT NULL,
-	`timeChanged` TEXT DEFAULT CURRENT_TIMESTAMP,
-	`name` TEXT,
-	`idTracks` TEXT,
-	FOREIGN KEY (`idPlayList`) REFERENCES PlayLists(idPlayList),
-	FOREIGN KEY (`idDevice`) REFERENCES Devices(idDevice)
-);
 DROP INDEX IF EXISTS `track_title`;
 CREATE INDEX `track_title` ON `Tracks` (`title` ASC);
 DROP INDEX IF EXISTS `track_album`;
@@ -123,8 +114,6 @@ DROP INDEX IF EXISTS `device_uuid`;
 CREATE INDEX `device_uuid` ON `Devices` (`uuid` ASC);
 DROP INDEX IF EXISTS `playlist_name`;
 CREATE INDEX `playlist_name` ON `PlayLists` (`name` ASC);
-DROP INDEX IF EXISTS `playListsHistory_device`;
-CREATE INDEX `playListsHistory_device` ON `PlayListsHistory` (`idDevice` ASC);
 
 DROP VIEW IF EXISTS `AllTracks`;
 CREATE VIEW `AllTracks` AS

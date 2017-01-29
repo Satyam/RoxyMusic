@@ -5,14 +5,12 @@ import {
 } from '_store/requests/actions';
 
 import {
-  GET_PLAY_LISTS,
-} from '_store/playLists/actions';
-
-import {
   START_SYNC,
-  GET_HISTORY,
-  CREATE_HISTORY,
-  UPDATE_HISTORY,
+  GET_SERVER_PLAYLISTS,
+  GET_CLIENT_PLAYLISTS,
+  TRANSFER_ACTION,
+  SET_ACTION_FOR_SYNC,
+  PLAYLIST_TRANSFER_DONE,
   IMPORT_TRACKS,
   IMPORT_ALBUMS,
   IMPORT_ARTISTS,
@@ -21,6 +19,32 @@ import {
   UPDATE_DOWNLOAD_STATUS,
   INCREMENT_PENDING,
 } from './actions';
+
+export function getSignature(pl) {
+  return (
+    pl && pl.name && pl.name.length
+    ? `${pl.name}:${pl.idTracks.join(',')}`
+    : null
+  );
+}
+
+export function getAction(client, server) {
+  if (client.signature) {
+    if (server.signature) {
+      if (client.signature !== server.signature) {
+        if (server.lastUpdated < client.lastUpdated) {
+          return TRANSFER_ACTION.SEND;
+        }
+        return TRANSFER_ACTION.IMPORT;
+      }  // else: they match, do nothing
+    } else {
+      return TRANSFER_ACTION.SEND;
+    }
+  } else if (server.signature) {
+    return TRANSFER_ACTION.IMPORT;
+  }
+  return TRANSFER_ACTION.DO_NOTHING;
+}
 
 export default (
   state = {
@@ -43,45 +67,79 @@ export default (
       return update(state, {
         $merge: payload,
       });
-    case GET_HISTORY: {
-      return update(state, {
-        hash: { $set: list.reduce(
-          (playLists, playList) =>
-            Object.assign({}, playLists, { [playList.idPlayList]: playList }),
-          state.hash
-        ) },
-      });
-    }
-    case GET_PLAY_LISTS: {
-      return update(state, {
-        hash: { $set: list.reduce(
-          (playLists, playList) =>
-            Object.assign({}, playLists, { [playList.idPlayList]: playList }),
-          state.hash
-        ) },
-      });
-    }
-    case UPDATE_HISTORY: {
+    case GET_SERVER_PLAYLISTS: {
+      // calculate signature
+      // guess proper action and set it
       return update(state, {
         hash: {
-          [payload.idPlayList]: {
-            previousName: { $set: payload.name },
-            previousIdTracks: { $set: payload.idTracks },
-          },
+          $set: list.reduce(
+            (playLists, playList) => {
+              const signature = getSignature(playList);
+              const server = Object.assign({ signature }, playList);
+              const client = (
+                playLists[playList.idPlayList]
+                ? playLists[playList.idPlayList].client
+                : {}
+              );
+              const act = getAction(client, server);
+              return Object.assign(
+                {
+                  [playList.idPlayList]: {
+                    client,
+                    server,
+                    action: act,
+                  },
+                },
+                playLists
+              );
+            },
+            state.hash
+          ),
         },
       });
     }
-    case CREATE_HISTORY: {
+
+    case GET_CLIENT_PLAYLISTS: {
       return update(state, {
         hash: {
-          [payload.idPlayList]: {
-            idPlayListHistory: { $set: payload.idPlayListHistory },
-            previousName: { $set: payload.name },
-            previousIdTracks: { $set: payload.idTracks },
-          },
+          $set: list.reduce(
+            (playLists, playList) => {
+              const signature = getSignature(playList);
+              const client = Object.assign({ signature }, playList);
+              const server = (
+                playLists[playList.idPlayList]
+                ? playLists[playList.idPlayList].server
+                : {}
+              );
+              const act = getAction(client, server);
+              return Object.assign(
+                {
+                  [playList.idPlayList]: {
+                    client,
+                    server,
+                    action: act,
+                  },
+                },
+                playLists
+              );
+            },
+            state.hash
+          ),
         },
       });
     }
+    case SET_ACTION_FOR_SYNC:
+      return update(state, {
+        hash: {
+          [payload.idPlayList]: { action: { $set: payload.action } },
+        },
+      });
+    case PLAYLIST_TRANSFER_DONE:
+      return update(state, {
+        hash: {
+          [payload.idPlayList]: { done: { $set: true } },
+        },
+      });
     case IMPORT_TRACKS: {
       return update(state, {
         tracks: { $set: list },

@@ -11,6 +11,7 @@ import { storeInitializer } from '_components/playLists/playLists';
 
 import {
   startSync,
+  push,
 } from '_store/actions';
 
 import styles from './sync.css';
@@ -74,7 +75,8 @@ export const mapStateToProps = state => state.config;
 
 export const mapDispatchToProps = dispatch => ({
   onSyncStart: () =>
-    dispatch(startSync()),
+    dispatch(startSync())
+    .then(() => dispatch(push('/sync/1'))),
 });
 
 

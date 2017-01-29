@@ -1,5 +1,5 @@
 import {
-  getPlayList,
+  getPlayLists,
 } from './playlists';
 
 let prepared = {};
@@ -11,20 +11,6 @@ export function init(db) {
   return db.prepareAll({
     getMyId: 'select idDevice, musicDir from Devices where uuid = $uuid',
     setMyId: 'insert into Devices (uuid) values ($uuid)',
-    getHistory: `select
-        idPlayListHistory, timeChanged, PlayLists.idPlayList as idPlayList,
-        PlayLists.name as serverName, PlayLists.idTracks as serverIdTracks,
-        PlayListsHistory.name as previousName,  PlayListsHistory.idTracks as previousIdTracks
-      from  PlayLists
-      left join PlayListsHistory using(idPlayList)
-      where  (serverName != ifnull(previousName, '')  or serverIdTracks != ifnull(previousIdTracks, ''))
-      and (idDevice = $idDevice or idDevice is null)`,
-    createHistory: `insert into PlayListsHistory
-      (idPlayList, idDevice, timeChanged, name, idTracks)
-      values ($idPlayList, $idDevice, datetime('now'), $name, $idTracks)`,
-    updateHistory: `update PlayListsHistory
-      set name = $name, idTracks = $idTracks, timeChanged = datetime('now')
-      where idPlayListHistory = $idPlayListHistory`,
     insertTrack: `insert into Tracks (
          idTrack,  title,  idArtist,  idAlbumArtist,  idAlbum,  track,
          year,  duration,  idGenre,  location,  fileModified,  size, ext
@@ -51,7 +37,6 @@ export function init(db) {
       where location is null`,
     updateTrackLocation: `update Tracks set location = $location
       where idTrack = $idTrack`,
-    deleteHistory: 'delete from PlayListsHistory', // just for testing
   })
   .then((p) => {
     prepared = p;
@@ -66,36 +51,6 @@ export function getMyId(o) {
   );
 }
 
-export function getHistory(o) {
-  function mapTracks(ids) {
-    return (ids && ids.split(',').map(id => parseInt(id, 10)));
-  }
-  return prepared.getHistory.all(o)
-    .then(histories => ({
-      list: histories.map(history => Object.assign(history, {
-        serverIdTracks: mapTracks(history.serverIdTracks),
-        previousIdTracks: mapTracks(history.previousIdTracks),
-      })),
-    }));
-}
-
-export function createHistory(o) {
-  return prepared.createHistory.run({
-    idDevice: o.keys.idDevice,
-    idPlayList: o.data.idPlayList,
-    name: o.data.name,
-    idTracks: o.data.idTracks.join(','),
-  })
-  .then(res => ({ idPlayListHistory: res.lastID }));
-}
-
-export function updateHistory(o) {
-  return prepared.updateHistory.run({
-    idPlayListHistory: o.keys.idPlayListHistory,
-    name: o.data.name,
-    idTracks: o.data.idTracks.join(','),
-  });
-}
 
 export function getTracks(o) {
   return $db.all(
@@ -156,25 +111,14 @@ export function updateTrackLocation(o) {
   );
 }
 
-export function deleteHistory() {
-  return prepared.deleteHistory.run();
-}
-
 export default db =>
   init(db)
   .then(() => ({
     '/myId/:uuid': {
       read: getMyId,
     },
-    '/history/:idDevice': {
-      read: getHistory,
-      create: createHistory,
-    },
-    '/history/:idPlayListHistory': {
-      update: updateHistory,
-    },
-    '/playlist/:idPlayList': {
-      read: getPlayList,
+    '/playlists': {
+      read: getPlayLists,
     },
     '/tracks/:idTracks': {
       read: getTracks,
@@ -202,8 +146,5 @@ export default db =>
     },
     '/track/:idTrack': {
       update: updateTrackLocation,
-    },
-    '/': {
-      delete: deleteHistory,
     },
   }));

@@ -2,76 +2,59 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'recompose';
 
-import map from 'lodash/map';
-
 import Icon from '_components/misc/icon';
 import ListGroup from 'react-bootstrap/lib/ListGroup';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 
 import {
-  getMissingTracks,
-  getHistory,
+  push,
+  getServerPlayLists,
+  getClientPlayLists,
 } from '_store/actions';
 
 import initStore from '_utils/initStore';
 
-import PlayListOnServerIsNew from './playListOnServerIsNew';
+import PlayListItemCompare from './playListItemCompare';
 
 export function PlayListCompareComponent({
-  idDevice,
   hash,
-  onDone,
 }) {
-  return (<div>
+  return (
     <ListGroup>
       {
-        map(hash, (playList, idPlayList) => {
-          if (playList.serverName && !playList.previousName && !playList.name) {
-            return (
-              <PlayListOnServerIsNew
-                key={playList.idPlayList}
-                idDevice={idDevice}
-                playList={playList}
-              />
-            );
-          }
-          return (
-            <ListGroupItem
-              key={idPlayList}
-              header={playList.name}
-              bsStyle="warning"
-            >
-              {JSON.stringify(playList)}
-            </ListGroupItem>
-          );
-        })
+        Object.keys(hash).map(idPlayList => (
+          <PlayListItemCompare
+            key={idPlayList}
+            idPlayList={idPlayList}
+          />
+        ))
       }
       <ListGroupItem>
         <Icon
           button
           block
           type="ok"
-          onClick={onDone}
+          href="/sync/2"
           label="Done"
         />
       </ListGroupItem>
     </ListGroup>
-  </div>);
+  );
 }
 
 PlayListCompareComponent.propTypes = {
-  idDevice: PropTypes.number,
   hash: PropTypes.object,
-  onDone: PropTypes.func,
 };
 
 export const storeInitializer = (dispatch, state) =>
-  Object.keys(state.sync.hash).length || dispatch(getHistory(state.sync.idDevice));
+  Object.keys(state.sync.hash).length ||
+    dispatch(getServerPlayLists())
+    .then(() => dispatch(getClientPlayLists()));
 
 export const mapStateToProps = state => state.sync;
 
 export const mapDispatchToProps = dispatch => ({
-  onDone: () => dispatch(getMissingTracks()),
+  onDone: () => dispatch(push('/sync/2')),
 });
 
 export default compose(
