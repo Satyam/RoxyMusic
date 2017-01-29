@@ -84,18 +84,19 @@ export default class DB {
   }
 
   process(statement, params, paramValues, change) {
+    const values = params.map(name => paramValues[name]);
     return new Promise((resolve, reject) => {
       this.db[change ? 'transaction' : 'readTransaction'](
         tx => tx.executeSql(
           statement,
-          params.map(name => paramValues[name]),
+          values,
           (tx1, rs) => resolve(rs),
           (tx2, err) => {
-            reject(`Error: ${JSON.stringify(err)} executing statement "${statement}", values ${paramValues}`);
+            reject(`Error: ${JSON.stringify(err)} executing statement "${statement}", values ${values}`);
           }
         ),
         (err) => {
-          reject(`Error: ${JSON.stringify(err)} securing transaction for statement "${statement}", values ${paramValues}`);
+          reject(`Error: ${JSON.stringify(err)} securing transaction for statement "${statement}", values ${values}`);
         }
       );
     });
