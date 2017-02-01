@@ -10,17 +10,16 @@ import initStore from '_utils/initStore';
 
 import {
   push,
-  getTransferPending,
-  importOneTrack,
+  startMp3Transfer,
 } from '_store/actions';
 
 
 export function TransferFilesComponent({
-  pending,
+  mp3TransferPending,
   i,
   onDone,
 }) {
-  const progress = Math.floor((i * 100) / pending.length);
+  const progress = Math.floor((i * 100) / mp3TransferPending.length);
   return (<div>
     <ProgressBar
       now={progress}
@@ -38,7 +37,7 @@ export function TransferFilesComponent({
         </tr>
       </thead>
       <tbody>
-        {pending.map(file => (
+        {mp3TransferPending.map(file => (
           <tr
             key={file.idTrack}
             className={[
@@ -67,23 +66,22 @@ export function TransferFilesComponent({
       type="ok"
       onClick={onDone}
       label="Done"
-      disabled={i !== pending.length}
+      disabled={i !== mp3TransferPending.length}
     />
   </div>);
 }
 
 TransferFilesComponent.propTypes = {
-  pending: PropTypes.arrayOf(
+  mp3TransferPending: PropTypes.arrayOf(
     PropTypes.object
   ),
   i: PropTypes.number,
   onDone: PropTypes.func,
 };
 
-export const storeInitializer = (dispatch, state) =>
-  state.sync.pending.length ||
-  dispatch(getTransferPending())
-  .then(() => dispatch(importOneTrack()));
+export const storeInitializer = dispatch =>
+  dispatch(startMp3Transfer());
+
 
 export const mapStateToProps = state => state.sync;
 

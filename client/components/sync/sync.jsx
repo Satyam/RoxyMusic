@@ -76,7 +76,7 @@ export const mapStateToProps = state => state.config;
 export const mapDispatchToProps = dispatch => ({
   onSyncStart: () =>
     dispatch(startSync())
-    .then(() => dispatch(push('/sync/1'))),
+    .then(() => dispatch(push('/sync/PlayListsCompare'))),
 });
 
 

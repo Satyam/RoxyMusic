@@ -2,17 +2,22 @@ let prepared = {};
 
 export function init(db) {
   return db.prepareAll({
-    getSongs: 'select idTrack, title from Tracks order by title limit $count offset $offset',
-    searchSongs: 'select idTrack, title from Tracks where title like $search order by title limit $count offset $offset',
+    getSongs: `select idTrack, title from Tracks
+        where title is not null order by title limit $count offset $offset`,
+    searchSongs: `select idTrack, title from Tracks
+        where title is not null and title like $search order by title
+        limit $count offset $offset`,
   })
   .then((p) => {
     prepared = p;
   });
 }
 
-// getSongs: 'select idTrack, title from Tracks order by title limit $count offset $offset',
-// searchSongs: 'select idTrack, title from Tracks
-// where artist like $search order by title limit $count offset $offset',
+// getSongs: `select idTrack, title from Tracks
+//     where title is not null order by title limit $count offset $offset`,
+// searchSongs: `select idTrack, title from Tracks
+//     where title is not null and title like $search order by title
+//     limit $count offset $offset`,
 export function getSongs(o) {
   return (
     o.options.search

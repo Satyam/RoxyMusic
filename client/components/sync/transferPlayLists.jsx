@@ -14,7 +14,6 @@ import initStore from '_utils/initStore';
 import {
   push,
   startPlayListTransfer,
-  getMissingTracks,
 } from '_store/actions';
 
 
@@ -103,8 +102,7 @@ export const storeInitializer = dispatch => dispatch(startPlayListTransfer());
 export const mapStateToProps = state => state.sync;
 
 export const mapDispatchToProps = dispatch => ({
-  onDone: () => dispatch(getMissingTracks())
-    .then(() => dispatch(push('/sync/3'))),
+  onDone: () => dispatch(push('/sync/ImportCatalogInfo')),
 });
 
 export default compose(

@@ -111,7 +111,8 @@ CREATE VIEW `AllTracks` AS
 		left join Albums using (idAlbum)
 		left join (select artist as albumArtist, idArtist as idAlbumArtist from Artists) using (idAlbumArtist)
 		left join Artists using (idArtist)
-		left join Genres using (idGenre);
+		left join Genres using (idGenre)
+		where title is not null;
 
 DROP VIEW IF EXISTS `AllAlbums`;
 CREATE VIEW `AllAlbums` AS
@@ -121,7 +122,7 @@ select idAlbum,  album, group_concat(artist) as artists, idArtist, numTracks, id
 	left join Artists using (idArtist)
 	left join (
 		select idAlbum, count(*) as numTracks, group_concat(idTrack) as idTracks
-		from Tracks group by idAlbum
+		from Tracks where title is not null group by idAlbum
 	) using (idAlbum)
 	group by album
 	order by album;
@@ -131,11 +132,12 @@ CREATE VIEW `AllArtists` as
 select idArtist, artist, numTracks, idTracks from Artists
 	left join (
 		select idArtist, count(*) as numTracks, group_concat(idTrack) as idTracks from (
-			select idArtist, idTrack from Tracks group by idArtist
+			select idArtist, idTrack from Tracks where title is not null group by idArtist
 			union
 			select AlbumArtistMap.idArtist as idArtist, idTrack
 			from Tracks
 			left join AlbumArtistMap using (idAlbum)
+			where title is not null
 		) group by idArtist
 	)  using (idArtist)
 	order by artist;

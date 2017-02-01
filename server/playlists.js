@@ -84,7 +84,7 @@ function saveOnePlayList(playList) {
       from Tracks
       left join Artists as AlbumArtist on idAlbumArtist = AlbumArtist.idArtist
       left join Artists as Artist on idAlbumArtist = Artist.idArtist
-      where idTrack in (${playList.idTracks})`)
+      where title is not null and idTrack in (${playList.idTracks})`)
     .then(tracks => tracks.reduce((m3u, track) =>
       `${m3u}
 #EXTINF:${track.duration || -1},${track.artist || ''} - ${track.title || ''}

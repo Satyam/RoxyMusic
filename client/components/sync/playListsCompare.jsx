@@ -18,6 +18,7 @@ import PlayListItemCompare from './playListItemCompare';
 
 export function PlayListCompareComponent({
   hash,
+  onDone,
 }) {
   return (
     <ListGroup>
@@ -34,7 +35,7 @@ export function PlayListCompareComponent({
           button
           block
           type="ok"
-          href="/sync/2"
+          onClick={onDone}
           label="Done"
         />
       </ListGroupItem>
@@ -44,6 +45,7 @@ export function PlayListCompareComponent({
 
 PlayListCompareComponent.propTypes = {
   hash: PropTypes.object,
+  onDone: PropTypes.func,
 };
 
 export const storeInitializer = (dispatch, state) =>
@@ -54,7 +56,7 @@ export const storeInitializer = (dispatch, state) =>
 export const mapStateToProps = state => state.sync;
 
 export const mapDispatchToProps = dispatch => ({
-  onDone: () => dispatch(push('/sync/2')),
+  onDone: () => dispatch(push('/sync/TransferPlayLists')),
 });
 
 export default compose(

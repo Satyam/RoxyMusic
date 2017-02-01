@@ -18,13 +18,23 @@ export function init(db) {
         $idTrack, $title, $idArtist, $idAlbumArtist, $idAlbum, $track,
         $year, $duration, $idGenre, $location, $fileModified, $size, $ext
       )`,
+    missingTracks: 'select idTrack from Tracks where title is null',
+    missingAlbums: `select idAlbum from Tracks left join Albums using (idAlbum)
+        where Albums.idAlbum is null and Tracks.idAlbum is not null`,
+    missingArtists: `select idArtist from Tracks
+        left join Artists using (idArtist)
+        where Artists.idArtist is null and Tracks.idArtist is not null
+      union
+        select idAlbumArtist as idArtist from Tracks
+        left join Artists on Artists.idArtist = Tracks.idAlbumArtist
+        where Artists.idArtist is null and  Tracks.idAlbumArtist is not null`,
     insertAlbum: 'insert into Albums values ($idAlbum, $album)',
     insertArtist: 'insert into Artists values ($idArtist, $artist)',
     truncateAlbumArtist: 'delete from AlbumArtistMap',
     updateAlbumArtist: `insert into AlbumArtistMap (idArtist, idAlbum)
       select distinct idAlbumArtist as idArtist, idAlbum
       from Tracks where idAlbumArtist is not null and idAlbum is not null`,
-    transferPending: `select
+    mp3PendingTransfer: `select
         idTrack,
         coalesce(albumArtist, artist, 'unknown artist') as artist,
         coalesce(album, 'unknown album') as album,
@@ -34,7 +44,7 @@ export function init(db) {
       left join Albums using(idAlbum)
       left join (select artist as albumArtist, idArtist as idAlbumArtist from Artists) using (idAlbumArtist)
       left join Artists using (idArtist)
-      where location is null`,
+      where title is not null and location is null`,
     updateTrackLocation: `update Tracks set location = $location
       where idTrack = $idTrack`,
   })
@@ -56,7 +66,8 @@ export function getTracks(o) {
   return $db.all(
     `select idTrack, title, idArtist, idAlbumArtist,idAlbum,
         track, year, duration, idGenre, ext
-        from Tracks where idTrack in (${o.keys.idTracks})`
+        from Tracks
+        where title is not null and idTrack in (${o.keys.idTracks})`
   )
   .then(list => ({ list }));
 }
@@ -100,8 +111,8 @@ export function updateAlbumArtistMap() {
   .then(() => prepared.updateAlbumArtist.run());
 }
 
-export function transferPending() {
-  return prepared.transferPending.all()
+export function mp3PendingTransfer() {
+  return prepared.mp3PendingTransfer.all()
   .then(list => ({ list }));
 }
 
@@ -109,6 +120,27 @@ export function updateTrackLocation(o) {
   return prepared.updateTrackLocation.run(
     Object.assign(o.keys, o.data)
   );
+}
+
+export function missingAlbums() {
+  return prepared.missingAlbums.all()
+  .then(list => ({ list }));
+}
+
+export function missingArtists() {
+  return prepared.missingArtists.all()
+  .then(list => ({ list }));
+}
+
+export function addMissingTracks(o) {
+  return $db.run(
+    `insert or ignore into Tracks (idTrack) values (${o.data.tracks.join('),(')})`
+  );
+}
+
+export function getMissingTracks() {
+  return prepared.missingTracks.all()
+  .then(list => ({ list }));
 }
 
 export default db =>
@@ -141,10 +173,20 @@ export default db =>
     '/albumArtistMap': {
       update: updateAlbumArtistMap,
     },
-    '/pending': {
-      read: transferPending,
+    '/mp3PendingTransfer': {
+      read: mp3PendingTransfer,
     },
     '/track/:idTrack': {
       update: updateTrackLocation,
+    },
+    '/missing/albums': {
+      read: missingAlbums,
+    },
+    '/missing/artists': {
+      read: missingArtists,
+    },
+    '/missing/tracks': {
+      read: getMissingTracks,
+      create: addMissingTracks,
     },
   }));

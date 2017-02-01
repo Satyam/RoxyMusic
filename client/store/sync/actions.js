@@ -1,11 +1,6 @@
 import restAPI from '_platform/restAPI';
 import remoteAPI from '_client/../webClient/restAPI';
 import asyncActionCreator from '_utils/asyncActionCreator';
-import difference from 'lodash/difference';
-import union from 'lodash/union';
-import compact from 'lodash/compact';
-import unique from 'lodash/uniq';
-import reduce from 'lodash/reduce';
 import map from 'lodash/map';
 import plainJoin from '_utils/plainJoin';
 
@@ -39,6 +34,12 @@ export const TRANSFER_ACTION = {
 };
 
 export const PLAYLIST_TRANSFER_DONE = `${NAME}/signal playlist transfer done`;
+export const COLLECT_TRACKS_FROM_IMPORTED_PLAYLISTS =
+  `${NAME}/collect the idTracks in the imported playlists`;
+
+export const GET_MISSING_TRACKS = `${NAME}/get missing tracks`;
+export const GET_MISSING_ALBUMS = `${NAME}/get missing albums`;
+export const GET_MISSING_ARTISTS = `${NAME}/get missing artists`;
 export const IMPORT_TRACKS = `${NAME}/import tracks`;
 export const SAVE_IMPORTED_TRACKS = `${NAME}/save imported tracks`;
 export const UPDATE_TRACK_LOCATION = `${NAME}/update track location`;
@@ -48,7 +49,7 @@ export const IMPORT_ARTISTS = `${NAME}/import artists`;
 export const SAVE_IMPORTED_ARTISTS = `${NAME}/save imported artists`;
 export const UPDATE_ALBUM_ARTIST_MAP = `${NAME}/update album-artist map`;
 export const CLEAR_ALL = `${NAME}/clear all`;
-export const FIND_TRANSFER_PENDING = `${NAME}/find pending transfer`;
+export const FIND_MISSING_MP3S = `${NAME}/find missing music files`;
 export const UPDATE_DOWNLOAD_STATUS = `${NAME}/update download status`;
 export const INCREMENT_PENDING = `${NAME}/increment pending`;
 
@@ -164,7 +165,7 @@ export function startPlayListTransfer() {
   return (dispatch, getState) => {
     const hash = getState().sync.hash;
     return Promise.all(map(hash, (playList, idPlayList) =>
-      dispatch([
+      playList.action && dispatch([
         null,
         sendPlaylist,
         importPlayList,
@@ -176,48 +177,79 @@ export function startPlayListTransfer() {
   };
 }
 
-// The
-export function getMissingAlbums() {
-  return (dispatch, getState) => {
-    const state = getState();
-    const neededIdAlbums = compact(state.sync.tracks.map(track => track.idAlbum));
-    const currentIdAlbums = Object.keys(state.albums.hash).map(id => parseInt(id, 10));
-    const missingIdAlbums = difference(neededIdAlbums, currentIdAlbums);
-    if (missingIdAlbums.length === 0) return null;
-    return dispatch(asyncActionCreator(
-      IMPORT_ALBUMS,
-      remote.read(`/albums/${missingIdAlbums.join(',')}`),
-      { missingIdAlbums }
+// These are called from importCatalog below
+export function getMissingTracks() {
+  return dispatch =>
+    dispatch(asyncActionCreator(
+      GET_MISSING_TRACKS,
+      local.read('/missing/tracks')
     ))
-    .then(() => dispatch(asyncActionCreator(
-      SAVE_IMPORTED_ALBUMS,
-      local.create('/albums', getState().sync.albums),
-      { tracks: getState().sync.albums }
-    )));
-  };
+    .then((action) => {
+      const missingIdTracks = action.payload.list;
+      if (missingIdTracks.length) {
+        const batchesOfMissingTracks = [];
+        for (let i = 0; i < missingIdTracks.length; i += 100) {
+          batchesOfMissingTracks.push(missingIdTracks.slice(i, i + 100));
+        }
+        return batchesOfMissingTracks.reduce(
+          (ps, batch) => ps.then(() =>
+            dispatch(asyncActionCreator(
+              IMPORT_TRACKS,
+              remote.read(`/tracks/${batch.join(',')}`),
+              { batch }
+            ))
+          ),
+          Promise.resolve()
+        )
+        .then((action2) => {
+          const tracks = action2.payload.list;
+          return tracks && dispatch(asyncActionCreator(
+            SAVE_IMPORTED_TRACKS,
+            local.create('/tracks', tracks),
+            { list: tracks }
+          ));
+        });
+      }
+      return Promise.resolve();
+    });
+}
+
+export function getMissingAlbums() {
+  return dispatch =>
+    dispatch(asyncActionCreator(
+      GET_MISSING_ALBUMS,
+      local.read('/missing/albums')
+    ))
+    .then(action => action.payload.list)
+    .then(missingIdAlbums =>
+      missingIdAlbums.length && dispatch(asyncActionCreator(
+        IMPORT_ALBUMS,
+        remote.read(`/albums/${missingIdAlbums.join(',')}`)
+      ))
+      .then(action => dispatch(asyncActionCreator(
+        SAVE_IMPORTED_ALBUMS,
+        local.create('/albums', action.payload.list)
+      )))
+    );
 }
 
 export function getMissingArtists() {
-  return (dispatch, getState) => {
-    const state = getState();
-    const neededIdArtists = compact(state.sync.tracks.map(track => track.idArtist));
-    const neededIdAlbumArtists = compact(state.sync.tracks.map(track => track.idAlbumArtist));
-    const currentIdArtists = Object.keys(state.albums.hash).map(id => parseInt(id, 10));
-    const missingIdArtists = difference(
-      unique(neededIdArtists, neededIdAlbumArtists), currentIdArtists
-    );
-    if (missingIdArtists.length === 0) return null;
-    return dispatch(asyncActionCreator(
-      IMPORT_ARTISTS,
-      remote.read(`/artists/${missingIdArtists.join(',')}`),
-      { missingIdArtists }
+  return dispatch =>
+    dispatch(asyncActionCreator(
+      GET_MISSING_ARTISTS,
+      local.read('/missing/artists')
     ))
-    .then(() => dispatch(asyncActionCreator(
-      SAVE_IMPORTED_ARTISTS,
-      local.create('/artists', getState().sync.artists),
-      { tracks: getState().sync.artists }
-    )));
-  };
+    .then(action => action.payload.list)
+    .then(missingIdArtists =>
+      missingIdArtists.length && dispatch(asyncActionCreator(
+        IMPORT_ARTISTS,
+        remote.read(`/artists/${missingIdArtists.join(',')}`)
+      ))
+      .then(action => dispatch(asyncActionCreator(
+        SAVE_IMPORTED_ARTISTS,
+        local.create('/artists', action.payload.list)
+      )))
+  );
 }
 
 export function updateAlbumArtistMap() {
@@ -233,10 +265,22 @@ export function clearAll() {
   };
 }
 
-export function getTransferPending() {
+// Called from importCatalogInfo.jsx
+export function importCatalog() {
+  return dispatch =>
+    dispatch(getMissingTracks())
+    .then(() => dispatch(getMissingAlbums()))
+    .then(() => dispatch(getMissingArtists()))
+    .then(() => dispatch(updateAlbumArtistMap()))
+    .then(() => dispatch(clearAll()))
+    ;
+}
+
+// These all belong to transferFiles.jsx
+export function getMissingMp3s() {
   return asyncActionCreator(
-    FIND_TRANSFER_PENDING,
-    local.read('/pending')
+    FIND_MISSING_MP3S,
+    local.read('/mp3PendingTransfer')
   );
 }
 
@@ -303,8 +347,8 @@ export function importOneTrack() {
   return (dispatch, getState) => {
     const sync = getState().sync;
     const i = sync.i;
-    if (i === sync.pending.length) return Promise.resolve('done');
-    const pending = sync.pending[i];
+    if (i === sync.mp3TransferPending.length) return Promise.resolve('done');
+    const pending = sync.mp3TransferPending[i];
     dispatch(updateDownloadStatus(i, 1));
     const audioExtensions = getState().config.portableAudioExtensions.split(',');
     if (audioExtensions.indexOf(pending.ext.substr(1)) === -1) {
@@ -324,33 +368,8 @@ export function importOneTrack() {
   };
 }
 
-export function getMissingTracks() {
-  return (dispatch, getState) => {
-    const state = getState();
-    const neededIdTracks = reduce(
-      state.playLists.hash,
-      (m, pl) => union(m, pl.idTracks),
-      []
-    );
-    const currentIdTracks = Object.keys(state.tracks).map(id => parseInt(id, 10));
-    const missingIdTracks = difference(neededIdTracks, currentIdTracks);
-    return Promise.resolve(
-      missingIdTracks.length &&
-      dispatch(asyncActionCreator(
-        IMPORT_TRACKS,
-        remote.read(`/tracks/${missingIdTracks.join(',')}`),
-        { missingIdTracks }
-      ))
-      .then(() => dispatch(asyncActionCreator(
-        SAVE_IMPORTED_TRACKS,
-        local.create('/tracks', getState().sync.tracks),
-        { tracks: getState().sync.tracks }
-      )))
-      .then(() => dispatch(getMissingAlbums()))
-      .then(() => dispatch(getMissingArtists()))
-      .then(() => dispatch(updateAlbumArtistMap()))
-    )
-    .then(() => dispatch(clearAll()))
-    ;
-  };
+export function startMp3Transfer() {
+  return dispatch =>
+    dispatch(getMissingMp3s())
+    .then(() => dispatch(importOneTrack()));
 }
