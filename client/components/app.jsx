@@ -18,7 +18,7 @@ import NowPlaying from '_components/nowPlaying';
 
 import styles from './app.css';
 
-const AppComponent = ({ wide, children }) => (
+export const AppComponent = ({ wide, children }) => (
   <div className={styles.app}>
     <Navbar>
       <Navbar.Header>
