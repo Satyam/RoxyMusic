@@ -16,12 +16,19 @@ import initStore from '_utils/initStore';
 
 import PlayListItemCompare from './playListItemCompare';
 
+import styles from './index.css';
+
 export function PlayListCompareComponent({
   hash,
   onDone,
 }) {
   return (
     <ListGroup>
+      <ListGroupItem>
+        <div className={styles.heading}>
+          Comparing Playlists
+        </div>
+      </ListGroupItem>
       {
         Object.keys(hash).map(idPlayList => (
           <PlayListItemCompare

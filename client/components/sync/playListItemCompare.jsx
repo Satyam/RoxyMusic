@@ -14,10 +14,23 @@ import {
   TRANSFER_ACTION,
 } from '_store/actions';
 
+import styles from './index.css';
+
 export class PlayListItemCompareComponent extends Component {
   constructor(props) {
     super(props);
-    const { client, server } = props;
+    this.state = this.guessAction(props);
+    bindHandlers(this);
+  }
+  componentWillReceiveProps(newProps) {
+    this.setState(this.guessAction(newProps));
+  }
+  onOptionChangeHandler(ev) {
+    const action = parseInt(ev.target.value, 10);
+    this.props.onActionChange(action);
+    this.setState({ action });
+  }
+  guessAction({ client, server }) {
     // signature will be calculated on the reducer
     // check whether the actual playlist is needed or just the signature
     // let the action be calculated on the reducer
@@ -40,7 +53,9 @@ export class PlayListItemCompareComponent extends Component {
           } else {
             comment += 'Server version is newer.';
           }
-        }  // else: they match, do nothing
+        } else {
+          comment = 'They match';
+        }
       } else {
         comment = 'Playlist was created new on the tablet. Needs sending to the server.';
         send = true;
@@ -51,22 +66,13 @@ export class PlayListItemCompareComponent extends Component {
       importIt = true;
       delServer = true;
     }
-    this.state = {
+    return {
       send,
       import: importIt,
       delClient,
       delServer,
       comment,
     };
-    bindHandlers(this);
-  }
-  // componentWillReceiveProps(newProps) {
-  //   this.setState(this.guessAction(newProps));
-  // }
-  onOptionChangeHandler(ev) {
-    const action = parseInt(ev.target.value, 10);
-    this.props.onActionChange(action);
-    this.setState({ action });
   }
   render() {
     const state = this.state;
@@ -76,7 +82,7 @@ export class PlayListItemCompareComponent extends Component {
     const name = (props.client && props.client.name) || (props.server && props.server.name);
     return (<ListGroupItem>
       <strong>{name}</strong>
-      <table width="100%">
+      <table className={styles.table}>
         <tbody>
           <tr>
             <td>
@@ -140,7 +146,7 @@ export class PlayListItemCompareComponent extends Component {
                   <Icon
                     button
                     type="transfer"
-                    label="Show Difference w/server"
+                    title="Show Difference w/server"
                   />
                 )
                 : null
