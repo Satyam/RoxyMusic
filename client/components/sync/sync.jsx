@@ -14,7 +14,7 @@ import {
   push,
 } from '_store/actions';
 
-import styles from './sync.css';
+import styles from './index.css';
 
 export function SyncComponent({
   remoteHost,

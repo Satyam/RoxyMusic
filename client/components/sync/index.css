@@ -5,3 +5,11 @@
 .status {
   line-height: 2em;
 }
+
+.table {
+  width: 100%;
+}
+
+.table td {
+  padding: 0.5em;
+}
