@@ -92,11 +92,13 @@ export default class DB {
           values,
           (tx1, rs) => resolve(rs),
           (tx2, err) => {
-            reject(`Error: ${JSON.stringify(err)} executing statement "${statement}", values ${values}`);
+            reject(`Error: ${JSON.stringify(err)} executing statement "${statement}",
+              values: ${params.map(name => `${name}: ${paramValues[name]},`)}`);
           }
         ),
         (err) => {
-          reject(`Error: ${JSON.stringify(err)} securing transaction for statement "${statement}", values ${values}`);
+          reject(`Error: ${JSON.stringify(err)} securing transaction for statement "${statement}",
+            values: ${params.map(name => `${name}: ${paramValues[name]},`)}`);
         }
       );
     });
