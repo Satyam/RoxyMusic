@@ -1,5 +1,8 @@
 import {
   getPlayLists,
+  addPlayList,
+  updatePlayList,
+  deletePlayList,
 } from './playlists';
 
 let prepared = {};
@@ -11,7 +14,7 @@ export function init(db) {
   return db.prepareAll({
     getMyId: 'select idDevice, musicDir from Devices where uuid = $uuid',
     setMyId: 'insert into Devices (uuid) values ($uuid)',
-    insertTrack: `insert into Tracks (
+    insertTrack: `insert or replace into Tracks (
          idTrack,  title,  idArtist,  idAlbumArtist,  idAlbum,  track,
          year,  duration,  idGenre,  location,  fileModified,  size, ext
       ) values (
@@ -124,23 +127,28 @@ export function updateTrackLocation(o) {
 
 export function missingAlbums() {
   return prepared.missingAlbums.all()
-  .then(list => ({ list }));
+  .then(rows => ({ list: rows.map(row => row.idAlbum) }));
 }
 
 export function missingArtists() {
   return prepared.missingArtists.all()
-  .then(list => ({ list }));
+  .then(rows => ({ list: rows.map(row => row.idArtist) }));
 }
 
 export function addMissingTracks(o) {
-  return $db.run(
-    `insert or ignore into Tracks (idTrack) values (${o.data.tracks.join('),(')})`
+  const idTracks = o.data.idTracks;
+  return (
+    idTracks.length
+    ? $db.run(
+      `insert or ignore into Tracks (idTrack) values (${idTracks.join('),(')})`
+    )
+    : Promise.resolve()
   );
 }
 
 export function getMissingTracks() {
   return prepared.missingTracks.all()
-  .then(list => ({ list }));
+  .then(rows => ({ list: rows.map(row => row.idTrack) }));
 }
 
 export default db =>
@@ -151,6 +159,11 @@ export default db =>
     },
     '/playlists': {
       read: getPlayLists,
+    },
+    '/playlist/:idPlayList': {
+      create: addPlayList,
+      update: updatePlayList,
+      delete: deletePlayList,
     },
     '/tracks/:idTracks': {
       read: getTracks,

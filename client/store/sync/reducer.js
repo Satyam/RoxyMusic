@@ -121,14 +121,14 @@ export default (
               );
               const act = getAction(client, server);
               return Object.assign(
+                playLists,
                 {
                   [playList.idPlayList]: {
                     client,
                     server,
                     action: act,
                   },
-                },
-                playLists
+                }
               );
             },
             state.hash
@@ -167,7 +167,7 @@ export default (
     case SAVE_IMPORTED_ARTISTS:
       return update(state, { catalogImportStage: { $set: 9 } });
     case CLEAR_ALL: {
-      return cloneDeep(initialState);
+      return Object.assign(cloneDeep(initialState), { catalogImportStage: 10 });
     }
     case FIND_MISSING_MP3S:
       return update(state, {

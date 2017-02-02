@@ -56,7 +56,8 @@ export function addPlayList(o) {
     idTracks: o.data.idTracks.join(','),
     idDevice: o.data.idDevice || 0,
   })
-  .then(() => ({ idPlayList }));
+  .then(() => $db.get('select CURRENT_TIMESTAMP as lastUpdated'))
+  .then(row => ({ idPlayList, lastUpdated: row.lastUpdated }));
 }
 
 // updatePlayList: `update PlayLists set name = $name,

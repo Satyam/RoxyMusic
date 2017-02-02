@@ -56,6 +56,7 @@ export default (
           name: payload.name,
           idPlayList,
           idTracks: payload.idTracks || [],
+          lastUpdated: payload.lastUpdated,
         } },
       } });
     case DELETE_PLAY_LIST:

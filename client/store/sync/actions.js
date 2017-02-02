@@ -121,22 +121,30 @@ export function setActionForSync(idPlayList, action) {
 export function sendPlaylist(idPlayList, playList) {
   return asyncActionCreator(
     UPDATE_PLAYLIST,
-    remote.update(idPlayList, {
+    remote.update(`/playlist/${idPlayList}`, {
       name: playList.client.name,
       idTracks: playList.client.idTracks,
+      lastUpdated: playList.client.lastUpdated,
       idDevice,
     }),
     {
       idPlayList,
       name: playList.client.name,
       idTracks: playList.client.idTracks,
+      lastUpdated: playList.client.lastUpdated,
       idDevice,
     },
   );
 }
 
 export function importPlayList(idPlayList, playList) {
-  return addPlayList(playList.server.name, playList.server.idTracks, idPlayList);
+  const idTracks = playList.server.idTracks || [];
+  return dispatch =>
+    dispatch(addPlayList(playList.server.name, idTracks, idPlayList))
+    .then(() => dispatch(asyncActionCreator(
+      COLLECT_TRACKS_FROM_IMPORTED_PLAYLISTS,
+      local.create('/missing/tracks', { idTracks })
+    )));
 }
 
 export function delClientPlayList(idPlayList) {
@@ -146,7 +154,7 @@ export function delClientPlayList(idPlayList) {
 export function delServerPlayList(idPlayList) {
   return asyncActionCreator(
     DELETE_PLAY_LIST,
-    remote.delete(idPlayList, { idDevice }),
+    remote.delete(`/playlist/${idPlayList}`, { idDevice }),
     { idPlayList, idDevice }
   );
 }
@@ -210,7 +218,7 @@ export function getMissingTracks() {
           ));
         });
       }
-      return Promise.resolve();
+      return null;
     });
 }
 
@@ -222,15 +230,17 @@ export function getMissingAlbums() {
     ))
     .then(action => action.payload.list)
     .then(missingIdAlbums =>
-      missingIdAlbums.length && dispatch(asyncActionCreator(
-        IMPORT_ALBUMS,
-        remote.read(`/albums/${missingIdAlbums.join(',')}`)
-      ))
-      .then(action => dispatch(asyncActionCreator(
-        SAVE_IMPORTED_ALBUMS,
-        local.create('/albums', action.payload.list)
-      )))
-    );
+      missingIdAlbums.length &&
+        dispatch(asyncActionCreator(
+          IMPORT_ALBUMS,
+          remote.read(`/albums/${missingIdAlbums.join(',')}`)
+        ))
+        .then(action => dispatch(asyncActionCreator(
+          SAVE_IMPORTED_ALBUMS,
+          local.create('/albums', action.payload.list)
+        )))
+    )
+  ;
 }
 
 export function getMissingArtists() {
@@ -241,15 +251,16 @@ export function getMissingArtists() {
     ))
     .then(action => action.payload.list)
     .then(missingIdArtists =>
-      missingIdArtists.length && dispatch(asyncActionCreator(
-        IMPORT_ARTISTS,
-        remote.read(`/artists/${missingIdArtists.join(',')}`)
-      ))
-      .then(action => dispatch(asyncActionCreator(
-        SAVE_IMPORTED_ARTISTS,
-        local.create('/artists', action.payload.list)
-      )))
-  );
+      missingIdArtists.length &&
+        dispatch(asyncActionCreator(
+          IMPORT_ARTISTS,
+          remote.read(`/artists/${missingIdArtists.join(',')}`)
+        ))
+        .then(action => dispatch(asyncActionCreator(
+          SAVE_IMPORTED_ARTISTS,
+          local.create('/artists', action.payload.list)
+        )))
+    );
 }
 
 export function updateAlbumArtistMap() {
@@ -268,7 +279,7 @@ export function clearAll() {
 // Called from importCatalogInfo.jsx
 export function importCatalog() {
   return dispatch =>
-    dispatch(getMissingTracks())
+    Promise.resolve(dispatch(getMissingTracks()))
     .then(() => dispatch(getMissingAlbums()))
     .then(() => dispatch(getMissingArtists()))
     .then(() => dispatch(updateAlbumArtistMap()))
