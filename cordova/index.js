@@ -1,12 +1,22 @@
+/* eslint-disable no-console */
 import client from '_client';
 import { join } from 'path';
-// import fs from 'fs';
 import openDatabase from '_server/utils/openCordovaWebSqlEvcoreFullPath';
 import DB from '_server/utils/webSqlP';
 
 import dataServers from '_server';
 
 import { addRoute } from './restAPI';
+
+
+require('isomorphic-fetch');
+
+global.Promise = require('bluebird');
+
+Promise.config({
+  longStackTraces: true,
+  warnings: true, // note, run node with --trace-warnings to see full stack traces for warnings
+});
 
 const resolveLocalFileSystemURL = path => new Promise((resolve, reject) =>
   window.resolveLocalFileSystemURL(
@@ -39,142 +49,90 @@ function readFile(path, encoding) {
   }));
 }
 
+// export function alert(message, title, buttonName) {
+//   return new Promise((resolve) => {
+//     navigator.notification.alert(message, resolve, title, buttonName);
+//   });
+// }
 // function unlink(path) {
 //   return resolveLocalFileSystemURL(path)
 //   .then(fileEntry => new Promise(fileEntry.remove));
 // }
 
+// export function folderPicker(startupPath) {
+//   return new Promise((resolve, reject) => {
+//     window.OurCodeWorld.Filebrowser.folderPicker.single({
+//       success: folders => resolve(folders[0]),
+//       error: reject,
+//       startupPath,
+//     });
+//   });
+// }
+
 
 window.addEventListener('load', () => {
-  const el = document.getElementById('log');
-  function log(msg) {
-    el.innerHTML = `${el.innerHTML}<pre>${msg}</pre>`;
-    // navigator.notification.alert(
-    //   msg,  // message
-    //   () => {},         // callback
-    //   'Log:',            // title
-    //   'Continue'                  // buttonName
-    // );
-  }
-  // const listDir = (key, path, howMany = 10) =>
-  //   resolveLocalFileSystemURL(path)
-  //   .then(dir => new Promise((resolve, reject) => {
-  //     if (dir.createReader) {
-  //       const directoryReader = dir.createReader();
-  //       directoryReader.readEntries(
-  //         (results) => {
-  //           log(`For ${key}, path: ${path} found ${results.length} entries`);
-  //           results.slice(0, howMany).forEach((fileEntry) => {
-  //             log(`${key} ${fileEntry.isFile ? 'F' : 'D'}, path ${fileEntry.fullPath},
-  //  ${fileEntry.toInternalURL()}`);
-  //           });
-  //           resolve(dir);
-  //         },
-  //         reject
-  //       );
-  //     } else {
-  //       log(`${key} ${dir.name} does not have createReader`);
-  //       reject(`${key} ${dir.name} does not have createReader`);
-  //     }
-  //   }))
-  //   .catch((err) => {
-  //     log(`Failed to resolve ${key}, ${path}, err: ${err.message || err}`);
-  //   });
-
-  // log('comenzando');
-
   document.addEventListener(
     'deviceready',
     () => {
-      if (!el) {
-        navigator.notification.alert(
-          'el not found',  // message
-          () => {},         // callback
-          'Game Over',            // title
-          'Done'                  // buttonName
-        );
-      }
       document.addEventListener('pause', () => {
         console.log('---Pausing ----');
       }, false);
       document.addEventListener('resume', () => {
         console.log('--- Resuming ---');
       }, false);
-      log('arranque');
-      const DELDB = false;
-      const musicDb = join(cordova.file.externalRootDirectory || '/', 'Music/RoxyMusic.db');
 
-      log(`musicdb: ${musicDb}`);
-      // if (fs && fs.init) {
-      //   fs.init(null, (err, granted) => {
-      //     if (err) {
-      //       log(`fs.init error ${err.message || err}`);
-      //     } else {
-      //       log(`Fs.init granted ${granted}`);
-      //       if (fs.readdir) {
-      //         fs.readdir(
-      //           '/',
-      //           (err1, files) => {
-      //             if (err) {
-      //               log(`fs.readdir error: ${err1.message || err1}`);
-      //             } else {
-      //               log(`fs.readdir found ${files.length} entries`);
-      //               log(files.map(entry => entry.name).join(',\n'));
-      //             }
-      //           }
-      //         );
-      //       } else log(`fs or fs.readdir not found: ${typeof fs}, ${typeof fs.readdir}`);
-      //     }
-      //   });
-      // }
+      const DELDB = true;
+      const musicDb = join(cordova.file.dataDirectory || '/', 'RoxyMusic.db');
 
-      // -----------------------------------
-      // if (window && window.sqlitePlugin) {
-      //   const sP = window.sqlitePlugin;
-      //   if (typeof sP.echoTest === 'function') {
-      //     sP.echoTest(() => {
-      //       log('sqlitePlugin ECHO test OK');
-      //     });
-      //   } else {
-      //     log(`echoTest not a function ${typeof sP.echoTest}`);
-      //   }
-      //   if (typeof sP.selfTest === 'function') {
-      //     sP.selfTest(() => {
-      //       log('sqlitePlugin SELF test OK');
-      //     });
-      //   } else {
-      //     log(`selfTest not a function ${typeof sP.selfTest}`);
-      //   }
-      // } else {
-      //   log('either no window or no window.sqlitePlugin');
-      // }
+      console.log(`musicdb: ${musicDb}`);
 
-      openDatabase(true ? musicDb : 'RoxyMusic.db')
+      if (window.device) {
+        console.log(`${window.device.model} : ${window.device.uuid}`);
+      } else {
+        console.log('no global device');
+      }
+      openDatabase(musicDb)
       .then((rawDb) => {
-        log('database opened');
+        console.log('database opened');
         return new DB(rawDb);
       })
       .then((db) => {
         function initDb() {
           return readFile(join(cordova.file.applicationDirectory, 'www/res/data.sql'), 'utf8')
-            .then((data) => {
-              log(`data read ${data.substr(0, 200)}`);
-              return db.exec(data);
-            })
+            .then(data => db.exec(data))
             .then(() => db);
         }
         if (DELDB) return initDb();
         return db.get('select count(*) as c from config')
         .then(() => db)
         .catch((err1) => {
-          log(`catch read on config ${err1.message || err1}`);
+          console.log(`catch read on config ${err1.message || err1}`);
           return initDb();
         });
       })
       .then(db => dataServers(db, addRoute))
+
+      .then(() => {
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
+        // https://github.github.io/fetch
+        if (window.fetch) {
+          return window.fetch(
+            'http://192.168.0.101:8080/data/v2/config',
+            {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+              credentials: 'include',
+            }
+          )
+          .then(response => response.text())
+          .then(data => console.log(`fetch ${data}`))
+          .catch(reason => console.log(`** fetch failed: ${reason}`));
+        }
+        return console.log('*** no fetch');
+      })
       .then(client)
       .catch((err) => {
-        log(`catch: ${err.message || err}`);
+        console.log(`catch: ${err.message || err}`);
       });
     },
     false
