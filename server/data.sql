@@ -27,11 +27,7 @@ CREATE TABLE `Tracks` (
 	`fileModified` TEXT,
 	`size` INTEGER,
 	`ext` TEXT,
-	`hasIssues` INTEGER,
-	FOREIGN KEY(`idArtist`) REFERENCES Artists(idArtist),
-	FOREIGN KEY(`idAlbumArtist`) REFERENCES Artists(idArtist),
-	FOREIGN KEY(`idAlbum`) REFERENCES Albums(idAlbum),
-	FOREIGN KEY(`idGenre`) REFERENCES Genres(idGenre)
+	`hasIssues` INTEGER
 );
 
 DROP TABLE IF EXISTS `Artists`;
@@ -55,9 +51,7 @@ DROP TABLE IF EXISTS `AlbumArtistMap`;
 CREATE TABLE `AlbumArtistMap` (
 	`idAlbumArtistMap` INTEGER PRIMARY KEY AUTOINCREMENT,
 	`idAlbum` INTEGER,
-	`idArtist` INTEGER,
-	FOREIGN KEY(`idAlbum`) REFERENCES Album(idAlbum),
-	FOREIGN KEY(`idArtist`) REFERENCES Artists(idArtist)
+	`idArtist` INTEGER
 );
 
 DROP TABLE IF EXISTS `PlayLists`;
