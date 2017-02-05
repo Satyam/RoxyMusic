@@ -11,7 +11,6 @@ import ProgressBar from 'react-bootstrap/lib/ProgressBar';
 import initStore from '_utils/initStore';
 
 import {
-  push,
   importCatalog,
 } from '_store/actions';
 
@@ -19,14 +18,13 @@ import styles from './index.css';
 
 export function ImportCatalogComponent({
   catalogImportStage,
-  onDone,
 }) {
   const total = 9;
   return (<div>
     <ListGroup>
       <ListGroupItem>
         <div className={styles.heading}>
-          Importing catalog info
+          4 of 5: Importing catalog info
         </div>
       </ListGroupItem>
       <ListGroupItem>
@@ -71,37 +69,21 @@ export function ImportCatalogComponent({
           </tbody>
         </Table>
       </ListGroupItem>
-      <ListGroupItem>
-        <Icon
-          button
-          block
-          type="ok"
-          onClick={onDone}
-          label="Done"
-          disabled={catalogImportStage < total}
-        />
-      </ListGroupItem>
     </ListGroup>
   </div>);
 }
 
 ImportCatalogComponent.propTypes = {
   catalogImportStage: PropTypes.number,
-  onDone: PropTypes.func,
 };
 
 export const storeInitializer = dispatch => dispatch(importCatalog());
 
 export const mapStateToProps = state => state.sync;
 
-export const mapDispatchToProps = dispatch => ({
-  onDone: () => dispatch(push('/sync/TransferFiles')),
-});
-
 export default compose(
   initStore(storeInitializer),
   connect(
     mapStateToProps,
-    mapDispatchToProps
   )
 )(ImportCatalogComponent);

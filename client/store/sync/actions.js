@@ -11,6 +11,7 @@ import {
   getPlayLists,
   addPlayList,
   deletePlayList,
+  push,
 } from '_store/actions';
 
 const NAME = 'sync';
@@ -181,7 +182,8 @@ export function startPlayListTransfer() {
         delServerPlayList,
       ][playList.action](idPlayList, playList))
       .then(() => dispatch(playListTransferDone(idPlayList)))
-    ));
+    ))
+    .then(() => dispatch(push('/sync/ImportCatalogInfo')));
   };
 }
 
@@ -283,7 +285,10 @@ export function importCatalog() {
     .then(() => dispatch(getMissingAlbums()))
     .then(() => dispatch(getMissingArtists()))
     .then(() => dispatch(updateAlbumArtistMap()))
-    .then(() => dispatch(clearAll()))
+    .then(() => {
+      dispatch(clearAll());
+      return dispatch(push('/sync/TransferFiles'));
+    })
     ;
 }
 
@@ -382,5 +387,7 @@ export function importOneTrack() {
 export function startMp3Transfer() {
   return dispatch =>
     dispatch(getMissingMp3s())
-    .then(() => dispatch(importOneTrack()));
+    .then(() => dispatch(importOneTrack()))
+    .then(() => dispatch(push('/sync/AllDone')))
+    ;
 }

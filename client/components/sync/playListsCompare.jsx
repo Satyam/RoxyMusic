@@ -26,15 +26,14 @@ export function PlayListCompareComponent({
     <ListGroup>
       <ListGroupItem>
         <div className={styles.heading}>
-          Comparing Playlists
+          2 of 5: Comparing Playlists
         </div>
       </ListGroupItem>
       {
         Object.keys(hash).map(idPlayList => (
-          <PlayListItemCompare
-            key={idPlayList}
-            idPlayList={idPlayList}
-          />
+          <ListGroupItem key={idPlayList}>
+            <PlayListItemCompare idPlayList={idPlayList} />
+          </ListGroupItem>
         ))
       }
       <ListGroupItem>

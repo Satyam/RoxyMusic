@@ -44,7 +44,7 @@ export function SyncComponent({
   return (
     <ListGroup>
       <ListGroupItem>
-        <div className={styles.heading}>Connection</div>
+        <div className={styles.heading}>1 of 5: Connection</div>
       </ListGroupItem>
       <ListGroupItem className={styles.status}>
         <Icon

@@ -11,7 +11,6 @@ import ProgressBar from 'react-bootstrap/lib/ProgressBar';
 import initStore from '_utils/initStore';
 
 import {
-  push,
   startMp3Transfer,
 } from '_store/actions';
 
@@ -20,14 +19,13 @@ import styles from './index.css';
 export function TransferFilesComponent({
   mp3TransferPending,
   i,
-  onDone,
 }) {
   const progress = Math.floor((i * 100) / mp3TransferPending.length);
   return (<div>
     <ListGroup>
       <ListGroupItem>
         <div className={styles.heading}>
-          Importing music files
+          5 of 5: Importing music files
         </div>
       </ListGroupItem>
       <ListGroupItem>
@@ -73,16 +71,6 @@ export function TransferFilesComponent({
           </tbody>
         </Table>
       </ListGroupItem>
-      <ListGroupItem>
-        <Icon
-          button
-          block
-          type="ok"
-          onClick={onDone}
-          label="Done"
-          disabled={i !== mp3TransferPending.length}
-        />
-      </ListGroupItem>
     </ListGroup>
   </div>);
 }
@@ -92,7 +80,6 @@ TransferFilesComponent.propTypes = {
     PropTypes.object
   ),
   i: PropTypes.number,
-  onDone: PropTypes.func,
 };
 
 export const storeInitializer = dispatch =>
@@ -101,14 +88,9 @@ export const storeInitializer = dispatch =>
 
 export const mapStateToProps = state => state.sync;
 
-export const mapDispatchToProps = dispatch => ({
-  onDone: () => dispatch(push('/')),
-});
-
 export default compose(
   initStore(storeInitializer),
   connect(
-    mapStateToProps,
-    mapDispatchToProps
+    mapStateToProps
   )
 )(TransferFilesComponent);

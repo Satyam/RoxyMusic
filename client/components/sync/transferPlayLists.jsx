@@ -15,7 +15,6 @@ import ProgressBar from 'react-bootstrap/lib/ProgressBar';
 import initStore from '_utils/initStore';
 
 import {
-  push,
   startPlayListTransfer,
 } from '_store/actions';
 
@@ -23,7 +22,6 @@ import styles from './index.css';
 
 export function TransferPlayListsComponent({
   hash,
-  onDone,
 }) {
   const total = filter(hash, playList => playList.action).length;
   const pending = filter(hash, playList => playList.action && playList.done).length;
@@ -32,7 +30,7 @@ export function TransferPlayListsComponent({
     <ListGroup>
       <ListGroupItem>
         <div className={styles.heading}>
-          Importing playlists
+          3 of 5: Importing playlists
         </div>
       </ListGroupItem>
       <ListGroupItem>
@@ -80,16 +78,6 @@ export function TransferPlayListsComponent({
           </tbody>
         </Table>
       </ListGroupItem>
-      <ListGroupItem>
-        <Icon
-          button
-          block
-          type="ok"
-          onClick={onDone}
-          label="Done"
-          disabled={pending !== total}
-        />
-      </ListGroupItem>
     </ListGroup>
   </div>);
 }
@@ -111,21 +99,15 @@ TransferPlayListsComponent.propTypes = {
     action: PropTypes.number,
     done: PropTypes.bool,
   }),
-  onDone: PropTypes.func,
 };
 
 export const storeInitializer = dispatch => dispatch(startPlayListTransfer());
 
 export const mapStateToProps = state => state.sync;
 
-export const mapDispatchToProps = dispatch => ({
-  onDone: () => dispatch(push('/sync/ImportCatalogInfo')),
-});
-
 export default compose(
   initStore(storeInitializer),
   connect(
-    mapStateToProps,
-    mapDispatchToProps
+    mapStateToProps
   )
 )(TransferPlayListsComponent);
