@@ -15,6 +15,17 @@ const indexArtists = (payload, oldIndex = {}) => payload.reduce(
   oldIndex
 );
 
+export const artistSelectors = {};
+
+function initSelectors(key) {
+  artistSelectors.list = state => state[key].list;
+  artistSelectors.isEmpty = state => state[key].list.length === 0;
+  artistSelectors.item = (state, idArtist) => state[key].hash[idArtist] || {};
+  artistSelectors.exists = (state, idArtist) => idArtist in state[key].hash;
+  artistSelectors.searchTerm = state => state[key].search;
+  artistSelectors.nextOffset = state => state[key].nextOffset;
+}
+
 export default (
   state = {
     search: '',
@@ -63,6 +74,9 @@ export default (
         hash: indexArtists([payload]),
       };
     }
+    case '@@selectors':
+      initSelectors(action.key);
+      return state;
     default:
       return state;
   }

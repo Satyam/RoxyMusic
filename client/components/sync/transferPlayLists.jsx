@@ -18,6 +18,10 @@ import {
   startPlayListTransfer,
 } from '_store/actions';
 
+import {
+  syncSelectors,
+} from '_store/selectors';
+
 import styles from './index.css';
 
 export function TransferPlayListsComponent({
@@ -103,7 +107,9 @@ TransferPlayListsComponent.propTypes = {
 
 export const storeInitializer = dispatch => dispatch(startPlayListTransfer());
 
-export const mapStateToProps = state => state.sync;
+export const mapStateToProps = state => ({
+  hash: syncSelectors.sideBySideHash(state),
+});
 
 export default compose(
   initStore(storeInitializer),

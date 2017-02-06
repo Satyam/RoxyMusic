@@ -14,13 +14,17 @@ import {
   startMp3Transfer,
 } from '_store/actions';
 
+import {
+  syncSelectors,
+} from '_store/selectors';
+
 import styles from './index.css';
 
 export function TransferFilesComponent({
-  mp3TransferPending,
-  i,
+  list,
+  index,
 }) {
-  const progress = Math.floor((i * 100) / mp3TransferPending.length);
+  const progress = Math.floor((index * 100) / list.length);
   return (<div>
     <ListGroup>
       <ListGroupItem>
@@ -31,7 +35,7 @@ export function TransferFilesComponent({
       <ListGroupItem>
         <ProgressBar
           now={progress}
-          label={`${i} of ${mp3TransferPending.length}`}
+          label={`${index} of ${list.length}`}
           striped
           bsStyle="info"
         />
@@ -47,7 +51,7 @@ export function TransferFilesComponent({
             </tr>
           </thead>
           <tbody>
-            {mp3TransferPending.map(file => (
+            {list.map(file => (
               <tr
                 key={file.idTrack}
                 className={[
@@ -76,17 +80,17 @@ export function TransferFilesComponent({
 }
 
 TransferFilesComponent.propTypes = {
-  mp3TransferPending: PropTypes.arrayOf(
+  list: PropTypes.arrayOf(
     PropTypes.object
   ),
-  i: PropTypes.number,
+  index: PropTypes.number,
 };
 
 export const storeInitializer = dispatch =>
   dispatch(startMp3Transfer());
 
 
-export const mapStateToProps = state => state.sync;
+export const mapStateToProps = state => syncSelectors.mp3TransferPending(state);
 
 export default compose(
   initStore(storeInitializer),

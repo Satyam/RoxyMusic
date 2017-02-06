@@ -11,6 +11,8 @@ import {
   savePlayList,
 } from '_store/actions';
 
+import { playListSelectors } from '_store/selectors';
+
 import styles from './playListItem.css';
 
 export const PlayListItemComponent = ({
@@ -47,7 +49,8 @@ PlayListItemComponent.propTypes = {
   onSaveClick: PropTypes.func,
 };
 
-export const mapStateToProps = (state, props) => state.playLists.hash[props.idPlayList] || {};
+export const mapStateToProps =
+  (state, props) => playListSelectors.item(state, props.idPlayList);
 
 export const mapDispatchToProps = (dispatch, { idPlayList }) => ({
   onDeleteClick: ev => isPlainClick(ev) && dispatch(deletePlayList(idPlayList)),

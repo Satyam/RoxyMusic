@@ -7,6 +7,15 @@ import {
   GET_TRACKS,
 } from './actions';
 
+export const trackSelectors = {};
+
+function initSelectors(key) {
+  trackSelectors.exists = (state, idTrack) => idTrack in state[key];
+  trackSelectors.item = (state, idTrack) => state[key][idTrack] || {};
+  trackSelectors.cachedTracks = state =>
+    Object.keys(state[key]).map(id => parseInt(id, 10));
+}
+
 export default (
   state = {},
   action
@@ -27,6 +36,9 @@ export default (
         {}
       ));
     }
+    case '@@selectors':
+      initSelectors(action.key);
+      return state;
     default:
       return state;
   }

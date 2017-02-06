@@ -1,6 +1,8 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
+import { requestSelectors } from '_store/selectors';
+
 import styles from './loading.css';
 
 export const LoadingComponent = ({ loading }) => (
@@ -18,7 +20,7 @@ LoadingComponent.propTypes = {
 };
 
 export const mapStateToProps = state => ({
-  loading: !!state.requests.pending,
+  loading: requestSelectors.isLoading(state),
 });
 
 export default connect(

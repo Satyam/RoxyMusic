@@ -12,6 +12,8 @@ import {
   addAlbumToPlayList,
 } from '_store/actions';
 
+import { albumSelectors } from '_store/selectors';
+
 import styles from './albumListItem.css';
 
 export const AlbumListItemComponent = ({
@@ -63,7 +65,8 @@ AlbumListItemComponent.propTypes = {
   onAddToPlayList: PropTypes.func,
 };
 
-export const mapStateToProps = (state, props) => state.albums.hash[props.idAlbum] || {};
+export const mapStateToProps = (state, props) =>
+  albumSelectors.item(state, props.idAlbum);
 
 export const mapDispatchToProps = (dispatch, { idAlbum }) => ({
   onPlayNowClick: () => dispatch(playAlbumNow(idAlbum)),

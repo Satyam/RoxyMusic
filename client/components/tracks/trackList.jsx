@@ -20,7 +20,7 @@ import Track from './track';
 
 function sortIdTracks(sorted, idTracks, tracks) {
   if (!sorted) return idTracks;
-  if (!Object.keys(tracks).length) return null;
+  if (!Object.keys(tracks).length) return [];
   return map(
     sortBy(
       pick(tracks, idTracks),

@@ -15,6 +15,10 @@ import {
   push,
 } from '_store/actions';
 
+import {
+  syncSelectors,
+} from '_store/selectors';
+
 import styles from './index.css';
 
 export function guessAction({ client, server }) {
@@ -186,7 +190,8 @@ PlayListItemCompareComponent.propTypes = {
   idPlayList: PropTypes.string,
 };
 
-export const mapStateToProps = (state, props) => state.sync.hash[props.idPlayList];
+export const mapStateToProps = (state, props) =>
+  syncSelectors.sideBySideItem(state, props.idPlayList);
 
 export const mapDispatchToProps = (dispatch, { idPlayList }) => ({
   onActionChange: action => dispatch(setActionForSync(idPlayList, action)),

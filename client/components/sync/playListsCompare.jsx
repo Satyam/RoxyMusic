@@ -12,6 +12,10 @@ import {
   getClientPlayLists,
 } from '_store/actions';
 
+import {
+  syncSelectors,
+} from '_store/selectors';
+
 import initStore from '_utils/initStore';
 
 import PlayListItemCompare from './playListItemCompare';
@@ -55,11 +59,13 @@ PlayListCompareComponent.propTypes = {
 };
 
 export const storeInitializer = (dispatch, state) =>
-  Object.keys(state.sync.hash).length ||
+  !syncSelectors.isEmpty(state) ||
     dispatch(getServerPlayLists())
     .then(() => dispatch(getClientPlayLists()));
 
-export const mapStateToProps = state => state.sync;
+export const mapStateToProps = state => ({
+  hash: syncSelectors.sideBySideHash(state),
+});
 
 export const mapDispatchToProps = dispatch => ({
   onDone: () => dispatch(push('/sync/TransferPlayLists')),

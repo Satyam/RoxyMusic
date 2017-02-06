@@ -1,6 +1,8 @@
 import restAPI from '_platform/restAPI';
 import asyncActionCreator from '_utils/asyncActionCreator';
 
+import { artistSelector } from '_store/selectors';
+
 const NAME = 'artists';
 const api = restAPI(NAME);
 
@@ -18,15 +20,14 @@ export function getArtists(search) {
 
 export function getMoreArtists() {
   return (dispatch, getState) => {
-    const artists = getState().artists;
+    const state = getState();
+    const search = artistSelector.searchTerm(state);
+    const offset = artistSelector.nextOffset(state);
 
     return dispatch(asyncActionCreator(
       GET_MORE_ARTISTS,
-      api.read(`?search=${artists.search}&offset=${artists.nextOffset}`),
-      {
-        search: artists.search,
-        offset: artists.nextOffset,
-      }
+      api.read(`?search=${search}&offset=${offset}`),
+      { search, offset }
     ));
   };
 }

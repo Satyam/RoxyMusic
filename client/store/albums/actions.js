@@ -1,6 +1,8 @@
 import restAPI from '_platform/restAPI';
 import asyncActionCreator from '_utils/asyncActionCreator';
 
+import { albumSelectors } from '_store/selectors';
+
 const NAME = 'albums';
 const api = restAPI(NAME);
 
@@ -18,14 +20,13 @@ export function getAlbums(search) {
 
 export function getMoreAlbums() {
   return (dispatch, getState) => {
-    const albums = getState().albums;
+    const state = getState();
+    const search = albumSelectors.searchTerm(state);
+    const offset = albumSelectors.nextOffset(state);
     return dispatch(asyncActionCreator(
       GET_MORE_ALBUMS,
-      api.read(`?search=${albums.search}&offset=${albums.nextOffset}`),
-      {
-        search: albums.search,
-        offset: albums.nextOffset,
-      }
+      api.read(`?search=${search}&offset=${offset}`),
+      { search, offset }
     ));
   };
 }

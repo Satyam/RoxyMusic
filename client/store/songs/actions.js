@@ -1,6 +1,7 @@
 import restAPI from '_platform/restAPI';
 import asyncActionCreator from '_utils/asyncActionCreator';
 import { getTrack } from '_store/tracks/actions';
+import { songSelectors } from '_store/selectors';
 
 const NAME = 'songs';
 const api = restAPI(NAME);
@@ -18,14 +19,13 @@ export function getSongs(search) {
 
 export function getMoreSongs() {
   return (dispatch, getState) => {
-    const songs = getState().songs;
+    const state = getState();
+    const search = songSelectors.searchTerm(state);
+    const offset = songSelectors.nextOffset(state);
     return dispatch(asyncActionCreator(
       GET_MORE_SONGS,
-      api.read(`?search=${songs.search}&offset=${songs.nextOffset}`),
-      {
-        search: songs.search,
-        offset: songs.nextOffset,
-      }
+      api.read(`?search=${search}&offset=${offset}`),
+      { search, offset }
     ));
   };
 }

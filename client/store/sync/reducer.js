@@ -28,6 +28,7 @@ import {
   INCREMENT_PENDING,
 } from './actions';
 
+
 export function getSignature(pl) {
   return (
     pl && pl.name && pl.name.length
@@ -53,14 +54,25 @@ export function getAction(client, server) {
   }
   return TRANSFER_ACTION.DO_NOTHING;
 }
+export const syncSelectors = {};
+
+function initSelectors(key) {
+  syncSelectors.catalogImportStage = state => state[key].catalogImportStage;
+  syncSelectors.sideBySideItem = (state, idPlayList) => state[key].hash[idPlayList];
+  syncSelectors.sideBySideHash = state => state[key].hash;
+  syncSelectors.isEmpty = state => Object.keys(state[key].hash).length === 0;
+  syncSelectors.mp3TransferPending = state => state[key].mp3TransferPending;
+}
 
 const initialState = {
   uuid: null,
   idDevice: null,
   hash: {},
   catalogImportStage: 0,
-  mp3TransferPending: [],
-  i: 0,
+  mp3TransferPending: {
+    list: [],
+    index: 0,
+  },
 };
 
 export default (
@@ -171,20 +183,25 @@ export default (
     }
     case FIND_MISSING_MP3S:
       return update(state, {
-        mp3TransferPending: { $set: list },
+        mp3TransferPending: { list: { $set: list } },
       });
     case UPDATE_DOWNLOAD_STATUS:
       return update(state, {
         mp3TransferPending: {
-          [payload.i]: {
-            status: { $set: payload.status },
+          list: {
+            [payload.index]: {
+              status: { $set: payload.status },
+            },
           },
         },
       });
     case INCREMENT_PENDING:
       return update(state, {
-        i: { $apply: i => i + 1 },
+        mp3TransferPending: { index: { $apply: i => i + 1 } },
       });
+    case '@@selectors':
+      initSelectors(action.key);
+      return state;
     default:
       return state;
   }

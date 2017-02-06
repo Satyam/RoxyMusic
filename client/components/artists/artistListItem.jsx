@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Artist } from '_components/entries';
+import { artistSelectors } from '_store/selectors';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 // import FoldingToolbar from '_components/misc/foldingToolbar';
 // import Icon from '_components/misc/icon';
@@ -30,7 +31,7 @@ ArtistListItemComponent.propTypes = {
   numTracks: PropTypes.number,
 };
 
-export const mapStateToProps = (state, props) => state.artists.hash[props.idArtist] || {};
+export const mapStateToProps = (state, props) => artistSelectors.item(state, props.idArtist);
 
 export default connect(
   mapStateToProps

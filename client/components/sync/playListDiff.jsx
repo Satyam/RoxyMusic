@@ -12,6 +12,10 @@ import {
   goBack,
 } from '_store/actions';
 
+import {
+  syncSelectors,
+} from '_store/selectors';
+
 import styles from './index.css';
 // console.log(diffArrays('1,3,5,7'.split(','), '3,4'.split(',')));
 
@@ -109,7 +113,8 @@ PlayListDiffComponent.propTypes = {
   onDone: PropTypes.func,
 };
 
-export const mapStateToProps = (state, props) => state.sync.hash[props.params.idPlayList];
+export const mapStateToProps = (state, props) =>
+  syncSelectors.sideBySideItem(state, props.params.idPlayList);
 
 export const mapDispatchToProps = dispatch => ({
   onDone: () => dispatch(goBack()),

@@ -1,5 +1,6 @@
 import update from 'react-addons-update';
 import omit from 'lodash/omit';
+import sortBy from 'lodash/sortBy';
 
 import {
   REQUEST_SENT,
@@ -16,6 +17,18 @@ import {
   CLOSE_ADD_TO_PLAYLIST,
 } from './actions';
 
+export const playListSelectors = {};
+
+function initSelectors(key) {
+  playListSelectors.loading = state => state[key].status !== 0;
+  playListSelectors.isReady = state => state[key].status === 2;
+  playListSelectors.item = (state, idPlayList) => state[key].hash[idPlayList] || {};
+  playListSelectors.exists = (state, idPlayList) => idPlayList in state[key].hash;
+  playListSelectors.all = state => state[key].hash;
+  playListSelectors.tracksToAdd = state => state[key].idTracksToAdd;
+  playListSelectors.orderedList = state =>
+    sortBy(state[key].hash, playList => playList.name);
+}
 
 export default (
   state = {
@@ -65,6 +78,9 @@ export default (
       return update(state, { idTracksToAdd: { $set: action.idTracks } });
     case CLOSE_ADD_TO_PLAYLIST:
       return update(state, { idTracksToAdd: { $set: null } });
+    case '@@selectors':
+      initSelectors(action.key);
+      return state;
     default:
       return state;
   }

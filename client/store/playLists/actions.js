@@ -1,6 +1,11 @@
 import restAPI from '_platform/restAPI';
 import asyncActionCreator from '_utils/asyncActionCreator';
 
+import {
+  playListSelectors,
+  albumSelectors,
+} from '_store/selectors';
+
 const NAME = 'playlists';
 const api = restAPI(NAME);
 
@@ -73,13 +78,13 @@ export function closeAddToPlayList() {
 
 export function addTracksToPlayList(idPlayList) {
   return (dispatch, getState) => {
-    const playLists = getState().playLists;
-    const playList = playLists.hash[idPlayList];
-    const idTracks = playLists.idTracksToAdd;
+    const state = getState();
+    const playList = playListSelectors.item(state, idPlayList);
+    const idTracksToAdd = playListSelectors.tracksToAdd(state);
     return dispatch(updatePlayList(
       idPlayList,
       playList.name,
-      playList.idTracks.concat(idTracks)
+      playList.idTracks.concat(idTracksToAdd)
     ))
     .then(() => dispatch(closeAddToPlayList()));
   };
@@ -87,9 +92,8 @@ export function addTracksToPlayList(idPlayList) {
 
 export function addTracksToNewPLaylist(name) {
   return (dispatch, getState) => {
-    const playLists = getState().playLists;
-    const idTracks = playLists.idTracksToAdd;
-    dispatch(addPlayList(name, idTracks))
+    const idTracksToAdd = playListSelectors.tracksToAdd(getState());
+    dispatch(addPlayList(name, idTracksToAdd))
     .then(() => dispatch(closeAddToPlayList()));
   };
 }
@@ -111,5 +115,5 @@ export function savePlayList(idPlayList) {
 
 export function addAlbumToPlayList(idAlbum) {
   return (dispatch, getState) =>
-    dispatch(selectPlayListToAddTracksTo(getState().albums.hash[idAlbum].idTracks));
+    dispatch(selectPlayListToAddTracksTo(albumSelectors.item(getState(), idAlbum).idTracks));
 }

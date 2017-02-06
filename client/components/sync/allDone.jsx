@@ -39,14 +39,11 @@ AllDoneComponent.propTypes = {
   onDone: PropTypes.func,
 };
 
-
-export const mapStateToProps = state => state.sync;
-
 export const mapDispatchToProps = dispatch => ({
   onDone: () => dispatch(push('/')),
 });
 
 export default connect(
-  mapStateToProps,
+  null,
   mapDispatchToProps
 )(AllDoneComponent);

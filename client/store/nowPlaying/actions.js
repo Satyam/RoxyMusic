@@ -1,6 +1,11 @@
 import restAPI from '_platform/restAPI';
 import asyncActionCreator from '_utils/asyncActionCreator';
 
+import {
+  nowPlayingSelectors,
+  albumSelectors,
+} from '_store/selectors';
+
 const NAME = 'now playing';
 const api = restAPI('config');
 
@@ -29,7 +34,7 @@ function update(action, idTracks = [], current = -1) {
 
 export function playNow(idTrack) {
   return (dispatch, getState) => {
-    const idTracks = getState().nowPlaying.idTracks;
+    const idTracks = nowPlayingSelectors.idTracks(getState());
     const index = idTracks.indexOf(idTrack);
     return (
       index === -1
@@ -40,10 +45,11 @@ export function playNow(idTrack) {
 }
 
 export function addToNowPlaying(idTracks) {
-  return (dispatch, getState) => {
-    const nowPlaying = getState().nowPlaying;
-    return dispatch(update(PLAY_NOW, nowPlaying.idTracks.concat(idTracks), nowPlaying.current));
-  };
+  return (dispatch, getState) => dispatch(update(
+    PLAY_NOW,
+    nowPlayingSelectors.idTracks(getState()).concat(idTracks),
+    nowPlayingSelectors.current(getState())
+  ));
 }
 
 export function clearNowPlaying() {
@@ -56,27 +62,31 @@ export function replaceNowPlaying(idTracks) {
 
 export function playNextTrack() {
   return (dispatch, getState) => {
-    const nowPlaying = getState().nowPlaying;
+    const state = getState();
     const next = (
-      nowPlaying.current < nowPlaying.idTracks.length - 1
-      ? nowPlaying.current + 1
+      nowPlayingSelectors.hasNext(state)
+      ? nowPlayingSelectors.current(state) + 1
       : -1
     );
-    return dispatch(update(PLAY_NEXT_TRACK, nowPlaying.idTracks, next));
+    return dispatch(update(PLAY_NEXT_TRACK, nowPlayingSelectors.idTracks(state), next));
   };
 }
 
-export function loadPlayingList() {
-  return asyncActionCreator(
-    LOAD_NOW_PLAYING,
-    api.read('nowPlaying')
-  );
+export function loadNowPlayingList() {
+  return (dispatch, getState) => {
+    if (!nowPlayingSelectors.loading(getState())) {
+      return dispatch(asyncActionCreator(
+        LOAD_NOW_PLAYING,
+        api.read('nowPlaying')
+      ));
+    }
+    return null;
+  };
 }
 
 export function playAlbumNow(idAlbum) {
   return (dispatch, getState) => {
-    const state = getState();
-    const idTracks = state.albums.hash[idAlbum].idTracks;
+    const idTracks = albumSelectors.item(getState(), idAlbum).idTracks;
     return dispatch(playNow(idTracks.shift()))
       .then(() => idTracks.length && dispatch(addToNowPlaying(idTracks)));
   };
@@ -84,18 +94,17 @@ export function playAlbumNow(idAlbum) {
 
 export function addAlbumToPlayNow(idAlbum) {
   return (dispatch, getState) =>
-    dispatch(addToNowPlaying(getState().albums.hash[idAlbum].idTracks));
+    dispatch(addToNowPlaying(albumSelectors.item(getState(), idAlbum).idTracks));
 }
 
 export function replaceAlbumInPlayNow(idAlbum) {
   return (dispatch, getState) =>
-    dispatch(replaceNowPlaying(getState().albums.hash[idAlbum].idTracks));
+    dispatch(replaceNowPlaying(albumSelectors.item(getState(), idAlbum).idTracks));
 }
 
 export function reorderNowPlayingTracks(idTracks) {
   return (dispatch, getState) => {
-    const nowPlaying = getState().nowPlaying;
-    const newCurrent = idTracks.indexOf(nowPlaying.idTracks[nowPlaying.current]);
+    const newCurrent = idTracks.indexOf(nowPlayingSelectors.currentIdTrack(getState()));
     return dispatch(update(REORDER_NOW_PLAYING_TRACKS, idTracks, newCurrent));
   };
 }

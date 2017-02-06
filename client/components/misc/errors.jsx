@@ -2,7 +2,10 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import isPlainClick from '_utils/isPlainClick';
 import classNames from 'classnames';
+
 import { clearHttpErrors } from '_store/actions';
+import { requestSelectors } from '_store/selectors';
+
 import styles from './errors.css';
 
 export const ErrorsComponent = ({ errors, onCloseErrors }) => {
@@ -33,7 +36,7 @@ ErrorsComponent.propTypes = {
 };
 
 export const mapStateToProps = state => ({
-  errors: state.requests.errors,
+  errors: requestSelectors.errors(state),
 });
 
 export const mapDispatchToProps = dispatch => ({

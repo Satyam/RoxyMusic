@@ -8,27 +8,29 @@ import Icon from '_components/misc/icon';
 import TrackList from '_components/tracks/trackList';
 
 import {
-  loadPlayingList,
+  loadNowPlayingList,
   reorderNowPlayingTracks,
  } from '_store/actions';
 
+import { nowPlayingSelectors } from '_store/selectors';
+
 import Toolbar from './nowPlayingTracksToolbar';
 
-export const NowPlayingComponent = ({ idTracks, current, router, onDragEnd }) =>
+export const NowPlayingComponent = ({ idTracks, on, currentIdTrack, router, onDragEnd }) =>
   (idTracks.length || null) && (
     <div>
       <Navbar>
         <Navbar.Header>
           <Navbar.Brand>
             { router && (<Icon type="arrow-up" href="/" label="  " />)}
-            Now Playing {current === -1 ? ' (none) ' : ''}
+            Now Playing {on ? '' : ' (none) '}
           </Navbar.Brand>
         </Navbar.Header>
       </Navbar>
       <TrackList
         idTracks={idTracks}
         Toolbar={Toolbar}
-        background={{ [idTracks[current]]: 'info' }}
+        background={{ [currentIdTrack]: 'info' }}
         onDragEnd={onDragEnd}
       />
     </div>
@@ -38,15 +40,19 @@ NowPlayingComponent.propTypes = {
   idTracks: PropTypes.arrayOf(
     PropTypes.number
   ),
+  on: PropTypes.bool,
+  currentIdTrack: PropTypes.number,
   Toolbar: PropTypes.element,
   onDragEnd: PropTypes.func,
 };
 
-export const storeInitializer = (dispatch, state) => (
-  state.nowPlaying.status > 0 || dispatch(loadPlayingList())
-);
+export const storeInitializer = dispatch => dispatch(loadNowPlayingList());
 
-export const mapStateToProps = state => state.nowPlaying || {};
+export const mapStateToProps = state => ({
+  on: nowPlayingSelectors.on(state),
+  idTracks: nowPlayingSelectors.idTracks(state),
+  currentIdTrack: nowPlayingSelectors.currentIdTrack(state),
+});
 
 export const mapDispatchToProps = dispatch => ({
   onDragEnd: idTracks => dispatch(reorderNowPlayingTracks(idTracks)),

@@ -4,6 +4,7 @@ import Navbar from 'react-bootstrap/lib/Navbar';
 import Icon from '_components/misc/icon';
 import compose from 'recompose/compose';
 import { getAlbum } from '_store/actions';
+import { albumSelectors } from '_store/selectors';
 import initStore from '_utils/initStore';
 import TrackList from '_components/tracks/trackList';
 import styles from './album.css';
@@ -51,10 +52,11 @@ AlbumComponent.propTypes = {
 
 export const storeInitializer = (dispatch, state, props) => {
   const idAlbum = parseInt(props.params.idAlbum, 10);
-  return state.albums.hash[idAlbum] || dispatch(getAlbum(idAlbum));
+  return albumSelectors.exists(state, idAlbum) || dispatch(getAlbum(idAlbum));
 };
 
-export const mapStateToProps = (state, props) => state.albums.hash[props.params.idAlbum] || {};
+export const mapStateToProps = (state, props) =>
+  albumSelectors.item(state, props.params.idAlbum);
 
 export default compose(
   initStore(storeInitializer),

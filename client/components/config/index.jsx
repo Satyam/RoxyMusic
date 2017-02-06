@@ -13,6 +13,7 @@ import Button from 'react-bootstrap/lib/Button';
 import Icon from '_components/misc/icon';
 
 import { setConfig } from '_store/actions';
+import { configSelectors } from '_store/selectors';
 import isPlainClick from '_utils/isPlainClick';
 import bindHandlers from '_utils/bindHandlers';
 
@@ -35,7 +36,7 @@ export class ConfigComponent extends Component {
     this.setState({ wide: ev.target.checked });
   }
   onOpenFolderHandler(ev) {
-
+    // pending
   }
   onSubmitHandler(ev) {
     if (isPlainClick(ev)) {
@@ -108,7 +109,7 @@ ConfigComponent.propTypes = {
   onSubmit: PropTypes.func,
 };
 
-export const mapStateToProps = state => state.config || {};
+export const mapStateToProps = configSelectors.all;
 
 export const mapDispatchToProps = dispatch => ({
   onSubmit: (newValues, oldValues) =>

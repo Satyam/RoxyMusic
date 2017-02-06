@@ -11,7 +11,10 @@ import initStore from '_utils/initStore';
 import isPlainClick from '_utils/isPlainClick';
 import Icon from '_components/misc/icon';
 import SearchField from '_components/misc/searchField';
+
 import { getSongs, getMoreSongs } from '_store/actions';
+import { songSelectors } from '_store/selectors';
+
 import styles from './songList.css';
 
 export function SongListComponent({
@@ -65,9 +68,12 @@ SongListComponent.propTypes = {
 
 
 export const storeInitializer =
-  (dispatch, state) => (state.songs.nextOffset || dispatch(getSongs()));
+  (dispatch, state) => !songSelectors.isEmpty(state) || dispatch(getSongs());
 
-export const mapStateToProps = state => state.songs;
+export const mapStateToProps = state => ({
+  list: songSelectors.list(state),
+  search: songSelectors.searchTerm(state),
+});
 
 export const mapDispatchToProps = dispatch => ({
   onSearchChangeHandler: ev => dispatch(getSongs(ev.target.value)),

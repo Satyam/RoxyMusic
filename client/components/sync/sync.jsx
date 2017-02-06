@@ -14,6 +14,8 @@ import {
   push,
 } from '_store/actions';
 
+import { configSelectors } from '_store/selectors';
+
 import styles from './index.css';
 
 export function SyncComponent({
@@ -71,7 +73,8 @@ SyncComponent.propTypes = {
   onSyncStart: PropTypes.func,
 };
 
-export const mapStateToProps = state => state.config;
+export const mapStateToProps = state =>
+  ({ remoteHost: configSelectors.get(state, 'remoteHost') });
 
 export const mapDispatchToProps = dispatch => ({
   onSyncStart: () =>

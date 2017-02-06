@@ -31,15 +31,11 @@ export const TracksToolbarComponent = ({
 );
 
 TracksToolbarComponent.propTypes = {
-  // idTrack: PropTypes.number,
   onPlayNowClick: PropTypes.func,
   onAddToPlayNowClick: PropTypes.func,
   onReplacePlayNowClick: PropTypes.func,
   onAddToPlayList: PropTypes.func,
 };
-
-export const mapStateToProps = (state, props) =>
-  state.tracks[props.idTrack || props.params.idTrack] || {};
 
 export const mapDispatchToProps = (dispatch, { idTrack }) => ({
   onPlayNowClick: ev => isPlainClick(ev) && dispatch(playNow(idTrack)),
@@ -50,7 +46,7 @@ export const mapDispatchToProps = (dispatch, { idTrack }) => ({
 
 export default compose(
   connect(
-    mapStateToProps,
+    null,
     mapDispatchToProps
   ),
 )(TracksToolbarComponent);

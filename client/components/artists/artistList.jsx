@@ -11,6 +11,7 @@ import isPlainClick from '_utils/isPlainClick';
 import Icon from '_components/misc/icon';
 import SearchField from '_components/misc/searchField';
 import { getArtists, getMoreArtists } from '_store/actions';
+import { artistSelectors } from '_store/selectors';
 import styles from './artistList.css';
 import ArtistListItem from './artistListItem';
 
@@ -72,13 +73,16 @@ ArtistListComponent.propTypes = {
 
 
 export const storeInitializer = (dispatch, state) => {
-  if (state.artists.nextOffset === 0) {
+  if (artistSelectors.isEmpty(state)) {
     return dispatch(getArtists());
   }
   return undefined;
 };
 
-export const mapStateToProps = state => state.artists;
+export const mapStateToProps = state => ({
+  list: artistSelectors.list(state),
+  search: artistSelectors.searchTerm(state),
+});
 
 export const mapDispatchToProps = dispatch => ({
   onSearchChangeHandler: ev => dispatch(getArtists(ev.target.value)),

@@ -14,6 +14,12 @@ import {
   push,
 } from '_store/actions';
 
+import {
+  syncSelectors,
+  configSelectors,
+  playListSelectors,
+} from '_store/selectors';
+
 const NAME = 'sync';
 let remote;
 let remoteHost;
@@ -70,15 +76,15 @@ export function startSync() {
   // "file:///storage/sdcard/"
   const UUID = window.device && `${window.device.model} : ${window.device.uuid}`;
   return (dispatch, getState) => {
-    const config = getState().config;
-    remoteHost = config.remoteHost;
+    const state = getState();
+    remoteHost = configSelectors.get(state, 'remoteHost');
     remote = remoteAPI(NAME, remoteHost);
     return dispatch(getDeviceInfo(UUID))
     .then((action) => {
       musicDir = action.payload.musicDir;
       idDevice = action.payload.idDevice;
       return (
-        musicDir !== config.musicDir &&
+        musicDir !== configSelectors.get(state, 'musicDir') &&
         dispatch(setConfig('musicDir', musicDir))
       );
     })
@@ -97,15 +103,15 @@ export function getServerPlayLists() {
 
 export function getClientPlayLists() {
   return (dispatch, getState) => {
-    const playLists = getState().playLists;
-    return Promise.resolve(playLists.status === 2 || dispatch(getPlayLists()))
-    .then(() => Object.values(getState().playLists.hash))
-    .then(list => dispatch({
+    const state = getState();
+    return Promise.resolve(playListSelectors.isReady(state) || dispatch(getPlayLists()))
+    .then(() => dispatch({
       type: GET_CLIENT_PLAYLISTS,
-      payload: { list },
+      payload: { list: playListSelectors.orderedList(state) },
     }));
   };
 }
+
 
 // This works with playListItemCompare.jsx
 export function setActionForSync(idPlayList, action) {
@@ -172,7 +178,7 @@ export function playListTransferDone(idPlayList) {
 // This is called by transferPlayLists.jsx
 export function startPlayListTransfer() {
   return (dispatch, getState) => {
-    const hash = getState().sync.hash;
+    const hash = syncSelectors.sideBySideHash(getState());
     return Promise.all(map(hash, (playList, idPlayList) =>
       playList.action && dispatch([
         null,
@@ -308,11 +314,11 @@ export function updateTrackLocation(idTrack, location) {
   );
 }
 
-export function updateDownloadStatus(i, status) {
+export function updateDownloadStatus(index, status) {
   return {
     type: UPDATE_DOWNLOAD_STATUS,
     payload: {
-      i,
+      index,
       status,
     },
   };
@@ -361,12 +367,12 @@ export function downloadTrack({ idTrack, artist, album, title, ext }) {
 
 export function importOneTrack() {
   return (dispatch, getState) => {
-    const sync = getState().sync;
-    const i = sync.i;
-    if (i === sync.mp3TransferPending.length) return Promise.resolve('done');
-    const pending = sync.mp3TransferPending[i];
-    dispatch(updateDownloadStatus(i, 1));
-    const audioExtensions = getState().config.portableAudioExtensions.split(',');
+    const state = getState();
+    const { list, index } = syncSelectors.mp3TransferPending(state);
+    if (index === list.length) return Promise.resolve('done');
+    const pending = list[index];
+    dispatch(updateDownloadStatus(index, 1));
+    const audioExtensions = configSelectors.get(state, 'portableAudioExtensions').split(',');
     if (audioExtensions.indexOf(pending.ext.substr(1)) === -1) {
       pending.ext = '.mp3';
     }
@@ -377,7 +383,7 @@ export function importOneTrack() {
         fileEntry.toURL().replace(musicDir, '')
       ))
     )
-    .then(() => dispatch(updateDownloadStatus(i, 2)))
+    .then(() => dispatch(updateDownloadStatus(index, 2)))
     .then(() => dispatch(incrPending()))
     .then(() => dispatch(importOneTrack()))
     ;

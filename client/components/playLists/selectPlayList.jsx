@@ -1,8 +1,6 @@
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'recompose';
-import sortBy from 'lodash/sortBy';
-import some from 'lodash/some';
 
 import ListGroup from 'react-bootstrap/lib/ListGroup';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
@@ -15,11 +13,17 @@ import Button from 'react-bootstrap/lib/Button';
 import Icon from '_components/misc/icon';
 
 import initStore from '_utils/initStore';
-import { addTracksToPlayList, closeAddToPlayList, addTracksToNewPLaylist } from '_store/actions';
+import {
+  addTracksToPlayList,
+  closeAddToPlayList,
+  addTracksToNewPLaylist,
+} from '_store/actions';
+import { playListSelectors } from '_store/selectors';
+
 import isPlainClick from '_utils/isPlainClick';
 import bindHandlers from '_utils/bindHandlers';
 
-import { storeInitializer, mapStateToProps } from './playLists';
+import { storeInitializer } from './playLists';
 
 export class SelectPlayListComponent extends Component {
   constructor(props) {
@@ -35,8 +39,7 @@ export class SelectPlayListComponent extends Component {
     const testName = newName.trim().toLowerCase();
     this.setState({
       newName,
-      duplicate: some(
-        this.props.hash,
+      duplicate: this.props.list.some(
         playList => playList.name.toLowerCase() === testName
       ),
     });
@@ -51,7 +54,7 @@ export class SelectPlayListComponent extends Component {
   render() {
     const {
       idTracksToAdd,
-      hash,
+      list,
       onClose,
       onPlayListClick,
     } = this.props;
@@ -65,7 +68,7 @@ export class SelectPlayListComponent extends Component {
         <Modal.Body>
           <ListGroup>
             {
-              sortBy(hash, playList => playList.name).map(playList => (
+              list.map(playList => (
                 <ListGroupItem
                   key={playList.idPlayList}
                   onClick={onPlayListClick(playList.idPlayList)}
@@ -116,11 +119,16 @@ SelectPlayListComponent.propTypes = {
   idTracksToAdd: PropTypes.arrayOf(
     PropTypes.number
   ),
-  hash: PropTypes.objectOf(PropTypes.object),
+  list: PropTypes.arrayOf(PropTypes.object),
   onPlayListClick: PropTypes.func,
   onAddToNewPlayList: PropTypes.func,
   onClose: PropTypes.func,
 };
+
+export const mapStateToProps = state => ({
+  list: playListSelectors.orderedList(state),
+  idTracksToAdd: playListSelectors.tracksToAdd(state),
+});
 
 export const mapDispatchToProps = dispatch => ({
   onPlayListClick: idPlayList => ev =>

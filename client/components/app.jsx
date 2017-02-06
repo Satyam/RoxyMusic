@@ -11,6 +11,7 @@ import Audio from '_components/audio';
 import SelectPlayList from '_components/playLists/selectPlayList';
 import NowPlaying from '_components/nowPlaying';
 
+import { configSelectors } from '_store/selectors';
 
 // import { remote } from 'electron';
 // const db = remote.getGlobal('db');
@@ -139,7 +140,7 @@ AppComponent.propTypes = {
   children: PropTypes.node,
 };
 
-export const mapStateToProps = state => state.config;
+export const mapStateToProps = state => ({ wide: configSelectors.get(state, 'wide') });
 
 export default compose(
   connect(

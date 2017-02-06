@@ -10,6 +10,8 @@ import {
   updatePlayList,
 } from '_store/actions';
 
+import { playListSelectors } from '_store/selectors';
+
 import initStore from '_utils/initStore';
 import styles from './playList.css';
 
@@ -48,16 +50,15 @@ PlayListComponent.propTypes = {
 export const storeInitializer = (dispatch, state, props) => {
   const idPlayList = props.params.idPlayList || 0;
   return (
-    state.playLists.status > 0
+    playListSelectors.loading(state)
     ? Promise.resolve()
     : dispatch(getPlayLists())
   ).then(() =>
-    (state.playLists.hash[idPlayList] && state.playLists.hash[idPlayList].idTracks)
-    || dispatch(getPlayList(idPlayList)));
+    playListSelectors.exists(state, idPlayList) || dispatch(getPlayList(idPlayList)));
 };
 
 export const mapStateToProps =
-  (state, props) => state.playLists.hash[props.params.idPlayList || 0] || {};
+  (state, props) => playListSelectors.item(state, props.params.idPlayList);
 
 export const mapDispatchToProps = (dispatch, props) => ({
   onDragEnd: idTracks =>

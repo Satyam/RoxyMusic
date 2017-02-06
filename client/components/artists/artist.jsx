@@ -4,6 +4,7 @@ import Navbar from 'react-bootstrap/lib/Navbar';
 import Icon from '_components/misc/icon';
 import compose from 'recompose/compose';
 import { getArtist } from '_store/actions';
+import { artistSelectors } from '_store/selectors';
 import initStore from '_utils/initStore';
 import TrackList from '_components/tracks/trackList';
 import styles from './artist.css';
@@ -49,11 +50,11 @@ ArtistComponent.propTypes = {
 
 export const storeInitializer = (dispatch, state, props) => {
   const idArtist = parseInt(props.params.idArtist, 10);
-  return state.artists.hash[idArtist] || dispatch(getArtist(idArtist));
+  return artistSelectors.exists(state, idArtist) || dispatch(getArtist(idArtist));
 };
 
 export const mapStateToProps =
-  (state, props) => state.artists.hash[props.params.idArtist] || {};
+  (state, props) => artistSelectors.item(state, props.params.idArtist);
 
 export default compose(
   initStore(storeInitializer),

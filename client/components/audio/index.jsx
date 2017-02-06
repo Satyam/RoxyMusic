@@ -15,6 +15,12 @@ import {
   getTrack,
 } from '_store/actions';
 
+import {
+  nowPlayingSelectors,
+  trackSelectors,
+  configSelectors,
+} from '_store/selectors';
+
 import styles from './index.css';
 
 export function secsToHHMMSS(secs) {
@@ -151,32 +157,28 @@ AudioComponent.propTypes = {
 
 export function storeInitializer(dispatch, state) {
   let trackP = false;
-  if (state.nowPlaying.status === 2) {
-    const nowPlaying = state.nowPlaying;
-    const current = nowPlaying.current;
-    if (current !== -1) {
-      const idTrack = nowPlaying.idTracks[current];
-      trackP = state.tracks[idTrack] || dispatch(getTrack(idTrack));
+  if (nowPlayingSelectors.isReady(state)) {
+    if (nowPlayingSelectors.on(state)) {
+      const idTrack = nowPlayingSelectors.currentIdTrack(state);
+      trackP = trackSelectors.exists(state, idTrack) || dispatch(getTrack(idTrack));
     }
   }
   return trackP;
 }
 
 export function mapStateToProps(state) {
-  if (state.nowPlaying.status === 2) {
-    const nowPlaying = state.nowPlaying;
-    const current = nowPlaying.current;
-    if (current !== -1) {
-      const idTrack = nowPlaying.idTracks[current];
-      if (state.tracks[idTrack] && state.config.musicDir) {
+  if (nowPlayingSelectors.isReady(state)) {
+    if (nowPlayingSelectors.on(state)) {
+      const idTrack = nowPlayingSelectors.currentIdTrack(state);
+      if (trackSelectors.exists(state, idTrack) && configSelectors.get(state, 'musicDir')) {
         return {
-          hasNext: !!nowPlaying.idTracks[current + 1],
+          hasNext: nowPlayingSelectors.hasNext(state),
           src: plainJoin(
               BUNDLE === 'webClient'
               ? '/music'
-              : state.config.musicDir
+              : configSelectors.get(state, 'musicDir')
             ,
-            state.tracks[idTrack].location
+            trackSelectors.item(state, idTrack).location
           ),
         };
       }

@@ -11,6 +11,8 @@ import isPlainClick from '_utils/isPlainClick';
 import Icon from '_components/misc/icon';
 import SearchField from '_components/misc/searchField';
 import { getAlbums, getMoreAlbums } from '_store/actions';
+import { albumSelectors } from '_store/selectors';
+
 import styles from './albumList.css';
 import AlbumListItem from './albumListItem';
 
@@ -72,13 +74,16 @@ AlbumListComponent.propTypes = {
 
 
 export const storeInitializer = (dispatch, state) => {
-  if (state.albums.nextOffset === 0) {
+  if (albumSelectors.isEmpty(state)) {
     return dispatch(getAlbums());
   }
   return undefined;
 };
 
-export const mapStateToProps = state => state.albums;
+export const mapStateToProps = state => ({
+  list: albumSelectors.list(state),
+  search: albumSelectors.searchTerm(state),
+});
 
 export const mapDispatchToProps = dispatch => ({
   onSearchChangeHandler: ev => dispatch(getAlbums(ev.target.value)),

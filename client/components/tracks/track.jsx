@@ -2,7 +2,10 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'recompose';
 import isPlainClick from '_utils/isPlainClick';
+
 import { getTracks, playNow } from '_store/actions';
+import { trackSelectors } from '_store/selectors';
+
 import initStore from '_utils/initStore';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 import renderAttr from '_components/misc/renderAttr';
@@ -69,10 +72,10 @@ TrackComponent.propTypes = {
 
 export const storeInitializer = (dispatch, state, props) => {
   const idTrack = props.idTrack;
-  return state.tracks[idTrack] || dispatch(getTracks(idTrack));
+  return trackSelectors.exists(state, idTrack) || dispatch(getTracks(idTrack));
 };
 
-export const mapStateToProps = (state, props) => state.tracks[props.idTrack] || {};
+export const mapStateToProps = (state, props) => trackSelectors.item(state, props.idTrack);
 
 export const mapDispatchToProps = (dispatch, { idTrack }) => ({
   onPlayClick: ev => isPlainClick(ev) && dispatch(playNow(idTrack)),

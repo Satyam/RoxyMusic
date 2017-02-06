@@ -15,6 +15,17 @@ const indexAlbums = (payload, oldIndex = {}) => payload.reduce(
   oldIndex
 );
 
+export const albumSelectors = {};
+
+function initSelectors(key) {
+  albumSelectors.list = state => state[key].list;
+  albumSelectors.isEmpty = state => state[key].list.length === 0;
+  albumSelectors.item = (state, idAlbum) => state[key].hash[idAlbum] || {};
+  albumSelectors.exists = (state, idAlbum) => idAlbum in state[key].hash;
+  albumSelectors.searchTerm = state => state[key].search;
+  albumSelectors.nextOffset = state => state[key].nextOffset;
+}
+
 export default (
   state = {
     search: '',
@@ -63,6 +74,9 @@ export default (
         hash: indexAlbums([payload]),
       };
     }
+    case '@@selectors':
+      initSelectors(action.key);
+      return state;
     default:
       return state;
   }

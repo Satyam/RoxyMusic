@@ -14,6 +14,15 @@ const indexSongs = (payload, oldIndex = {}) => payload.reduce(
   oldIndex
 );
 
+export const songSelectors = {};
+
+function initSelectors(key) {
+  songSelectors.list = state => state[key].list;
+  songSelectors.isEmpty = state => state[key].list.length === 0;
+  songSelectors.searchTerm = state => state[key].search;
+  songSelectors.nextOffset = state => state[key].nextOffset;
+}
+
 export default (
   state = {
     search: '',
@@ -42,6 +51,9 @@ export default (
         hash: { $set: indexSongs(list, state.hash) },
       });
     }
+    case '@@selectors':
+      initSelectors(action.key);
+      return state;
     default:
       return state;
   }

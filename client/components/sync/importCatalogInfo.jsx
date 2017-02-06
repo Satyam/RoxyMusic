@@ -14,6 +14,8 @@ import {
   importCatalog,
 } from '_store/actions';
 
+import { syncSelectors } from '_store/selectors';
+
 import styles from './index.css';
 
 export function ImportCatalogComponent({
@@ -79,7 +81,9 @@ ImportCatalogComponent.propTypes = {
 
 export const storeInitializer = dispatch => dispatch(importCatalog());
 
-export const mapStateToProps = state => state.sync;
+export const mapStateToProps = state => ({
+  catalogImportStage: syncSelectors.catalogImportStage(state),
+});
 
 export default compose(
   initStore(storeInitializer),

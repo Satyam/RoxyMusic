@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'recompose';
-import sortBy from 'lodash/sortBy';
+
 
 import Navbar from 'react-bootstrap/lib/Navbar';
 import ListGroup from 'react-bootstrap/lib/ListGroup';
@@ -11,11 +11,14 @@ import FoldingToolbar from '_components/misc/foldingToolbar';
 import isPlainClick from '_utils/isPlainClick';
 import initStore from '_utils/initStore';
 import { getPlayLists, saveAllPlayLists } from '_store/actions';
+
+import { playListSelectors } from '_store/selectors';
+
 import styles from './playLists.css';
 import PlayListItem from './playListItem';
 
 export function PlayListsComponent({
-  hash,
+  list,
   onPlayListSave,
  }) {
   return (
@@ -32,7 +35,7 @@ export function PlayListsComponent({
       </Navbar>
       <ListGroup>
         {
-          sortBy(hash, playList => playList.name).map(playList => (
+          list.map(playList => (
             <PlayListItem
               key={playList.idPlayList}
               idPlayList={playList.idPlayList}
@@ -45,15 +48,17 @@ export function PlayListsComponent({
 }
 
 PlayListsComponent.propTypes = {
-  hash: PropTypes.objectOf(PropTypes.object),
+  list: PropTypes.arrayOf(PropTypes.object),
   onPlayListSave: PropTypes.func,
 };
 
 
 export const storeInitializer = (dispatch, state) =>
-  state.playLists.status > 0 || dispatch(getPlayLists());
+  playListSelectors.loading(state) || dispatch(getPlayLists());
 
-export const mapStateToProps = state => state.playLists;
+export const mapStateToProps = state => ({
+  list: playListSelectors.orderedList(state),
+});
 
 export const mapDispatchToProps = dispatch => ({
   onPlayListSave: ev => isPlainClick(ev) && dispatch(saveAllPlayLists()),
