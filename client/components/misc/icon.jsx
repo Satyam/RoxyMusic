@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import classnames from 'classnames';
-
+import isPlainClick from '_utils/isPlainClick';
 import styles from './icon.css';
 
 function Icon({
@@ -18,7 +18,7 @@ function Icon({
   ...props
  }) {
   /* eslint-disable jsx-a11y/no-static-element-interactions */
-  const actualOnClick = !disabled && onClick;
+  const actualOnClick = ev => !disabled && isPlainClick(ev) && onClick(ev);
   const span = (
     <span className={styles.icons}>{
       type.split(',').map(t => (

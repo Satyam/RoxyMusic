@@ -7,7 +7,6 @@ import ListGroup from 'react-bootstrap/lib/ListGroup';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 
 import initStore from '_utils/initStore';
-import isPlainClick from '_utils/isPlainClick';
 import Icon from '_components/misc/icon';
 import SearchField from '_components/misc/searchField';
 import { getAlbums, getMoreAlbums } from '_store/actions';
@@ -87,8 +86,8 @@ export const mapStateToProps = state => ({
 
 export const mapDispatchToProps = dispatch => ({
   onSearchChangeHandler: ev => dispatch(getAlbums(ev.target.value)),
-  onSearchClearHandler: ev => isPlainClick(ev) && dispatch(getAlbums()),
-  onMoreAlbumsHandler: ev => isPlainClick(ev) && dispatch(getMoreAlbums()),
+  onSearchClearHandler: () => dispatch(getAlbums()),
+  onMoreAlbumsHandler: () => dispatch(getMoreAlbums()),
 });
 
 export default compose(

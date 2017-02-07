@@ -7,7 +7,6 @@ import ListGroup from 'react-bootstrap/lib/ListGroup';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 
 import initStore from '_utils/initStore';
-import isPlainClick from '_utils/isPlainClick';
 import Icon from '_components/misc/icon';
 import SearchField from '_components/misc/searchField';
 import { getArtists, getMoreArtists } from '_store/actions';
@@ -86,8 +85,8 @@ export const mapStateToProps = state => ({
 
 export const mapDispatchToProps = dispatch => ({
   onSearchChangeHandler: ev => dispatch(getArtists(ev.target.value)),
-  onSearchClearHandler: ev => isPlainClick(ev) && dispatch(getArtists()),
-  onMoreArtistsHandler: ev => isPlainClick(ev) && dispatch(getMoreArtists()),
+  onSearchClearHandler: () => dispatch(getArtists()),
+  onMoreArtistsHandler: () => dispatch(getMoreArtists()),
 });
 
 export default compose(

@@ -5,7 +5,6 @@ import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 import FoldingToolbar from '_components/misc/foldingToolbar';
 import Icon from '_components/misc/icon';
 
-import isPlainClick from '_utils/isPlainClick';
 import {
   deletePlayList,
   savePlayList,
@@ -53,8 +52,8 @@ export const mapStateToProps =
   (state, props) => playListSelectors.item(state, props.idPlayList);
 
 export const mapDispatchToProps = (dispatch, { idPlayList }) => ({
-  onDeleteClick: ev => isPlainClick(ev) && dispatch(deletePlayList(idPlayList)),
-  onSaveClick: ev => isPlainClick(ev) && dispatch(savePlayList(idPlayList)),
+  onDeleteClick: () => dispatch(deletePlayList(idPlayList)),
+  onSaveClick: () => dispatch(savePlayList(idPlayList)),
 });
 
 export default connect(

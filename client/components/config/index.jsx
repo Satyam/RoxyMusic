@@ -9,12 +9,10 @@ import Checkbox from 'react-bootstrap/lib/Checkbox';
 import ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import FormControl from 'react-bootstrap/lib/FormControl';
 import HelpBlock from 'react-bootstrap/lib/HelpBlock';
-import Button from 'react-bootstrap/lib/Button';
 import Icon from '_components/misc/icon';
 
 import { setConfig } from '_store/actions';
 import { configSelectors } from '_store/selectors';
-import isPlainClick from '_utils/isPlainClick';
 import bindHandlers from '_utils/bindHandlers';
 
 
@@ -38,10 +36,8 @@ export class ConfigComponent extends Component {
   onOpenFolderHandler(ev) {
     // pending
   }
-  onSubmitHandler(ev) {
-    if (isPlainClick(ev)) {
-      this.props.onSubmit(this.state, pick(this.props, relevantProps));
-    }
+  onSubmitHandler() {
+    this.props.onSubmit(this.state, pick(this.props, relevantProps));
   }
   render() {
     return (<div>
@@ -97,7 +93,11 @@ export class ConfigComponent extends Component {
       >
         Wide Screen
       </Checkbox>
-      <Button onClick={this.onSubmitHandler}>Submit</Button>
+      <Icon
+        type="ok"
+        button
+        onClick={this.onSubmitHandler}
+      >Submit</Icon>
     </div>);
   }
 }

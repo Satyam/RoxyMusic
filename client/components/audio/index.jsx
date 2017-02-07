@@ -8,7 +8,6 @@ import Icon from '_components/misc/icon';
 import ProgressBar from 'react-bootstrap/lib/ProgressBar';
 import Well from 'react-bootstrap/lib/Well';
 import bindHandlers from '_utils/bindHandlers';
-import isPlainClick from '_utils/isPlainClick';
 
 import {
   playNextTrack,
@@ -60,14 +59,12 @@ export class AudioComponent extends Component {
       });
     }
   }
-  onPlayPauseClickHandler(ev) {
-    if (isPlainClick(ev)) {
-      const audio = this.audio;
-      if (audio.paused) {
-        audio.play();
-      } else {
-        audio.pause();
-      }
+  onPlayPauseClickHandler() {
+    const audio = this.audio;
+    if (audio.paused) {
+      audio.play();
+    } else {
+      audio.pause();
     }
   }
   onPlayHandler() {

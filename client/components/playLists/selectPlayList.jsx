@@ -9,7 +9,6 @@ import InputGroup from 'react-bootstrap/lib/InputGroup';
 import FormControl from 'react-bootstrap/lib/FormControl';
 import HelpBlock from 'react-bootstrap/lib/HelpBlock';
 import Modal from 'react-bootstrap/lib/Modal';
-import Button from 'react-bootstrap/lib/Button';
 import Icon from '_components/misc/icon';
 
 import initStore from '_utils/initStore';
@@ -44,11 +43,9 @@ export class SelectPlayListComponent extends Component {
       ),
     });
   }
-  onSubmitHandler(ev) {
-    if (isPlainClick(ev)) {
-      this.props.onAddToNewPlayList(this.state.newName);
-      this.setState({ newName: '' });
-    }
+  onSubmitHandler() {
+    this.props.onAddToNewPlayList(this.state.newName);
+    this.setState({ newName: '' });
   }
 
   render() {
@@ -107,7 +104,11 @@ export class SelectPlayListComponent extends Component {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button onClick={onClose}>Close</Button>
+          <Icon
+            type="remove"
+            button
+            onClick={onClose}
+          >Close</Icon>
         </Modal.Footer>
 
       </Modal>
@@ -136,7 +137,7 @@ export const mapDispatchToProps = dispatch => ({
     && dispatch(addTracksToPlayList(idPlayList)),
   onAddToNewPlayList: name =>
     dispatch(addTracksToNewPLaylist(name)),
-  onClose: ev => isPlainClick(ev) && dispatch(closeAddToPlayList()),
+  onClose: () => dispatch(closeAddToPlayList()),
 });
 
 const enhance = compose(

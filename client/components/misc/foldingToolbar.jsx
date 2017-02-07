@@ -17,8 +17,8 @@ class FoldingToolbar extends Component {
   componentWillUnmount() {
     if (this.timer) clearInterval(this.timer);
   }
-  onOpenHandler(ev) {
-    if (isPlainClick(ev)) this.setState({ open: true });
+  onOpenHandler() {
+    this.setState({ open: true });
     this.timer = setTimeout(() => this.close(), 10000);
   }
   onClickHandler(ev) {
