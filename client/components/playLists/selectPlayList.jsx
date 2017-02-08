@@ -2,6 +2,7 @@ import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'recompose';
 
+import Panel from 'react-bootstrap/lib/Panel';
 import ListGroup from 'react-bootstrap/lib/ListGroup';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 import FormGroup from 'react-bootstrap/lib/FormGroup';
@@ -10,6 +11,7 @@ import FormControl from 'react-bootstrap/lib/FormControl';
 import HelpBlock from 'react-bootstrap/lib/HelpBlock';
 import Modal from 'react-bootstrap/lib/Modal';
 import Icon from '_components/misc/icon';
+import TrackList from '_components/tracks/trackList';
 
 import initStore from '_utils/initStore';
 import {
@@ -51,6 +53,7 @@ export class SelectPlayListComponent extends Component {
   render() {
     const {
       idTracksToAdd,
+      duplicatesToAdd,
       list,
       onClose,
       onPlayListClick,
@@ -63,44 +66,66 @@ export class SelectPlayListComponent extends Component {
         </Modal.Header>
 
         <Modal.Body>
-          <ListGroup>
-            {
-              list.map(playList => (
-                <ListGroupItem
-                  key={playList.idPlayList}
-                  onClick={onPlayListClick(playList.idPlayList)}
+          {
+            duplicatesToAdd
+            ? (
+              <Panel
+                header="These tracks are already in the playlist"
+                bsStyle="danger"
+              >
+                <Icon
+                  type="list"
+                  href={`/playLists/${duplicatesToAdd.idPlayList}`}
                 >
-                  {playList.name}
-                </ListGroupItem>
-              ))
-            }
-            <ListGroupItem key="new">
-              <FormGroup validationState={this.state.duplicate ? 'warning' : null}>
-                <InputGroup>
-                  <InputGroup.Addon>New Playlist</InputGroup.Addon>
-                  <FormControl
-                    type="text"
-                    value={this.state.value}
-                    placeholder="Enter name"
-                    onChange={this.onChangeHandler}
-                  />
-                  <InputGroup.Addon>
-                    <Icon
-                      type="plus"
-                      disabled={!this.state.newName.length}
-                      onClick={this.onSubmitHandler}
-                      label="Add"
-                    />
-                  </InputGroup.Addon>
-                </InputGroup>
+                  {duplicatesToAdd.name}
+                </Icon>
+                <TrackList
+                  idTracks={duplicatesToAdd.idTracks}
+                  sorted
+                />
+              </Panel>
+            )
+            : (
+              <ListGroup>
                 {
-                  this.state.duplicate
-                  ? (<HelpBlock>Nombre ya existe.</HelpBlock>)
-                  : null
+                  list.map(playList => (
+                    <ListGroupItem
+                      key={playList.idPlayList}
+                      onClick={onPlayListClick(playList.idPlayList)}
+                    >
+                      {playList.name}
+                    </ListGroupItem>
+                  ))
                 }
-              </FormGroup>
-            </ListGroupItem>
-          </ListGroup>
+                <ListGroupItem key="new">
+                  <FormGroup validationState={this.state.duplicate ? 'warning' : null}>
+                    <InputGroup>
+                      <InputGroup.Addon>New Playlist</InputGroup.Addon>
+                      <FormControl
+                        type="text"
+                        value={this.state.value}
+                        placeholder="Enter name"
+                        onChange={this.onChangeHandler}
+                      />
+                      <InputGroup.Addon>
+                        <Icon
+                          type="plus"
+                          disabled={!this.state.newName.length}
+                          onClick={this.onSubmitHandler}
+                          label="Add"
+                        />
+                      </InputGroup.Addon>
+                    </InputGroup>
+                    {
+                      this.state.duplicate
+                      ? (<HelpBlock>Nombre ya existe.</HelpBlock>)
+                      : null
+                    }
+                  </FormGroup>
+                </ListGroupItem>
+              </ListGroup>
+            )
+          }
         </Modal.Body>
 
         <Modal.Footer>
@@ -120,6 +145,7 @@ SelectPlayListComponent.propTypes = {
   idTracksToAdd: PropTypes.arrayOf(
     PropTypes.number
   ),
+  duplicatesToAdd: PropTypes.object,
   list: PropTypes.arrayOf(PropTypes.object),
   onPlayListClick: PropTypes.func,
   onAddToNewPlayList: PropTypes.func,
@@ -129,6 +155,7 @@ SelectPlayListComponent.propTypes = {
 export const mapStateToProps = state => ({
   list: playListSelectors.orderedList(state),
   idTracksToAdd: playListSelectors.tracksToAdd(state),
+  duplicatesToAdd: playListSelectors.duplicatesToAdd(state),
 });
 
 export const mapDispatchToProps = dispatch => ({

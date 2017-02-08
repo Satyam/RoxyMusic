@@ -1,6 +1,7 @@
 import restAPI from '_platform/restAPI';
 import asyncActionCreator from '_utils/asyncActionCreator';
-
+import intersection from 'lodash/intersection';
+import without from 'lodash/without';
 import {
   playListSelectors,
   albumSelectors,
@@ -16,6 +17,7 @@ export const ADD_PLAY_LIST = `${NAME}/add playlist`;
 export const DELETE_PLAY_LIST = `${NAME}/delete playlist`;
 export const ADD_TRACK_TO_PLAYLIST = `${NAME}/add track to playlist`;
 export const SELECT_PLAYLIST_FOR_TRACK = `${NAME}/select playlist for track`;
+export const DUPLICATE_PLAYLIST_FOR_TRACK = `${NAME}/track already exists in playlist`;
 export const CLOSE_ADD_TO_PLAYLIST = `${NAME}/close add to playlist`;
 export const SAVE_ALL_PLAYLISTS = `${NAME}/save all playlists`;
 export const SAVE_PLAYLIST = `${NAME}/save playlist`;
@@ -80,13 +82,29 @@ export function addTracksToPlayList(idPlayList) {
   return (dispatch, getState) => {
     const state = getState();
     const playList = playListSelectors.item(state, idPlayList);
-    const idTracksToAdd = playListSelectors.tracksToAdd(state);
-    return dispatch(updatePlayList(
-      idPlayList,
-      playList.name,
-      playList.idTracks.concat(idTracksToAdd)
-    ))
-    .then(() => dispatch(closeAddToPlayList()));
+    let idTracksToAdd = playListSelectors.tracksToAdd(state);
+    const duplicates = intersection(idTracksToAdd, playList.idTracks);
+    if (duplicates.length) {
+      dispatch({
+        type: DUPLICATE_PLAYLIST_FOR_TRACK,
+        payload: {
+          idTracks: duplicates,
+          name: playList.name,
+          idPlayList,
+        },
+      });
+      idTracksToAdd = without(idTracksToAdd, ...duplicates);
+    } else {
+      dispatch(closeAddToPlayList());
+    }
+    if (idTracksToAdd.length) {
+      return dispatch(updatePlayList(
+        idPlayList,
+        playList.name,
+        playList.idTracks.concat(idTracksToAdd)
+      ));
+    }
+    return null;
   };
 }
 

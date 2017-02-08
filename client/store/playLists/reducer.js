@@ -14,6 +14,7 @@ import {
   ADD_PLAY_LIST,
   DELETE_PLAY_LIST,
   SELECT_PLAYLIST_FOR_TRACK,
+  DUPLICATE_PLAYLIST_FOR_TRACK,
   CLOSE_ADD_TO_PLAYLIST,
 } from './actions';
 
@@ -26,6 +27,7 @@ function initSelectors(key) {
   playListSelectors.exists = (state, idPlayList) => idPlayList in state[key].hash;
   playListSelectors.all = state => state[key].hash;
   playListSelectors.tracksToAdd = state => state[key].idTracksToAdd;
+  playListSelectors.duplicatesToAdd = state => state[key].duplicatesToAdd;
   playListSelectors.orderedList = state =>
     sortBy(state[key].hash, playList => playList.name);
 }
@@ -35,6 +37,7 @@ export default (
     status: 0,
     hash: {},
     idTracksToAdd: null,
+    duplicatesToAdd: null,
   },
   action
 ) => {
@@ -59,8 +62,8 @@ export default (
     case UPDATE_PLAYLIST:
       return update(state, { hash: {
         [idPlayList]: {
-          name: { $set: payload.name },
-          idTracks: { $set: payload.idTracks },
+          name: { $apply: name => (payload.name || name) },
+          idTracks: { $apply: idTracks => (payload.idTracks || idTracks) },
         },
       } });
     case ADD_PLAY_LIST:
@@ -76,8 +79,13 @@ export default (
       return update(state, { hash: { $set: omit(state.hash, idPlayList) } });
     case SELECT_PLAYLIST_FOR_TRACK:
       return update(state, { idTracksToAdd: { $set: action.idTracks } });
+    case DUPLICATE_PLAYLIST_FOR_TRACK:
+      return update(state, { duplicatesToAdd: { $set: payload } });
     case CLOSE_ADD_TO_PLAYLIST:
-      return update(state, { idTracksToAdd: { $set: null } });
+      return update(state, {
+        idTracksToAdd: { $set: null },
+        duplicatesToAdd: { $set: null },
+      });
     case '@@selectors':
       initSelectors(action.key);
       return state;
