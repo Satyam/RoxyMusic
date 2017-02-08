@@ -287,7 +287,7 @@ export function clearAll() {
 // Called from importCatalogInfo.jsx
 export function importCatalog() {
   return dispatch =>
-    Promise.resolve(dispatch(getMissingTracks()))
+    dispatch(getMissingTracks())
     .then(() => dispatch(getMissingAlbums()))
     .then(() => dispatch(getMissingArtists()))
     .then(() => dispatch(updateAlbumArtistMap()))
