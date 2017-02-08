@@ -6,7 +6,6 @@ import TrackList from '_components/tracks/trackList';
 import compose from 'recompose/compose';
 import {
   getPlayList,
-  getPlayLists,
   updatePlayList,
 } from '_store/actions';
 
@@ -49,12 +48,7 @@ PlayListComponent.propTypes = {
 
 export const storeInitializer = (dispatch, state, props) => {
   const idPlayList = props.params.idPlayList || 0;
-  return (
-    playListSelectors.loading(state)
-    ? Promise.resolve()
-    : dispatch(getPlayLists())
-  ).then(() =>
-    playListSelectors.exists(state, idPlayList) || dispatch(getPlayList(idPlayList)));
+  return playListSelectors.exists(state, idPlayList) || dispatch(getPlayList(idPlayList));
 };
 
 export const mapStateToProps =
@@ -62,7 +56,7 @@ export const mapStateToProps =
 
 export const mapDispatchToProps = (dispatch, props) => ({
   onDragEnd: idTracks =>
-    dispatch(updatePlayList(props.params.idPlayList, props.params.name, idTracks)),
+    dispatch(updatePlayList(props.params.idPlayList, null, idTracks)),
 });
 
 const enhance = compose(
