@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import Icon from '_components/misc/icon';
 import compose from 'recompose/compose';
 import FoldingToolbar from '_components/misc/foldingToolbar';
-import isPlainClick from '_utils/isPlainClick';
 
 import {
   playNow,
@@ -20,7 +19,7 @@ NowPlayingTracksToolbarComponent.propTypes = {
 };
 
 export const mapDispatchToProps = (dispatch, { idTrack }) => ({
-  onPlayClick: ev => isPlainClick(ev) && dispatch(playNow(idTrack)),
+  onPlayClick: () => dispatch(playNow(idTrack)),
 });
 
 export default compose(
