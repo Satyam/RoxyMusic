@@ -37,47 +37,49 @@ export function PlayListDiffComponent({
         </div>
       </ListGroupItem>
       <ListGroupItem>
-        <Table bordered condensed hover responsive>
-          <thead>
+        <Table className={styles.centeredTable} bordered condensed hover responsive>
+          <thead className={styles.thead}>
             <tr>
               <th>Tablet</th>
               <th>Server</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              (
-                client.name === server.name
-                ? (<td colSpan="2">{client.name}</td>)
-                : (<td>{client.name}</td><td>{server.name}</td>)
-              )
-            </tr>
-            {[
-              (<tr>
-                <td className={styles.newer}>{client.lastUpdated}</td>
-                <td className={styles.older}>{server.lastUpdated}</td>
-              </tr>),
-              (<tr><td colSpan="2">Update date match: {client.lastUpdated}</td></tr>),
-              (<tr>
-                <td className={styles.older}>{client.lastUpdated}</td>
-                <td className={styles.newer}>{server.lastUpdated}</td>
-              </tr>),
-            ][Math.sign(Date.parse(client.lastUpdated) - Date.parse(server.lastUpdated)) + 1]
+            <tr><th colSpan="2" className={styles.headingRow}>Name</th></tr>
+            {
+              client.name === server.name
+              ? (<tr><td colSpan="2">{client.name}</td></tr>)
+              : (<tr><td>{client.name}</td><td>{server.name}</td></tr>)
             }
+            <tr><th colSpan="2" className={styles.headingRow}>Update Dates</th></tr>
+            {
+              [
+                (<tr>
+                  <td className={styles.older}>{client.lastUpdated}</td>
+                  <td className={styles.newer}>{server.lastUpdated}</td>
+                </tr>),
+                (<tr><td colSpan="2">Update date match: {client.lastUpdated}</td></tr>),
+                (<tr>
+                  <td className={styles.newer}>{client.lastUpdated}</td>
+                  <td className={styles.older}>{server.lastUpdated}</td>
+                </tr>),
+              ][Math.sign(Date.parse(client.lastUpdated) - Date.parse(server.lastUpdated)) + 1]
+            }
+            <tr><th colSpan="2" className={styles.headingRow}>Tracks</th></tr>
             {diffs.map(diff =>
-              ((diff.added || null) && diff.values.map(v => (
+              ((diff.added || null) && diff.value.map(v => (
                 <tr>
                   <td className={styles.missing} />
                   <td className={styles.added}>{v}</td>
                 </tr>
               ))) ||
-              ((diff.removed || null) && diff.values.map(v => (
+              ((diff.removed || null) && diff.value.map(v => (
                 <tr>
                   <td className={styles.added}>{v}</td>
                   <td className={styles.missing} />
                 </tr>
               ))) ||
-              diff.values.map(v => (
+              diff.value.map(v => (
                 <tr>
                   <td colSpan="2">{v}</td>
                 </tr>

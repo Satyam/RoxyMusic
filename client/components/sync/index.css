@@ -13,3 +13,27 @@
 .table td {
   padding: 0.5em;
 }
+.centeredTable {
+ text-align: center;
+}
+.thead th {
+  font-size: xx-large;
+  text-align: center;
+}
+.headingRow {
+  font-size: larger;
+  text-align: center;
+  composes: global(bg-primary);
+}
+.newer {
+  composes: global(bg-success);
+}
+.older {
+  composes: global(bg-warning);
+}
+.missing {
+  composes: global(bg-danger);
+}
+.added {
+  composes: global(bg-info);
+}
