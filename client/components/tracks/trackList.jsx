@@ -21,10 +21,10 @@ export function TrackListComponent({
     <ListGroup>
       {idTracks.map(idTrack => (
         <ListGroupItem
+          key={idTrack}
           bsStyle={background && background[idTrack]}
         >
           <Track
-            key={idTrack}
             idTrack={idTrack}
             Toolbar={Toolbar}
           />
