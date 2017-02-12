@@ -1,5 +1,6 @@
 import restAPI from '_platform/restAPI';
 import asyncActionCreator from '_utils/asyncActionCreator';
+import difference from 'lodash/difference';
 
 import {
   nowPlayingSelectors,
@@ -47,7 +48,9 @@ export function playNow(idTrack) {
 export function addToNowPlaying(idTracks) {
   return (dispatch, getState) => dispatch(update(
     PLAY_NOW,
-    nowPlayingSelectors.idTracks(getState()).concat(idTracks),
+    // To avoid duplicate tracks in the list, the first existing track is dropped
+    // and the new instance relocated to the back;
+    difference(nowPlayingSelectors.idTracks(getState()), idTracks).concat(idTracks),
     nowPlayingSelectors.current(getState())
   ));
 }
