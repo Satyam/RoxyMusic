@@ -157,7 +157,9 @@ export function storeInitializer(dispatch, state) {
   if (nowPlayingSelectors.isReady(state)) {
     if (nowPlayingSelectors.on(state)) {
       const idTrack = nowPlayingSelectors.currentIdTrack(state);
-      trackP = trackSelectors.exists(state, idTrack) || dispatch(getTrack(idTrack));
+      if (idTrack) {
+        trackP = trackSelectors.exists(state, idTrack) || dispatch(getTrack(idTrack));
+      }
     }
   }
   return trackP;
