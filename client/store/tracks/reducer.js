@@ -1,3 +1,7 @@
+import pick from 'lodash/pick';
+import sortBy from 'lodash/sortBy';
+import map from 'lodash/map';
+
 import {
   REPLY_RECEIVED,
 } from '_store/requests/actions';
@@ -12,8 +16,18 @@ export const trackSelectors = {};
 function initSelectors(key) {
   trackSelectors.exists = (state, idTrack) => idTrack in state[key];
   trackSelectors.item = (state, idTrack) => state[key][idTrack] || {};
-  trackSelectors.cachedTracks = state =>
+  trackSelectors.cachedIdTracks = state =>
     Object.keys(state[key]).map(id => parseInt(id, 10));
+  trackSelectors.idTracks = (state, idTracks, sorted) => {
+    if (!sorted) return idTracks;
+    return map(
+      sortBy(
+        pick(state[key], idTracks),
+        track => track.title + track.album + track.track
+      ),
+      track => track.idTrack
+    );
+  };
 }
 
 export default (

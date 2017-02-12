@@ -10,7 +10,7 @@ export const GET_TRACKS = 'tracks/get tracks';
 
 export function getTracks(idTracks) {
   return (dispatch, getState) => {
-    const currentIds = trackSelectors.cachedTracks(getState());
+    const currentIds = trackSelectors.cachedIdTracks(getState());
     const missing = difference(idTracks, currentIds);
     if (missing.length === 0) return null;
     return dispatch(asyncActionCreator(
@@ -20,7 +20,8 @@ export function getTracks(idTracks) {
         requested: idTracks,
         missing,
       }
-    ));
+    ))
+    ;
   };
 }
 
