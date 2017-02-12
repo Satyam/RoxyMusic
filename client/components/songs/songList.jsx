@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { compose } from 'recompose';
 
 import Navbar from 'react-bootstrap/lib/Navbar';
-import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 
 import TrackList from '_components/tracks/trackList';
 
@@ -43,17 +42,8 @@ export function SongListComponent({
       <TrackList
         idTracks={list.map(song => song.idTrack)}
         Toolbar="default"
-      >
-        <ListGroupItem>
-          <Icon
-            button
-            block
-            type="menu-down"
-            label="More"
-            onClick={onMoreSongsHandler}
-          />
-        </ListGroupItem>
-      </TrackList>
+        onMoreClick={onMoreSongsHandler}
+      />
     </div>
   );
 }
