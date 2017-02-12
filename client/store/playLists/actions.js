@@ -48,6 +48,13 @@ export function updatePlayList(idPlayList, name, idTracks, idDevice = 0) {
   );
 }
 
+export function deleteTrackFromPlaylist(idPlayList, idTrack) {
+  return (dispatch, getState) => {
+    const playList = playListSelectors.item(getState(), idPlayList);
+    const idTracks = without(playList.idTracks, idTrack);
+    return dispatch(updatePlayList(idPlayList, playList.name, idTracks));
+  };
+}
 
 export function addPlayList(name, idTracks = [], idPlayList = '', idDevice = 0) {
   return asyncActionCreator(
