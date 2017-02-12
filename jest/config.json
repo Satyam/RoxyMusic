@@ -1,0 +1,26 @@
+{
+  "moduleFileExtensions": [
+    "js",
+    "jsx"
+  ],
+  "moduleNameMapper": {
+    "^_client/(.*)": "<rootDir>/client/$1",
+    "^_server/(.*)": "<rootDir>/server/$1",
+    "^_store/(.*)": "<rootDir>/client/store/$1",
+    "^_components/(.*)": "<rootDir>/client/components/$1",
+    "^_utils/(.*)": "<rootDir>/client/utils/$1",
+    "^_platform/restAPI": "<rootDir>/webClient/restAPI.js",
+    "\\.(css|less)$": "<rootDir>/jest/styleMock.js"
+  },
+  "globals": {
+    "process.env": {
+      "NODE_ENV": "development"
+    },
+    "PORT": "8080",
+    "HOST": "http://localhost",
+    "REST_API_PATH": "/data/v2",
+    "ROOT_DIR": "/",
+    "BUNDLE": "webClient"
+  },
+  "transform": {".*": "<rootDir>/node_modules/jest-css-modules"}
+}
