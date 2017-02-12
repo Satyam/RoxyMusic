@@ -18,7 +18,7 @@ function Icon({
   ...props
  }) {
   /* eslint-disable jsx-a11y/no-static-element-interactions */
-  const actualOnClick = ev => !disabled && isPlainClick(ev) && onClick(ev);
+  const actualOnClick = !disabled && onClick && (ev => isPlainClick(ev) && onClick(ev));
   const span = (
     <span className={styles.icons}>{
       type.split(',').map(t => (
