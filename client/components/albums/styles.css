@@ -1,3 +1,9 @@
+.album-info {
+  padding-top: 1em;
+}
+.album-num-tracks {
+  font-size: small;
+}
 .li {
   overflow: hidden;
 }

@@ -18,7 +18,7 @@ import {
   syncSelectors,
 } from '_store/selectors';
 
-import styles from './index.css';
+import styles from './styles.css';
 
 export function TransferFilesComponent({
   list,

@@ -6,7 +6,7 @@ import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 // import FoldingToolbar from '_components/misc/foldingToolbar';
 // import Icon from '_components/misc/icon';
 
-import styles from './artistListItem.css';
+import styles from './styles.css';
 
 export const ArtistListItemComponent = ({ idArtist, artist, numTracks }) => (
   <ListGroupItem className={styles.li}>

@@ -17,7 +17,7 @@ import { configSelectors } from '_store/selectors';
 // const db = remote.getGlobal('db');
 // console.log(db.all('select * from Albums'));
 
-import styles from './app.css';
+import styles from './styles.css';
 
 export const AppComponent = ({ wide, children }) => (
   <div className={styles.app}>

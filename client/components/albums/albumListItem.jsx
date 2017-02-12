@@ -14,7 +14,7 @@ import {
 
 import { albumSelectors } from '_store/selectors';
 
-import styles from './albumListItem.css';
+import styles from './styles.css';
 
 export const AlbumListItemComponent = ({
   idAlbum,

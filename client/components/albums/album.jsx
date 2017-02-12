@@ -7,7 +7,7 @@ import { getAlbum } from '_store/actions';
 import { albumSelectors } from '_store/selectors';
 import initStore from '_utils/initStore';
 import TrackList from '_components/tracks/trackList';
-import styles from './album.css';
+import styles from './styles.css';
 
 export const AlbumComponent = ({ idAlbum, album, artists, numTracks, idTracks, error }) =>
   (idAlbum || null) && (

@@ -10,7 +10,7 @@ import {
   push,
 } from '_store/actions';
 
-import styles from './index.css';
+import styles from './styles.css';
 
 export function AllDoneComponent({
   onDone,

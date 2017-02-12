@@ -12,7 +12,7 @@ import {
 } from 'react-sortable-hoc';
 
 import Track from './track';
-import styles from './track.css';
+import styles from './styles.css';
 
 
 const DraggableTrack = DragElement(props => (

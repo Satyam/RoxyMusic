@@ -14,7 +14,7 @@ import SearchField from '_components/misc/searchField';
 import { getSongs, getMoreSongs } from '_store/actions';
 import { songSelectors } from '_store/selectors';
 
-import styles from './songList.css';
+import styles from './styles.css';
 
 export function SongListComponent({
   list,

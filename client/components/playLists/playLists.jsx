@@ -14,7 +14,7 @@ import { getPlayLists, saveAllPlayLists } from '_store/actions';
 
 import { playListSelectors } from '_store/selectors';
 
-import styles from './playLists.css';
+import styles from './styles.css';
 import PlayListItem from './playListItem';
 
 export function PlayListsComponent({

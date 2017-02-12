@@ -12,7 +12,6 @@ import SearchField from '_components/misc/searchField';
 import { getAlbums, getMoreAlbums } from '_store/actions';
 import { albumSelectors } from '_store/selectors';
 
-import styles from './albumList.css';
 import AlbumListItem from './albumListItem';
 
 export function AlbumListComponent({
@@ -23,7 +22,7 @@ export function AlbumListComponent({
   onMoreAlbumsHandler,
  }) {
   return (
-    <div className={styles.albumList}>
+    <div>
       <Navbar>
         <Navbar.Header>
           <Navbar.Brand>

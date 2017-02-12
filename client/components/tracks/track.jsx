@@ -5,7 +5,7 @@ import { trackSelectors } from '_store/selectors';
 
 import renderAttr from '_components/misc/renderAttr';
 import { Song, Album, Artist } from '_components/entries';
-import styles from './track.css';
+import styles from './styles.css';
 import DefaultToolbar from './defaultTracksToolbar';
 
 export const TrackComponent = ({

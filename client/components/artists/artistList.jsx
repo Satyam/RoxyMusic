@@ -11,7 +11,6 @@ import Icon from '_components/misc/icon';
 import SearchField from '_components/misc/searchField';
 import { getArtists, getMoreArtists } from '_store/actions';
 import { artistSelectors } from '_store/selectors';
-import styles from './artistList.css';
 import ArtistListItem from './artistListItem';
 
 export function ArtistListComponent({
@@ -22,7 +21,7 @@ export function ArtistListComponent({
   onMoreArtistsHandler,
  }) {
   return (
-    <div className={styles.artistList}>
+    <div>
       <Navbar>
         <Navbar.Header>
           <Navbar.Brand>

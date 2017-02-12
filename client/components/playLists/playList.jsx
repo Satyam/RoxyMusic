@@ -13,7 +13,7 @@ import { playListSelectors } from '_store/selectors';
 
 import initStore from '_utils/initStore';
 import PlayListToolbar from './playListTrackToolbar';
-import styles from './playList.css';
+import styles from './styles.css';
 
 export const PlayListComponent = ({
   idPlayList,

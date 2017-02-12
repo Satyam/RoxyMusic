@@ -1,0 +1,18 @@
+.play-list-num-tracks {
+  font-size: small;
+}
+.right {
+  float:right;
+  width: 10%;
+  text-align: right;
+  padding: 0.5em 0;
+}
+.li {
+  overflow: hidden;
+}
+.name {
+  font-weight: bold;
+}
+.left {
+  float:left;
+}

@@ -16,7 +16,7 @@ import {
   syncSelectors,
 } from '_store/selectors';
 
-import styles from './index.css';
+import styles from './styles.css';
 // console.log(diffArrays('1,3,5,7'.split(','), '3,4'.split(',')));
 
 // [ { count: 1, added: undefined, removed: true, value: [ '1' ] },

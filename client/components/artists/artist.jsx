@@ -7,7 +7,7 @@ import { getArtist } from '_store/actions';
 import { artistSelectors } from '_store/selectors';
 import initStore from '_utils/initStore';
 import TrackList from '_components/tracks/trackList';
-import styles from './artist.css';
+import styles from './styles.css';
 
 export const ArtistComponent = ({ idArtist, artist, numTracks, idTracks, error }) =>
   (idArtist || null) && (

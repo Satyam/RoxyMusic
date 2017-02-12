@@ -12,7 +12,7 @@ import {
 
 import { playListSelectors } from '_store/selectors';
 
-import styles from './playListItem.css';
+import styles from './styles.css';
 
 export const PlayListItemComponent = ({
   idPlayList,

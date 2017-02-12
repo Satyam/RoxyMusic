@@ -20,7 +20,7 @@ import initStore from '_utils/initStore';
 
 import PlayListItemCompare from './playListItemCompare';
 
-import styles from './index.css';
+import styles from './styles.css';
 
 export function PlayListCompareComponent({
   hash,

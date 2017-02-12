@@ -16,7 +16,7 @@ import {
 
 import { configSelectors } from '_store/selectors';
 
-import styles from './index.css';
+import styles from './styles.css';
 
 export function SyncComponent({
   remoteHost,
