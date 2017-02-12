@@ -1,7 +1,7 @@
 import restAPI from '_platform/restAPI';
 import asyncActionCreator from '_utils/asyncActionCreator';
 
-import { artistSelector } from '_store/selectors';
+import { artistSelectors } from '_store/selectors';
 
 const NAME = 'artists';
 const api = restAPI(NAME);
