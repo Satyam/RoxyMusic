@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Navbar from 'react-bootstrap/lib/Navbar';
 import Icon from '_components/misc/icon';
-import TrackList from '_components/tracks/trackList';
+import TrackList from '_components/tracks/draggableTrackList';
 import compose from 'recompose/compose';
 import {
   getPlayList,
@@ -12,9 +12,15 @@ import {
 import { playListSelectors } from '_store/selectors';
 
 import initStore from '_utils/initStore';
+import PlayListToolbar from './playListTrackToolbar';
 import styles from './playList.css';
 
-export const PlayListComponent = ({ idPlayList, name, idTracks, onDragEnd }) =>
+export const PlayListComponent = ({
+  idPlayList,
+  name,
+  idTracks,
+  onDragEnd,
+}) =>
   (typeof idPlayList !== 'undefined' || null) && (
     <div className={styles.playList}>
       <Navbar>
@@ -31,6 +37,7 @@ export const PlayListComponent = ({ idPlayList, name, idTracks, onDragEnd }) =>
       <TrackList
         idTracks={idTracks}
         onDragEnd={onDragEnd}
+        Toolbar={PlayListToolbar(idPlayList)}
       />
     </div>
   );

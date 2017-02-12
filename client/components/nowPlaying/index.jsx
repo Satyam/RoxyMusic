@@ -5,7 +5,7 @@ import initStore from '_utils/initStore';
 
 import Navbar from 'react-bootstrap/lib/Navbar';
 import Icon from '_components/misc/icon';
-import TrackList from '_components/tracks/trackList';
+import TrackList from '_components/tracks/draggableTrackList';
 
 import {
   loadNowPlayingList,

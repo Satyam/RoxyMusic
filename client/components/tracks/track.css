@@ -14,3 +14,6 @@
 .album {
   margin-left: 2em;
 }
+.draggedTrack {
+  opacity: 0.5;
+}

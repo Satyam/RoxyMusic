@@ -1,13 +1,8 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { compose } from 'recompose';
-import isPlainClick from '_utils/isPlainClick';
 
-import { getTracks, playNow } from '_store/actions';
 import { trackSelectors } from '_store/selectors';
 
-import initStore from '_utils/initStore';
-import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 import renderAttr from '_components/misc/renderAttr';
 import { Song, Album, Artist } from '_components/entries';
 import styles from './track.css';
@@ -23,13 +18,13 @@ export const TrackComponent = ({
   track,
   error,
   Toolbar,
-  background,
 }) =>
   (idTrack || null) && (
     error === 404
     ? (<div className={styles.notFound}>Track for that URL no longer exists</div>)
     : (
-      <ListGroupItem className={styles.track} bsStyle={background}>
+      <div className={styles.track}>
+
         <div className={styles.left}>
           <Song
             className={styles.title}
@@ -49,7 +44,7 @@ export const TrackComponent = ({
           />
         </div>
         {renderAttr(Toolbar === 'default' ? DefaultToolbar : Toolbar, { idTrack })}
-      </ListGroupItem>
+      </div>
     )
   );
 
@@ -67,24 +62,10 @@ TrackComponent.propTypes = {
     PropTypes.oneOf(['default']),
   ]),
 
-  background: PropTypes.string,
-};
-
-export const storeInitializer = (dispatch, state, props) => {
-  const idTrack = props.idTrack;
-  return trackSelectors.exists(state, idTrack) || dispatch(getTracks(idTrack));
 };
 
 export const mapStateToProps = (state, props) => trackSelectors.item(state, props.idTrack);
 
-export const mapDispatchToProps = (dispatch, { idTrack }) => ({
-  onPlayClick: ev => isPlainClick(ev) && dispatch(playNow(idTrack)),
-});
-
-export default compose(
-  initStore(storeInitializer),
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  ),
+export default connect(
+    mapStateToProps
 )(TrackComponent);
