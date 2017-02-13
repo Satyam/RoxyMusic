@@ -21,8 +21,8 @@ export function getArtists(search) {
 export function getMoreArtists() {
   return (dispatch, getState) => {
     const state = getState();
-    const search = artistSelector.searchTerm(state);
-    const offset = artistSelector.nextOffset(state);
+    const search = artistSelectors.searchTerm(state);
+    const offset = artistSelectors.nextOffset(state);
 
     return dispatch(asyncActionCreator(
       GET_MORE_ARTISTS,
