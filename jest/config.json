@@ -22,5 +22,6 @@
     "ROOT_DIR": "/",
     "BUNDLE": "webClient"
   },
-  "transform": {".*": "<rootDir>/node_modules/jest-css-modules"}
+  "transform": {".*": "<rootDir>/node_modules/jest-css-modules"},
+  "coverageDirectory": "<rootDir>/coverage"
 }

@@ -1,0 +1,202 @@
+exports[`AppComponent snapshot testing with children 1`] = `
+<div>
+  <Uncontrolled(Navbar)
+    bsStyle="default">
+    <NavbarHeader>
+      <NavbarBrand>
+        <Icon
+          href="/"
+          label="Roxy Music"
+          title="home"
+          type="heart,music" />
+      </NavbarBrand>
+    </NavbarHeader>
+    <FoldingToolbar>
+      <Icon
+        button={true}
+        href="/config"
+        title="Configure"
+        type="cog" />
+    </FoldingToolbar>
+  </Uncontrolled(Navbar)>
+  <Connect(LoadingComponent) />
+  <Connect(ErrorsComponent) />
+  <initStore(Connect(SelectPlayListComponent)) />
+  <div>
+    <h1>
+      whatever
+    </h1>
+    <initStore(Connect(AudioComponent)) />
+  </div>
+</div>
+`;
+
+exports[`AppComponent snapshot testing with children and wide=true 1`] = `
+<div>
+  <Uncontrolled(Navbar)
+    bsStyle="default">
+    <NavbarHeader>
+      <NavbarBrand>
+        <Icon
+          href="/"
+          label="Roxy Music"
+          title="home"
+          type="heart,music" />
+      </NavbarBrand>
+    </NavbarHeader>
+    <FoldingToolbar>
+      <Icon
+        button={true}
+        href="/config"
+        title="Configure"
+        type="cog" />
+    </FoldingToolbar>
+  </Uncontrolled(Navbar)>
+  <Connect(LoadingComponent) />
+  <Connect(ErrorsComponent) />
+  <initStore(Connect(SelectPlayListComponent)) />
+  <div>
+    <div>
+      <h1>
+        whatever
+      </h1>
+    </div>
+    <div>
+      <initStore(Connect(AudioComponent)) />
+      <initStore(Connect(NowPlayingComponent)) />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`AppComponent snapshot testing with no properties 1`] = `
+<div>
+  <Uncontrolled(Navbar)
+    bsStyle="default">
+    <NavbarHeader>
+      <NavbarBrand>
+        <Icon
+          href="/"
+          label="Roxy Music"
+          title="home"
+          type="heart,music" />
+      </NavbarBrand>
+    </NavbarHeader>
+    <FoldingToolbar>
+      <Icon
+        button={true}
+        href="/config"
+        title="Configure"
+        type="cog" />
+    </FoldingToolbar>
+  </Uncontrolled(Navbar)>
+  <Connect(LoadingComponent) />
+  <Connect(ErrorsComponent) />
+  <initStore(Connect(SelectPlayListComponent)) />
+  <div>
+    <ul>
+      <Icon
+        block={true}
+        button="primary"
+        href="/albums"
+        type="cd">
+        Albums
+      </Icon>
+      <Icon
+        block={true}
+        button="primary"
+        href="/artists"
+        type="user">
+        Artists
+      </Icon>
+      <Icon
+        block={true}
+        button="primary"
+        href="/songs"
+        type="music">
+        Songs
+      </Icon>
+      <Icon
+        block={true}
+        button="primary"
+        href="/playLists"
+        type="list">
+        Play Lists
+      </Icon>
+      <Icon
+        block={true}
+        button="primary"
+        href="/now"
+        type="play">
+        Now Playing
+      </Icon>
+    </ul>
+    <initStore(Connect(AudioComponent)) />
+  </div>
+</div>
+`;
+
+exports[`AppComponent snapshot testing with wide=true 1`] = `
+<div>
+  <Uncontrolled(Navbar)
+    bsStyle="default">
+    <NavbarHeader>
+      <NavbarBrand>
+        <Icon
+          href="/"
+          label="Roxy Music"
+          title="home"
+          type="heart,music" />
+      </NavbarBrand>
+    </NavbarHeader>
+    <FoldingToolbar>
+      <Icon
+        button={true}
+        href="/config"
+        title="Configure"
+        type="cog" />
+    </FoldingToolbar>
+  </Uncontrolled(Navbar)>
+  <Connect(LoadingComponent) />
+  <Connect(ErrorsComponent) />
+  <initStore(Connect(SelectPlayListComponent)) />
+  <div>
+    <div>
+      <div>
+        <Icon
+          block={true}
+          button="primary"
+          href="/albums"
+          type="cd">
+          Albums
+        </Icon>
+        <Icon
+          block={true}
+          button="primary"
+          href="/artists"
+          type="user">
+          Artists
+        </Icon>
+        <Icon
+          block={true}
+          button="primary"
+          href="/songs"
+          type="music">
+          Songs
+        </Icon>
+        <Icon
+          block={true}
+          button="primary"
+          href="/playLists"
+          type="list">
+          Play Lists
+        </Icon>
+      </div>
+    </div>
+    <div>
+      <initStore(Connect(AudioComponent)) />
+      <initStore(Connect(NowPlayingComponent)) />
+    </div>
+  </div>
+</div>
+`;

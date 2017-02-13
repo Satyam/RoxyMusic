@@ -1,120 +1,53 @@
-import React, { PropTypes } from 'react';
-import { shallow, mount } from 'enzyme';
+import React from 'react';
+import { shallow } from 'enzyme';
+import toJson from 'enzyme-to-json';
 
-import configureMockStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
+import { AppComponent, mapStateToProps } from '../app';
 
-import App, { AppComponent } from '../app';
-
-function createStore(middlewares, initialState) {
-  return configureMockStore(middlewares)(initialState);
-}
-
-const initialState = {
-  requests: { pending: 0, errors: [] },
-  config: {},
-  playLists: {
-    status: 0,
-    hash: {},
+jest.mock('_store/selectors.js', () => ({
+  configSelectors: {
+    get: jest.fn((state, name) => state.config[name]),
   },
-};
+}));
 
 describe('AppComponent', () => {
-  // describe('with .html()', () => {
-  //   it('without store in context', () => {
-  //     const app = shallow(<AppComponent />);
-  //     console.log(app.html());
-  //   });
-  //   it('with store', () => {
-  //     const app = shallow(
-  //       <AppComponent />,
-  //       { context: { store: createStore([thunk], initialState) } }
-  //     );
-  //     console.log(app.html());
-  //   });
-  //   it('with store and enclosed JSX', () => {
-  //     const app = shallow(
-  //       (<AppComponent />),
-  //       { context: { store: createStore([thunk], initialState) } }
-  //     );
-  //     console.log(app.html());
-  //   });
-  // });
-  describe('with .text()', () => {
-    it('without store in context', () => {
-      const app = shallow(<AppComponent />);
-      console.log(app.text());
+  describe('snapshot testing', () => {
+    it('with no properties', () => {
+      const wrapper = shallow(<AppComponent />);
+      expect(toJson(wrapper)).toMatchSnapshot();
     });
-    it('with store', () => {
-      const app = shallow(
-        <AppComponent />,
-        { context: { store: createStore([thunk], initialState) } }
+
+    it('with wide=true', () => {
+      const wrapper = shallow(<AppComponent wide />);
+      expect(toJson(wrapper)).toMatchSnapshot();
+    });
+
+    it('with children', () => {
+      const wrapper = shallow(
+        <AppComponent>
+          <h1>whatever</h1>
+        </AppComponent>
       );
-      console.log(app.text());
+      expect(toJson(wrapper)).toMatchSnapshot();
     });
-    it('with store and enclosed JSX', () => {
-      const app = shallow(
-        (<AppComponent />),
-        { context: { store: createStore([thunk], initialState) } }
+
+    it('with children and wide=true', () => {
+      const wrapper = shallow(
+        <AppComponent wide>
+          <h1>whatever</h1>
+        </AppComponent>
       );
-      console.log(app.text());
-    });
-    describe('connected with .text()', () => {
-      // it('without store in context', () => {
-      //   const app = shallow(<App />);
-      //   console.log(app.text());
-      // });
-      // it('with store', () => {
-      //   const app = shallow(
-      //     <App />,
-      //     { context: { store: createStore([thunk], initialState) } }
-      //   );
-      //   console.log(app.text());
-      // });
-      // it('with store and enclosed JSX', () => {
-      //   const app = shallow(
-      //     (<App />),
-      //     { context: { store: createStore([thunk], initialState) } }
-      //   );
-      //   console.log(app.text());
-      // });
-    });
-    describe('find', () => {
-      // it('find Icon', () => {
-      //   const app = shallow(<AppComponent />);
-      //   const icon = app.find('Icon');
-      //   console.log(icon.text());
-      // });
-      it('find Connect(LoadingComponent)', () => {
-        const app = shallow(<AppComponent />);
-        const loading = app.find('Connect(LoadingComponent)');
-        console.log('found', loading.text());
-      });
-      // it('find LoadingComponent', () => {
-      //   const app = shallow(<AppComponent />);
-      //   const loading = app.find('LoadingComponent');
-      //   console.log('found', loading.text());
-      // });
+      expect(toJson(wrapper)).toMatchSnapshot();
     });
   });
-
-
-  // it('deep un-connected AppComponent', () => {
-  //   const app = mount(o
-  //     (<AppComponent />),
-  //     // {
-  //     //   context: { store: createStore([thunk], initialState) },
-  //     //   childContextTypes: { store: PropTypes.object },
-  //     // }
-  //   );
-  //   console.log(app.text());
-  // });
-  //
-  // it('connected App', () => {
-  //   const app = shallow(
-  //     (<App />),
-  //     // { context: { store: createStore([thunk], initialState) } }
-  //   );
-  //   console.log(app.text());
-  // });
+  describe('mapStateToProps', () => {
+    it('should return value from config object cache', () => {
+      const initialState = {
+        config: {
+          wide: true,
+        },
+      };
+      expect(mapStateToProps(initialState, 'wide')).toEqual({ wide: true });
+    });
+  });
 });
