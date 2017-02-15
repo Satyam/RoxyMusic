@@ -10,7 +10,8 @@
     "^_components/(.*)": "<rootDir>/client/components/$1",
     "^_utils/(.*)": "<rootDir>/client/utils/$1",
     "^_platform/restAPI": "<rootDir>/webClient/restAPI.js",
-    "\\.(css|less)$": "<rootDir>/jest/styleMock.js"
+    "\\.(css|less)$": "<rootDir>/jest/styleMock.js",
+    "^_jest/(.*)": "<rootDir>/jest/$1"
   },
   "globals": {
     "process.env": {

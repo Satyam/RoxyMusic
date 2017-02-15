@@ -21,6 +21,7 @@ module.exports = version => [
     _utils: absPath('client/utils'),
     _test: absPath('test'),
     _platform: absPath(bundle),
+    _jest: absPath('jest'),
   };
   return {
     entry: {
