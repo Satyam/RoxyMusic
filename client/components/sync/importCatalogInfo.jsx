@@ -59,7 +59,7 @@ export function ImportCatalogComponent({
               'Saving new artists info into local catalog',
             ].map((descr, index) => (
               <tr
-                key={index}
+                key={descr}
                 className={index < catalogImportStage ? 'bg-info' : ''}
               >
                 <td><Icon
