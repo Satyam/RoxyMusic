@@ -24,5 +24,6 @@
     "BUNDLE": "webClient"
   },
   "transform": {".*": "<rootDir>/node_modules/jest-css-modules"},
-  "coverageDirectory": "<rootDir>/coverage"
+  "coverageDirectory": "<rootDir>/coverage",
+  "coverageReporters": [ "html", "text"]
 }
