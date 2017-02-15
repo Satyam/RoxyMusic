@@ -2,6 +2,7 @@ import isSelector from '_jest/isSelector';
 import {
   REQUEST_SENT,
   REPLY_RECEIVED,
+  FAILURE_RECEIVED,
 } from '_store/actions';
 
 import reducer, { albumSelectors } from '../reducer';
@@ -174,6 +175,27 @@ describe('Albums reducer', () => {
         nextOffset: 0,
         list: [albumInfo],
         hash: indexed([albumInfo]),
+      });
+    });
+    it('GET_ALBUM may fail', () => {
+      expect(reducer(
+        initialState,
+        {
+          type: GET_ALBUM,
+          stage: FAILURE_RECEIVED,
+          payload: { idAlbum: 42 },
+          error: 999,
+        }
+      )).toEqual({
+        search: '',
+        nextOffset: 0,
+        list: [],
+        hash: {
+          42: {
+            error: 404,
+            idAlbum: 42,
+          },
+        },
       });
     });
   });
