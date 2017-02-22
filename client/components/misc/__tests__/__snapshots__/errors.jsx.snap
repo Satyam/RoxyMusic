@@ -1,16 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
 exports[`ErrorsComponent snapshot testing with errors property 1`] = `
 <div
-  className="errors">
+  className="errors"
+>
   <button
-    onClick={[Function]} />
+    onClick={[Function]}
+  />
   {
-    \"error\": {
-      \"message\": \"whatever\"
+    "error": {
+      "message": "whatever"
     }
   }
   {
-    \"error\": {
-      \"message\": \"another\"
+    "error": {
+      "message": "another"
     }
   }
 </div>
@@ -18,8 +22,10 @@ exports[`ErrorsComponent snapshot testing with errors property 1`] = `
 
 exports[`ErrorsComponent snapshot testing with no properties 1`] = `
 <div
-  className="errors hide">
+  className="errors hide"
+>
   <button
-    onClick={[Function]} />
+    onClick={[Function]}
+  />
 </div>
 `;

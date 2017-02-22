@@ -1,14 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
 exports[`AppComponent snapshot testing with children 1`] = `
 <div>
   <Uncontrolled(Navbar)
-    bsStyle="default">
+    bsStyle="default"
+  >
     <NavbarHeader>
       <NavbarBrand>
         <Icon
           href="/"
           label="Roxy Music"
           title="home"
-          type="heart,music" />
+          type="heart,music"
+        />
       </NavbarBrand>
     </NavbarHeader>
     <FoldingToolbar>
@@ -16,7 +20,8 @@ exports[`AppComponent snapshot testing with children 1`] = `
         button={true}
         href="/config"
         title="Configure"
-        type="cog" />
+        type="cog"
+      />
     </FoldingToolbar>
   </Uncontrolled(Navbar)>
   <Connect(LoadingComponent) />
@@ -34,14 +39,16 @@ exports[`AppComponent snapshot testing with children 1`] = `
 exports[`AppComponent snapshot testing with children and wide=true 1`] = `
 <div>
   <Uncontrolled(Navbar)
-    bsStyle="default">
+    bsStyle="default"
+  >
     <NavbarHeader>
       <NavbarBrand>
         <Icon
           href="/"
           label="Roxy Music"
           title="home"
-          type="heart,music" />
+          type="heart,music"
+        />
       </NavbarBrand>
     </NavbarHeader>
     <FoldingToolbar>
@@ -49,7 +56,8 @@ exports[`AppComponent snapshot testing with children and wide=true 1`] = `
         button={true}
         href="/config"
         title="Configure"
-        type="cog" />
+        type="cog"
+      />
     </FoldingToolbar>
   </Uncontrolled(Navbar)>
   <Connect(LoadingComponent) />
@@ -72,14 +80,16 @@ exports[`AppComponent snapshot testing with children and wide=true 1`] = `
 exports[`AppComponent snapshot testing with no properties 1`] = `
 <div>
   <Uncontrolled(Navbar)
-    bsStyle="default">
+    bsStyle="default"
+  >
     <NavbarHeader>
       <NavbarBrand>
         <Icon
           href="/"
           label="Roxy Music"
           title="home"
-          type="heart,music" />
+          type="heart,music"
+        />
       </NavbarBrand>
     </NavbarHeader>
     <FoldingToolbar>
@@ -87,7 +97,8 @@ exports[`AppComponent snapshot testing with no properties 1`] = `
         button={true}
         href="/config"
         title="Configure"
-        type="cog" />
+        type="cog"
+      />
     </FoldingToolbar>
   </Uncontrolled(Navbar)>
   <Connect(LoadingComponent) />
@@ -99,35 +110,40 @@ exports[`AppComponent snapshot testing with no properties 1`] = `
         block={true}
         button="primary"
         href="/albums"
-        type="cd">
+        type="cd"
+      >
         Albums
       </Icon>
       <Icon
         block={true}
         button="primary"
         href="/artists"
-        type="user">
+        type="user"
+      >
         Artists
       </Icon>
       <Icon
         block={true}
         button="primary"
         href="/songs"
-        type="music">
+        type="music"
+      >
         Songs
       </Icon>
       <Icon
         block={true}
         button="primary"
         href="/playLists"
-        type="list">
+        type="list"
+      >
         Play Lists
       </Icon>
       <Icon
         block={true}
         button="primary"
         href="/now"
-        type="play">
+        type="play"
+      >
         Now Playing
       </Icon>
     </ul>
@@ -139,14 +155,16 @@ exports[`AppComponent snapshot testing with no properties 1`] = `
 exports[`AppComponent snapshot testing with wide=true 1`] = `
 <div>
   <Uncontrolled(Navbar)
-    bsStyle="default">
+    bsStyle="default"
+  >
     <NavbarHeader>
       <NavbarBrand>
         <Icon
           href="/"
           label="Roxy Music"
           title="home"
-          type="heart,music" />
+          type="heart,music"
+        />
       </NavbarBrand>
     </NavbarHeader>
     <FoldingToolbar>
@@ -154,7 +172,8 @@ exports[`AppComponent snapshot testing with wide=true 1`] = `
         button={true}
         href="/config"
         title="Configure"
-        type="cog" />
+        type="cog"
+      />
     </FoldingToolbar>
   </Uncontrolled(Navbar)>
   <Connect(LoadingComponent) />
@@ -167,28 +186,32 @@ exports[`AppComponent snapshot testing with wide=true 1`] = `
           block={true}
           button="primary"
           href="/albums"
-          type="cd">
+          type="cd"
+        >
           Albums
         </Icon>
         <Icon
           block={true}
           button="primary"
           href="/artists"
-          type="user">
+          type="user"
+        >
           Artists
         </Icon>
         <Icon
           block={true}
           button="primary"
           href="/songs"
-          type="music">
+          type="music"
+        >
           Songs
         </Icon>
         <Icon
           block={true}
           button="primary"
           href="/playLists"
-          type="list">
+          type="list"
+        >
           Play Lists
         </Icon>
       </div>
