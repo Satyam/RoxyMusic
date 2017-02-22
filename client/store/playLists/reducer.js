@@ -22,14 +22,12 @@ export const playListSelectors = {};
 
 function initSelectors(key) {
   playListSelectors.loading = state => state[key].status !== 0;
-  playListSelectors.isReady = state => state[key].status === 2;
   playListSelectors.item = (state, idPlayList) => state[key].hash[idPlayList] || {};
-  playListSelectors.exists = (state, idPlayList) => idPlayList in state[key].hash;
   playListSelectors.all = state => state[key].hash;
   playListSelectors.tracksToAdd = state => state[key].idTracksToAdd;
   playListSelectors.duplicatesToAdd = state => state[key].duplicatesToAdd;
   playListSelectors.orderedList = state =>
-    sortBy(state[key].hash, playList => playList.name);
+    sortBy(state[key].hash, playList => playList.name.toLowerCase());
 }
 
 export default (

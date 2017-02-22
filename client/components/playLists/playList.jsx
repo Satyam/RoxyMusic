@@ -21,7 +21,7 @@ export const PlayListComponent = ({
   idTracks,
   onDragEnd,
 }) =>
-  (typeof idPlayList !== 'undefined' || null) && (
+  (idPlayList || null) && (
     <div className={styles.playList}>
       <Navbar>
         <Navbar.Header>
@@ -53,10 +53,8 @@ PlayListComponent.propTypes = {
   onDragEnd: PropTypes.func,
 };
 
-export const storeInitializer = (dispatch, state, props) => {
-  const idPlayList = props.params.idPlayList || 0;
-  return playListSelectors.exists(state, idPlayList) || dispatch(getPlayList(idPlayList));
-};
+export const storeInitializer = (dispatch, state, props) =>
+  dispatch(getPlayList(props.params.idPlayList));
 
 export const mapStateToProps =
   (state, props) => playListSelectors.item(state, props.params.idPlayList);

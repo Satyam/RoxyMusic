@@ -37,19 +37,28 @@ export class SelectPlayListComponent extends Component {
   }
   onChangeHandler(ev) {
     const newName = ev.target.value;
-    const testName = newName.trim().toLowerCase();
+    const playList = this.inList(newName);
     this.setState({
       newName,
-      duplicate: this.props.list.some(
-        playList => playList.name.toLowerCase() === testName
-      ),
+      duplicate: playList && playList.idTracks.length,
     });
   }
   onSubmitHandler() {
-    this.props.onAddToNewPlayList(this.state.newName);
+    const newName = this.state.newName.trim();
+    const playList = this.inList(newName);
+    if (playList) {
+      this.props.onAddToExistingPlayList(playList.idPlayList);
+    } else {
+      this.props.onAddToNewPlayList(newName);
+    }
     this.setState({ newName: '' });
   }
-
+  inList(newName) {
+    const testName = newName.trim().toLowerCase();
+    return this.props.list.find(
+      playList => playList.name.toLowerCase() === testName
+    );
+  }
   render() {
     const {
       idTracksToAdd,
@@ -89,12 +98,16 @@ export class SelectPlayListComponent extends Component {
               <ListGroup>
                 {
                   list.map(playList => (
-                    <ListGroupItem
-                      key={playList.idPlayList}
-                      onClick={onPlayListClick(playList.idPlayList)}
-                    >
-                      {playList.name}
-                    </ListGroupItem>
+                    playList.idTracks.length
+                    ? (
+                      <ListGroupItem
+                        key={playList.idPlayList}
+                        onClick={onPlayListClick(playList.idPlayList)}
+                      >
+                        {playList.name}
+                      </ListGroupItem>
+                    )
+                    : null
                   ))
                 }
                 <ListGroupItem key="new">
@@ -149,6 +162,7 @@ SelectPlayListComponent.propTypes = {
   list: PropTypes.arrayOf(PropTypes.object),
   onPlayListClick: PropTypes.func,
   onAddToNewPlayList: PropTypes.func,
+  onAddToExistingPlayList: PropTypes.func,
   onClose: PropTypes.func,
 };
 
@@ -164,6 +178,8 @@ export const mapDispatchToProps = dispatch => ({
     && dispatch(addTracksToPlayList(idPlayList)),
   onAddToNewPlayList: name =>
     dispatch(addTracksToNewPLaylist(name)),
+  onAddToExistingPlayList: idPlayList =>
+    dispatch(addTracksToPlayList(idPlayList)),
   onClose: () => dispatch(closeAddToPlayList()),
 });
 

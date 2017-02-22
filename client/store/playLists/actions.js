@@ -23,18 +23,20 @@ export const SAVE_ALL_PLAYLISTS = `${NAME}/save all playlists`;
 export const SAVE_PLAYLIST = `${NAME}/save playlist`;
 
 export function getPlayLists() {
-  return asyncActionCreator(
-    GET_PLAY_LISTS,
-    api.read('/')
-  );
+  return (dispatch, getState) => playListSelectors.loading(getState()) ||
+    dispatch(asyncActionCreator(
+      GET_PLAY_LISTS,
+      api.read('/')
+    ));
 }
 
 export function getPlayList(idPlayList) {
-  return asyncActionCreator(
-    GET_PLAY_LIST,
-    api.read(idPlayList),
-    { idPlayList }
-  );
+  return (dispatch, getState) => playListSelectors.loading(getState()) ||
+    dispatch(asyncActionCreator(
+      GET_PLAY_LIST,
+      api.read(idPlayList),
+      { idPlayList }
+    ));
 }
 
 // The idDevice is only used on operations involving remote synchronization

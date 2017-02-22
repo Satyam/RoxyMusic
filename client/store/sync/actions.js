@@ -104,7 +104,7 @@ export function getServerPlayLists() {
 export function getClientPlayLists() {
   return (dispatch, getState) => {
     const state = getState();
-    return Promise.resolve(playListSelectors.isReady(state) || dispatch(getPlayLists()))
+    return Promise.resolve(dispatch(getPlayLists()))
     .then(() => dispatch({
       type: GET_CLIENT_PLAYLISTS,
       payload: { list: playListSelectors.orderedList(state) },

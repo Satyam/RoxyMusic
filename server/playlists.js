@@ -23,7 +23,8 @@ export function init(db) {
     addPlayList:
       `insert into PlayLists (idPlayList,  name,  idTracks, lastUpdated,        idDevice)
                      values ($idPlayList, $name, $idTracks, CURRENT_TIMESTAMP, $idDevice)`,
-    deletePlayList: 'delete from PlayLists  where idPlayList = $idPlayList',
+    deletePlayList: `update PlayLists set idTracks = null, lastUpdated = CURRENT_TIMESTAMP,
+      idDevice = $idDevice where idPlayList = $idPlayList`,
   })
   .then((p) => {
     prepared = p;
@@ -77,9 +78,13 @@ export function updatePlayList(o) {
   );
 }
 
-// deletePlayList: 'delete from PlayLists  where idPlayList = $idPlayList',
+// deletePlayList: `update PlayLists set idTracks = null, lastUpdated = CURRENT_TIMESTAMP,
+//   idDevice = $idDevice where idPlayList = $idPlayList`,
 export function deletePlayList(o) {
-  return prepared.deletePlayList.run(o.keys);
+  return prepared.deletePlayList.run({
+    idPlayList: o.keys.idPlayList,
+    idDevice: o.data.idDevice || 0,
+  });
 }
 
 function saveOnePlayList(playList) {

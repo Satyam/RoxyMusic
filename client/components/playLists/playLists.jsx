@@ -36,10 +36,14 @@ export function PlayListsComponent({
       <ListGroup>
         {
           list.map(playList => (
-            <PlayListItem
-              key={playList.idPlayList}
-              idPlayList={playList.idPlayList}
-            />
+            playList.idTracks.length
+            ? (
+              <PlayListItem
+                key={playList.idPlayList}
+                idPlayList={playList.idPlayList}
+              />
+            )
+            : null
           ))
         }
       </ListGroup>
@@ -53,8 +57,7 @@ PlayListsComponent.propTypes = {
 };
 
 
-export const storeInitializer = (dispatch, state) =>
-  playListSelectors.loading(state) || dispatch(getPlayLists());
+export const storeInitializer = dispatch => dispatch(getPlayLists());
 
 export const mapStateToProps = state => ({
   list: playListSelectors.orderedList(state),
