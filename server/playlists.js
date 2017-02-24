@@ -21,8 +21,8 @@ export function init(db) {
     getPlayLists: 'select * from PlayLists',
     getPlayList: 'select * from PlayLists where idPlayList = $idPlayList',
     addPlayList:
-      `insert into PlayLists (idPlayList,  name,  idTracks, lastUpdated,        idDevice)
-                     values ($idPlayList, $name, $idTracks, CURRENT_TIMESTAMP, $idDevice)`,
+      `insert or replace into PlayLists (idPlayList, name, idTracks, lastUpdated, idDevice)
+          values ($idPlayList, $name, $idTracks, CURRENT_TIMESTAMP, $idDevice)`,
     deletePlayList: `update PlayLists set idTracks = null, lastUpdated = CURRENT_TIMESTAMP,
       idDevice = $idDevice where idPlayList = $idPlayList`,
   })
@@ -64,11 +64,20 @@ export function addPlayList(o) {
 export function updatePlayList(o) {
   const name = o.data.name;
   const idTracks = o.data.idTracks;
-  return $db.run(`update PlayLists set
-    ${name ? 'name = $name,' : ''}
-    ${idTracks ? 'idTracks = $idTracks,' : ''}
-    lastUpdated = CURRENT_TIMESTAMP, idDevice = $idDevice
-    where idPlayList = $idPlayList`,
+  return $db.run(
+    `insert or replace into PlayLists (
+      idPlayList,
+      ${name ? 'name,' : ''}
+      ${idTracks ? 'idTracks,' : ''}
+      lastUpdated,
+      idDevice
+    ) values (
+      $idPlayList,
+      ${name ? '$name,' : ''}
+      ${idTracks ? '$idTracks,' : ''}
+      CURRENT_TIMESTAMP,
+      $idDevice
+    )`,
     {
       idPlayList: o.keys.idPlayList,
       name: name || undefined,
