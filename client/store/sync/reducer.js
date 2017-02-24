@@ -30,11 +30,14 @@ import {
 
 
 export function getSignature(pl) {
-  return (
-    pl && pl.name && pl.name.length
-    ? `${pl.name}:${pl.idTracks.join(',')}`
-    : null
-  );
+  return {
+    signature: (
+      pl && pl.name && pl.name.length
+      ? `${pl.name}:${pl.idTracks.join(',')}`
+      : null
+    ),
+    empty: pl.idTracks.length === 0,
+  };
 }
 
 export function getAction(client, server) {
@@ -94,20 +97,18 @@ export default (
         hash: {
           $set: list.reduce(
             (playLists, playList) => {
-              const signature = getSignature(playList);
-              const server = Object.assign({ signature }, playList);
+              const server = Object.assign(getSignature(playList), playList);
               const client = (
                 playLists[playList.idPlayList]
                 ? playLists[playList.idPlayList].client
                 : {}
               );
-              const act = getAction(client, server);
               return Object.assign(
                 {
                   [playList.idPlayList]: {
                     client,
                     server,
-                    action: act,
+                    action: getAction(client, server),
                   },
                 },
                 playLists
@@ -124,21 +125,19 @@ export default (
         hash: {
           $set: list.reduce(
             (playLists, playList) => {
-              const signature = getSignature(playList);
-              const client = Object.assign({ signature }, playList);
+              const client = Object.assign(getSignature(playList), playList);
               const server = (
                 playLists[playList.idPlayList]
                 ? playLists[playList.idPlayList].server
                 : {}
               );
-              const act = getAction(client, server);
               return Object.assign(
                 playLists,
                 {
                   [playList.idPlayList]: {
                     client,
                     server,
-                    action: act,
+                    action: getAction(client, server),
                   },
                 }
               );

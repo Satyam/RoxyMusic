@@ -33,14 +33,27 @@ export function guessAction({ client, server }) {
   let delClient;
   let delServer;
   let comment;
+  let show = true;
+  let showDiff = false;
   if (client.signature) {
     if (server.signature) {
       if (client.signature !== server.signature) {
         send = true;
         importIt = true;
+        showDiff = !client.empty && !server.empty;
         comment = 'Tablet and server playlists are different. ';
         if (server.lastUpdated < client.lastUpdated) {
-          comment += 'Tablet version is newer.';
+          if (client.empty) {
+            comment += 'Playlist was deleted on the tablet';
+          } else if (server.empty) {
+            comment = 'Playlist is new';
+          } else {
+            comment += 'Tablet version is newer.';
+          }
+        } else if (server.empty) {
+          comment += 'PlayList was deleted on the server';
+        } else if (client.empty) {
+          comment = 'Previously deleted playlist was changed in the server';
         } else {
           comment += 'Server version is newer.';
         }
@@ -49,11 +62,13 @@ export function guessAction({ client, server }) {
       }
     } else {
       comment = 'Playlist was created new on the tablet. Needs sending to the server.';
+      if (client.empty) show = false;
       send = true;
       delClient = true;
     }
   } else if (server.signature) {
     comment = 'Playlist is new on the server. Needs importing to the tablet.';
+    if (server.empty) show = false;
     importIt = true;
     delServer = true;
   }
@@ -63,6 +78,8 @@ export function guessAction({ client, server }) {
     delClient,
     delServer,
     comment,
+    show,
+    showDiff,
   };
 }
 
@@ -91,7 +108,7 @@ export class PlayListItemCompareComponent extends Component {
     const action = props.action;
     const idPlayList = this.props.idPlayList;
     const name = (props.client && props.client.name) || (props.server && props.server.name);
-    return (
+    return (state.show || null) && (
       <table className={styles.table}>
         <caption>{name}</caption>
         <tbody>
@@ -152,7 +169,7 @@ export class PlayListItemCompareComponent extends Component {
             </td>
             <td>
               {
-                state.send && state.import
+                state.showDiff
                 ? (
                   <Icon
                     button
