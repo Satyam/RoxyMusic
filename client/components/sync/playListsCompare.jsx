@@ -8,8 +8,7 @@ import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 
 import {
   push,
-  getServerPlayLists,
-  getClientPlayLists,
+  populateSideBySideHash,
 } from '_store/actions';
 
 import {
@@ -59,9 +58,7 @@ PlayListCompareComponent.propTypes = {
 };
 
 export const storeInitializer = (dispatch, state) =>
-  !syncSelectors.isEmpty(state) ||
-    dispatch(getServerPlayLists())
-    .then(() => dispatch(getClientPlayLists()));
+  !syncSelectors.isEmpty(state) || dispatch(populateSideBySideHash());
 
 export const mapStateToProps = state => ({
   hash: syncSelectors.sideBySideHash(state),

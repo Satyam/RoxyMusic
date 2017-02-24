@@ -98,14 +98,14 @@ export function startSync() {
 
 // These action creators work with playListsCompare.jsx
 
-export function getServerPlayLists() {
+export function _getServerPlayLists() {
   return asyncActionCreator(
     GET_SERVER_PLAYLISTS,
     remote.read('/playlists')
   );
 }
 
-export function getClientPlayLists() {
+export function _getClientPlayLists() {
   return (dispatch, getState) => {
     const state = getState();
     return Promise.resolve(dispatch(getPlayLists()))
@@ -116,6 +116,11 @@ export function getClientPlayLists() {
   };
 }
 
+export function populateSideBySideHash() {
+  return dispatch => dispatch(_getServerPlayLists())
+  .then(() => dispatch(_getClientPlayLists()))
+  ;
+}
 
 // This works with playListItemCompare.jsx
 export function setActionForSync(idPlayList, action) {
