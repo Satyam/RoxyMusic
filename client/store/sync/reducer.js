@@ -65,11 +65,14 @@ function initSelectors(key) {
   syncSelectors.sideBySideHash = state => state[key].hash;
   syncSelectors.isEmpty = state => Object.keys(state[key].hash).length === 0;
   syncSelectors.mp3TransferPending = state => state[key].mp3TransferPending;
+  syncSelectors.idDevice = state => state[key].idDevice;
+  syncSelectors.musicDir = state => state[key].musicDir;
 }
 
 const initialState = {
   uuid: null,
   idDevice: null,
+  musicDir: null,
   hash: {},
   catalogImportStage: 0,
   mp3TransferPending: {

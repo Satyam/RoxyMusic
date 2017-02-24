@@ -1,5 +1,15 @@
+/* Methods whose name start with _ are internal to this module
+ * They are only being exported to make them accessible to tests
+ * but are not used in other modules within the app.
+ * All those exports might be dropped for a production version
+ * before minimizing by replacing `export function _` with `function _`
+ * which would shave off a few bytes
+ */
+
+/* eslint-disable import/no-duplicates, no-underscore-dangle */
 import restAPI from '_platform/restAPI';
 import remoteAPI from '_client/../webClient/restAPI';
+/* eslint-enable import/no-duplicates */
 import asyncActionCreator from '_utils/asyncActionCreator';
 import map from 'lodash/map';
 import plainJoin from '_utils/plainJoin';
@@ -21,12 +31,8 @@ import {
 } from '_store/selectors';
 
 const NAME = 'sync';
-let remote;
-let remoteHost;
-let musicDir;
-let idDevice;
-
 const local = restAPI(NAME);
+let remote;
 
 export const START_SYNC = `${NAME}/Start Synchronization`;
 export const GET_SERVER_PLAYLISTS = `${NAME}/Get Server Playlists`;
@@ -63,7 +69,7 @@ export const INCREMENT_PENDING = `${NAME}/increment pending`;
 // console.log('cordova.file', cordova.file);
 
 // These action creators workwith startSync (below)
-export function getDeviceInfo(uuid) {
+export function _getDeviceInfo(uuid) {
   return asyncActionCreator(
     START_SYNC,
     remote.read(`/myId/${uuid}`),
@@ -77,12 +83,10 @@ export function startSync() {
   const UUID = window.device && `${window.device.model} : ${window.device.uuid}`;
   return (dispatch, getState) => {
     const state = getState();
-    remoteHost = configSelectors.get(state, 'remoteHost');
-    remote = remoteAPI(NAME, remoteHost);
-    return dispatch(getDeviceInfo(UUID))
+    remote = remoteAPI(NAME, configSelectors.get(state, 'remoteHost'));
+    return dispatch(_getDeviceInfo(UUID))
     .then((action) => {
-      musicDir = action.payload.musicDir;
-      idDevice = action.payload.idDevice;
+      const musicDir = action.payload.musicDir;
       return (
         musicDir !== configSelectors.get(state, 'musicDir') &&
         dispatch(setConfig('musicDir', musicDir))
@@ -125,26 +129,30 @@ export function setActionForSync(idPlayList, action) {
 }
 
 // these are called by startPlayListTransfer, below
-export function sendPlaylist(idPlayList, playList) {
-  return asyncActionCreator(
-    UPDATE_PLAYLIST,
-    remote.update(`/playlist/${idPlayList}`, {
-      name: playList.client.name,
-      idTracks: playList.client.idTracks,
-      lastUpdated: playList.client.lastUpdated,
-      idDevice,
-    }),
-    {
-      idPlayList,
-      name: playList.client.name,
-      idTracks: playList.client.idTracks,
-      lastUpdated: playList.client.lastUpdated,
-      idDevice,
-    },
-  );
+export function _sendPlaylist(idPlayList, playList) {
+  return (dispatch, getState) => {
+    const { name, idTracks, lastUpdated } = playList.client;
+    const idDevice = syncSelectors.idDevice(getState());
+    return dispatch(asyncActionCreator(
+      UPDATE_PLAYLIST,
+      remote.update(`/playlist/${idPlayList}`, {
+        name,
+        idTracks,
+        lastUpdated,
+        idDevice,
+      }),
+      {
+        idPlayList,
+        name,
+        idTracks,
+        lastUpdated,
+        idDevice,
+      },
+    ));
+  };
 }
 
-export function importPlayList(idPlayList, playList) {
+export function _importPlayList(idPlayList, playList) {
   const idTracks = playList.server.idTracks || [];
   return dispatch =>
     dispatch(addPlayList(playList.server.name, idTracks, idPlayList))
@@ -154,19 +162,22 @@ export function importPlayList(idPlayList, playList) {
     )));
 }
 
-export function delClientPlayList(idPlayList) {
+export function _delClientPlayList(idPlayList) {
   return deletePlayList(idPlayList);
 }
 
-export function delServerPlayList(idPlayList) {
-  return asyncActionCreator(
-    DELETE_PLAY_LIST,
-    remote.delete(`/playlist/${idPlayList}`, { idDevice }),
-    { idPlayList, idDevice }
-  );
+export function _delServerPlayList(idPlayList) {
+  return (dispatch, getState) => {
+    const idDevice = syncSelectors.idDevice(getState());
+    return dispatch(asyncActionCreator(
+      DELETE_PLAY_LIST,
+      remote.delete(`/playlist/${idPlayList}`, { idDevice }),
+      { idPlayList, idDevice }
+    ));
+  };
 }
 
-export function playListTransferDone(idPlayList) {
+export function _playListTransferDone(idPlayList) {
   return {
     type: PLAYLIST_TRANSFER_DONE,
     payload: {
@@ -182,19 +193,19 @@ export function startPlayListTransfer() {
     return Promise.all(map(hash, (playList, idPlayList) =>
       playList.action && dispatch([
         null,
-        sendPlaylist,
-        importPlayList,
-        delClientPlayList,
-        delServerPlayList,
+        _sendPlaylist,
+        _importPlayList,
+        _delClientPlayList,
+        _delServerPlayList,
       ][playList.action](idPlayList, playList))
-      .then(() => dispatch(playListTransferDone(idPlayList)))
+      .then(() => dispatch(_playListTransferDone(idPlayList)))
     ))
     .then(() => dispatch(push('/sync/ImportCatalogInfo')));
   };
 }
 
 // These are called from importCatalog below
-export function getMissingTracks() {
+export function _getMissingTracks() {
   return dispatch =>
     dispatch(asyncActionCreator(
       GET_MISSING_TRACKS,
@@ -230,7 +241,7 @@ export function getMissingTracks() {
     });
 }
 
-export function getMissingAlbums() {
+export function _getMissingAlbums() {
   return dispatch =>
     dispatch(asyncActionCreator(
       GET_MISSING_ALBUMS,
@@ -251,7 +262,7 @@ export function getMissingAlbums() {
   ;
 }
 
-export function getMissingArtists() {
+export function _getMissingArtists() {
   return dispatch =>
     dispatch(asyncActionCreator(
       GET_MISSING_ARTISTS,
@@ -271,14 +282,14 @@ export function getMissingArtists() {
     );
 }
 
-export function updateAlbumArtistMap() {
+export function _updateAlbumArtistMap() {
   return asyncActionCreator(
     UPDATE_ALBUM_ARTIST_MAP,
     local.update('/albumArtistMap')
   );
 }
 
-export function clearAll() {
+export function _clearAll() {
   return {
     type: CLEAR_ALL,
   };
@@ -287,26 +298,26 @@ export function clearAll() {
 // Called from importCatalogInfo.jsx
 export function importCatalog() {
   return dispatch =>
-    dispatch(getMissingTracks())
-    .then(() => dispatch(getMissingAlbums()))
-    .then(() => dispatch(getMissingArtists()))
-    .then(() => dispatch(updateAlbumArtistMap()))
+    dispatch(_getMissingTracks())
+    .then(() => dispatch(_getMissingAlbums()))
+    .then(() => dispatch(_getMissingArtists()))
+    .then(() => dispatch(_updateAlbumArtistMap()))
     .then(() => {
-      dispatch(clearAll());
+      dispatch(_clearAll());
       return dispatch(push('/sync/TransferFiles'));
     })
     ;
 }
 
 // These all belong to transferFiles.jsx
-export function getMissingMp3s() {
+export function _getMissingMp3s() {
   return asyncActionCreator(
     FIND_MISSING_MP3S,
     local.read('/mp3PendingTransfer')
   );
 }
 
-export function updateTrackLocation(idTrack, location) {
+export function _updateTrackLocation(idTrack, location) {
   return asyncActionCreator(
     UPDATE_TRACK_LOCATION,
     local.update(`/track/${idTrack}`, { location }),
@@ -314,7 +325,7 @@ export function updateTrackLocation(idTrack, location) {
   );
 }
 
-export function updateDownloadStatus(index, status) {
+export function _updateDownloadStatus(index, status) {
   return {
     type: UPDATE_DOWNLOAD_STATUS,
     payload: {
@@ -324,13 +335,13 @@ export function updateDownloadStatus(index, status) {
   };
 }
 
-export function incrPending() {
+export function _incrPending() {
   return {
     type: INCREMENT_PENDING,
   };
 }
 
-export function downloadTrack({ idTrack, artist, album, title, ext }) {
+export function _downloadTrack({ idTrack, artist, album, title, ext }, musicDir, remoteHost) {
   function sanitize(name) {
     return name.replace('/', '-').replace('<', '').replace('>', '');
   }
@@ -365,35 +376,38 @@ export function downloadTrack({ idTrack, artist, album, title, ext }) {
   );
 }
 
-export function importOneTrack() {
+export function _importOneTrack() {
   return (dispatch, getState) => {
     const state = getState();
     const { list, index } = syncSelectors.mp3TransferPending(state);
+    const musicDir = syncSelectors.musicDir(state);
+    const remoteHost = configSelectors.get(state, 'remoteHost');
+
     if (index === list.length) return Promise.resolve('done');
     const pending = list[index];
-    dispatch(updateDownloadStatus(index, 1));
+    dispatch(_updateDownloadStatus(index, 1));
     const audioExtensions = configSelectors.get(state, 'portableAudioExtensions').split(',');
     if (audioExtensions.indexOf(pending.ext.substr(1)) === -1) {
       pending.ext = '.mp3';
     }
-    return downloadTrack(pending)
+    return _downloadTrack(pending, musicDir, remoteHost)
     .then(fileEntry =>
-      dispatch(updateTrackLocation(
+      dispatch(_updateTrackLocation(
         pending.idTrack,
         fileEntry.toURL().replace(musicDir, '')
       ))
     )
-    .then(() => dispatch(updateDownloadStatus(index, 2)))
-    .then(() => dispatch(incrPending()))
-    .then(() => dispatch(importOneTrack()))
+    .then(() => dispatch(_updateDownloadStatus(index, 2)))
+    .then(() => dispatch(_incrPending()))
+    .then(() => dispatch(_importOneTrack()))
     ;
   };
 }
 
 export function startMp3Transfer() {
   return dispatch =>
-    dispatch(getMissingMp3s())
-    .then(() => dispatch(importOneTrack()))
+    dispatch(_getMissingMp3s())
+    .then(() => dispatch(_importOneTrack()))
     .then(() => dispatch(push('/sync/AllDone')))
     ;
 }
