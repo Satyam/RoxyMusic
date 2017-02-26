@@ -1,6 +1,7 @@
 import pick from 'lodash/pick';
 import sortBy from 'lodash/sortBy';
 import map from 'lodash/map';
+import compact from 'lodash/compact';
 
 import {
   REPLY_RECEIVED,
@@ -16,8 +17,8 @@ export const trackSelectors = {};
 function initSelectors(key) {
   trackSelectors.exists = (state, idTrack) => idTrack in state[key];
   trackSelectors.item = (state, idTrack) => state[key][idTrack] || {};
-  trackSelectors.cachedIdTracks = state =>
-    Object.keys(state[key]).map(id => parseInt(id, 10));
+  trackSelectors.availableIdTracks = state =>
+    compact(map(state[key], track => !track.error && track.idTrack));
   trackSelectors.idTracks = (state, idTracks, sorted) => {
     if (!sorted) return idTracks;
     return map(
