@@ -10,7 +10,7 @@ export function init(db) {
 export function getTracks(o) {
   return $db.all(
       o.options.brief
-      ? `select idTrack,title, album, coalesce(artist, albumArtist) as  artist
+      ? `select idTrack, title, album, coalesce(artist, albumArtist) as artist
         from AllTracks where idTrack in (${o.keys.idTracks})`
       : `select * from AllTracks where idTrack in (${o.keys.idTracks})`)
   .then(list => ({ list }));
