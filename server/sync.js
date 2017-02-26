@@ -1,9 +1,15 @@
+import * as validators from '_server/utils/validators';
+
 import {
   getPlayLists,
   addPlayList,
   updatePlayList,
   deletePlayList,
 } from './playlists';
+
+import {
+  getTracks,
+} from './tracks';
 
 let prepared = {};
 
@@ -65,7 +71,7 @@ export function getMyId(o) {
 }
 
 
-export function getTracks(o) {
+export function getTracksStrict(o) {
   return $db.all(
     `select idTrack, title, idArtist, idAlbumArtist,idAlbum,
         track, year, duration, idGenre, ext
@@ -165,8 +171,17 @@ export default db =>
       update: updatePlayList,
       delete: deletePlayList,
     },
+    '/tracksStrict/:idTracks': {
+      read: [
+        validators.keyIsIntegerList('idTracks'),
+        getTracksStrict,
+      ],
+    },
     '/tracks/:idTracks': {
-      read: getTracks,
+      read: [
+        validators.keyIsIntegerList('idTracks'),
+        getTracks,
+      ],
     },
     '/tracks': {
       create: saveImportedTracks,
