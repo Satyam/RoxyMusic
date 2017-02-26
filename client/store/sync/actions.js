@@ -12,6 +12,8 @@ import remoteAPI from '_client/../webClient/restAPI';
 /* eslint-enable import/no-duplicates */
 import asyncActionCreator from '_utils/asyncActionCreator';
 import map from 'lodash/map';
+import difference from 'lodash/difference';
+import intersection from 'lodash/intersection';
 import plainJoin from '_utils/plainJoin';
 
 import {
@@ -22,12 +24,14 @@ import {
   addPlayList,
   deletePlayList,
   push,
+  getTracks,
 } from '_store/actions';
 
 import {
   syncSelectors,
   configSelectors,
   playListSelectors,
+  trackSelectors,
 } from '_store/selectors';
 
 const NAME = 'sync';
@@ -61,11 +65,12 @@ export const SAVE_IMPORTED_ALBUMS = `${NAME}/save imported albums`;
 export const IMPORT_ARTISTS = `${NAME}/import artists`;
 export const SAVE_IMPORTED_ARTISTS = `${NAME}/save imported artists`;
 export const UPDATE_ALBUM_ARTIST_MAP = `${NAME}/update album-artist map`;
-export const CLEAR_ALL = `${NAME}/clear all`;
+export const CLEAR_SIDE_BY_SIDE = `${NAME}/clear side by side playlists hash`;
 export const FIND_MISSING_MP3S = `${NAME}/find missing music files`;
 export const UPDATE_DOWNLOAD_STATUS = `${NAME}/update download status`;
 export const INCREMENT_PENDING = `${NAME}/increment pending`;
-
+export const CLEAR_MP3_TRANSFER = `${NAME}/clear MP3 transfer list`;
+export const PILE_UP_TRACK_INFO = `${NAME}/pile up the track info for diff`;
 // console.log('cordova.file', cordova.file);
 
 // These action creators workwith startSync (below)
@@ -120,6 +125,44 @@ export function populateSideBySideHash() {
   return dispatch => dispatch(_getServerPlayLists())
   .then(() => dispatch(_getClientPlayLists()))
   ;
+}
+
+export function _pileUpTrackInfo(idPlayList, tracks) {
+  return {
+    type: PILE_UP_TRACK_INFO,
+    payload: {
+      idPlayList,
+      list: tracks,
+    },
+  };
+}
+
+export function _getRemoteTrackToDiff(idPlayList, idTracks) {
+  return asyncActionCreator(
+    PILE_UP_TRACK_INFO,
+    remote.read(`/tracks/${idTracks.join(',')}?brief=true`),
+    { idPlayList }
+  );
+}
+
+export function getTracksToDiff(idPlayList) {
+  return (dispatch, getState) => {
+    const idTracks = syncSelectors.idTracksForPlayList(getState(), idPlayList);
+    return dispatch(getTracks(idTracks))
+    .then(() => {
+      const state = getState();
+      const available = intersection(trackSelectors.availableIdTracks(state), idTracks);
+      dispatch(_pileUpTrackInfo(
+        idPlayList,
+        available.map(idTrack => trackSelectors.item(state, idTrack))
+      ));
+      return available;
+    })
+    .then(available =>
+      dispatch(_getRemoteTrackToDiff(idPlayList, difference(idTracks, available)))
+    )
+    ;
+  };
 }
 
 // This works with playListItemCompare.jsx
@@ -227,7 +270,7 @@ export function _getMissingTracks() {
           (ps, batch) => ps.then(() =>
             dispatch(asyncActionCreator(
               IMPORT_TRACKS,
-              remote.read(`/tracks/${batch.join(',')}`),
+              remote.read(`/tracksStrict/${batch.join(',')}`),
               { batch }
             ))
           ),
@@ -294,9 +337,9 @@ export function _updateAlbumArtistMap() {
   );
 }
 
-export function _clearAll() {
+export function _clearSideBySide() {
   return {
-    type: CLEAR_ALL,
+    type: CLEAR_SIDE_BY_SIDE,
   };
 }
 
@@ -308,7 +351,7 @@ export function importCatalog() {
     .then(() => dispatch(_getMissingArtists()))
     .then(() => dispatch(_updateAlbumArtistMap()))
     .then(() => {
-      dispatch(_clearAll());
+      dispatch(_clearSideBySide());
       return dispatch(push('/sync/TransferFiles'));
     })
     ;
@@ -409,10 +452,16 @@ export function _importOneTrack() {
   };
 }
 
+export function _clearMp3Transfer() {
+  return {
+    type: CLEAR_MP3_TRANSFER,
+  };
+}
 export function startMp3Transfer() {
   return dispatch =>
     dispatch(_getMissingMp3s())
     .then(() => dispatch(_importOneTrack()))
+    .then(() => dispatch(_clearMp3Transfer()))
     .then(() => dispatch(push('/sync/AllDone')))
     ;
 }

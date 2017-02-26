@@ -1,6 +1,5 @@
 import update from 'react-addons-update';
-import cloneDeep from 'lodash/cloneDeep';
-
+import unique from 'lodash/uniq';
 
 import {
   REPLY_RECEIVED,
@@ -22,10 +21,12 @@ import {
   GET_MISSING_ARTISTS,
   IMPORT_ARTISTS,
   SAVE_IMPORTED_ARTISTS,
-  CLEAR_ALL,
+  CLEAR_SIDE_BY_SIDE,
   FIND_MISSING_MP3S,
   UPDATE_DOWNLOAD_STATUS,
   INCREMENT_PENDING,
+  CLEAR_MP3_TRANSFER,
+  PILE_UP_TRACK_INFO,
 } from './actions';
 
 
@@ -67,22 +68,24 @@ function initSelectors(key) {
   syncSelectors.mp3TransferPending = state => state[key].mp3TransferPending;
   syncSelectors.idDevice = state => state[key].idDevice;
   syncSelectors.musicDir = state => state[key].musicDir;
+  syncSelectors.idTracksForPlayList = (state, idPlayList) => {
+    const pls = state[key].hash[idPlayList];
+    return unique(pls.client.idTracks.concat(pls.server.idTracks));
+  };
 }
 
-const initialState = {
-  uuid: null,
-  idDevice: null,
-  musicDir: null,
-  hash: {},
-  catalogImportStage: 0,
-  mp3TransferPending: {
-    list: [],
-    index: 0,
-  },
-};
-
 export default (
-  state = cloneDeep(initialState),
+  state = {
+    uuid: null,
+    idDevice: null,
+    musicDir: null,
+    hash: {},
+    catalogImportStage: 0,
+    mp3TransferPending: {
+      list: [],
+      index: 0,
+    },
+  },
   action
 ) => {
   if (action.stage && action.stage !== REPLY_RECEIVED) return state;
@@ -180,8 +183,11 @@ export default (
       return update(state, { catalogImportStage: { $set: 8 } });
     case SAVE_IMPORTED_ARTISTS:
       return update(state, { catalogImportStage: { $set: 9 } });
-    case CLEAR_ALL: {
-      return Object.assign(cloneDeep(initialState), { catalogImportStage: 10 });
+    case CLEAR_SIDE_BY_SIDE: {
+      return update(state, {
+        hash: { $set: {} },
+        catalogImportStage: { $set: 10 } },
+      );
     }
     case FIND_MISSING_MP3S:
       return update(state, {
@@ -201,6 +207,33 @@ export default (
       return update(state, {
         mp3TransferPending: { index: { $apply: i => i + 1 } },
       });
+    case CLEAR_MP3_TRANSFER:
+      return update(state, {
+        mp3TransferPending: {
+          $set: {
+            list: [],
+            index: 0,
+          },
+        },
+      });
+    case PILE_UP_TRACK_INFO: {
+      return update(state, {
+        hash: {
+          [payload.idPlayList]: {
+            tracks: {
+              $apply: tracks => list.reduce(
+                (ts, track) => (
+                  track.error
+                  ? ts
+                  : Object.assign(ts, { [track.idTrack]: track })
+                ),
+                tracks || {}
+              ),
+            },
+          },
+        },
+      });
+    }
     case '@@selectors':
       initSelectors(action.key);
       return state;

@@ -27,13 +27,40 @@
 }
 .newer {
   composes: global(bg-success);
+  width: 50%;
 }
 .older {
   composes: global(bg-warning);
+  width: 50%;
 }
 .missing {
   composes: global(bg-danger);
+  font-size: x-large;
+  font-weight: bold;
+  width: 25%;
 }
 .added {
   composes: global(bg-info);
+  font-size: x-large;
+  font-weight: bold;
+  width: 25%;
+}
+.same {
+  font-size: x-large;
+  font-weight: bold;
+  width: 25%;
+}
+.trackInfo {
+  margin: 0 1em;
+  width: 50%;
+}
+.track-title {
+  margin: 0;
+  font-weight: bold;
+}
+.track-album {
+  margin: 0;
+}
+.track-artist {
+  margin: 0;
 }
