@@ -83,7 +83,7 @@ export function loadNowPlayingList() {
         api.read('nowPlaying')
       ));
     }
-    return null;
+    return Promise.resolve(null);
   };
 }
 

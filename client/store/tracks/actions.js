@@ -10,9 +10,9 @@ export const GET_TRACKS = 'tracks/get tracks';
 
 export function getTracks(idTracks) {
   return (dispatch, getState) => {
-    const currentIds = trackSelectors.cachedIdTracks(getState());
+    const currentIds = trackSelectors.availableIdTracks(getState());
     const missing = difference(idTracks, currentIds);
-    if (missing.length === 0) return null;
+    if (missing.length === 0) return Promise.resolve(null);
     return dispatch(asyncActionCreator(
       GET_TRACKS,
       api.read(missing),
