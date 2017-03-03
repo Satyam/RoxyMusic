@@ -12,24 +12,24 @@ import {
   GET_TRACKS,
 } from './actions';
 
-export const trackSelectors = {};
 
-function initSelectors(key) {
-  trackSelectors.exists = (state, idTrack) => idTrack in state[key];
-  trackSelectors.item = (state, idTrack) => state[key][idTrack] || {};
-  trackSelectors.availableIdTracks = state =>
-    compact(map(state[key], track => !track.error && track.idTrack));
-  trackSelectors.idTracks = (state, idTracks, sorted) => {
+const SUB_STORE = 'tracks';
+export const trackSelectors = {
+  exists: (state, idTrack) => idTrack in state[SUB_STORE],
+  item: (state, idTrack) => state[SUB_STORE][idTrack] || {},
+  availableIdTracks: state =>
+    compact(map(state[SUB_STORE], track => !track.error && track.idTrack)),
+  idTracks: (state, idTracks, sorted) => {
     if (!sorted) return idTracks;
     return map(
       sortBy(
-        pick(state[key], idTracks),
+        pick(state[SUB_STORE], idTracks),
         track => track.title + track.album + track.track
       ),
       track => track.idTrack
     );
-  };
-}
+  },
+};
 
 export default (
   state = {},
@@ -51,9 +51,6 @@ export default (
         {}
       ));
     }
-    case '@@selectors':
-      initSelectors(action.key);
-      return state;
     default:
       return state;
   }

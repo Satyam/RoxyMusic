@@ -10,12 +10,12 @@ import {
   SET_CONFIG,
 } from './actions';
 
-export const configSelectors = {};
+const SUB_STORE = 'config';
 
-function initSelectors(key) {
-  configSelectors.all = state => state[key];
-  configSelectors.get = (state, name) => state[key][name];
-}
+export const configSelectors = {
+  all: state => state[SUB_STORE],
+  get: (state, name) => state[SUB_STORE][name],
+};
 
 export default (
   state = {},
@@ -29,9 +29,6 @@ export default (
     case GET_CONFIG:
     case SET_CONFIG:
       return update(state, { [payload.key]: { $set: payload.value } });
-    case '@@selectors':
-      initSelectors(action.key);
-      return state;
     default:
       return state;
   }

@@ -18,17 +18,16 @@ import {
   CLOSE_ADD_TO_PLAYLIST,
 } from './actions';
 
-export const playListSelectors = {};
-
-function initSelectors(key) {
-  playListSelectors.loading = state => state[key].status !== 0;
-  playListSelectors.item = (state, idPlayList) => state[key].hash[idPlayList] || {};
-  playListSelectors.all = state => state[key].hash;
-  playListSelectors.tracksToAdd = state => state[key].idTracksToAdd;
-  playListSelectors.duplicatesToAdd = state => state[key].duplicatesToAdd;
-  playListSelectors.orderedList = state =>
-    sortBy(state[key].hash, playList => playList.name.toLowerCase());
-}
+const SUB_STORE = 'playLists';
+export const playListSelectors = {
+  loading: state => state[SUB_STORE].status !== 0,
+  item: (state, idPlayList) => state[SUB_STORE].hash[idPlayList] || {},
+  all: state => state[SUB_STORE].hash,
+  tracksToAdd: state => state[SUB_STORE].idTracksToAdd,
+  duplicatesToAdd: state => state[SUB_STORE].duplicatesToAdd,
+  orderedList: state =>
+    sortBy(state[SUB_STORE].hash, playList => playList.name.toLowerCase()),
+};
 
 export default (
   state = {
@@ -84,9 +83,6 @@ export default (
         idTracksToAdd: { $set: null },
         duplicatesToAdd: { $set: null },
       });
-    case '@@selectors':
-      initSelectors(action.key);
-      return state;
     default:
       return state;
   }

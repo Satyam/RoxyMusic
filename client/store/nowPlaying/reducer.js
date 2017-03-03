@@ -15,18 +15,17 @@ import {
   REORDER_NOW_PLAYING_TRACKS,
 } from './actions';
 
-export const nowPlayingSelectors = {};
-
-function initSelectors(key) {
-  nowPlayingSelectors.loading = state => state[key].status !== 0;
-  nowPlayingSelectors.isReady = state => state[key].status === 2;
-  nowPlayingSelectors.on = state => state[key].current !== -1;
-  nowPlayingSelectors.idTracks = state => state[key].idTracks;
-  nowPlayingSelectors.currentIdTrack = state => state[key].idTracks[state[key].current];
-  nowPlayingSelectors.current = state => state[key].current;
-  nowPlayingSelectors.hasNext = state =>
-    state[key].idTracks.length > ((state[key].current + 1) || 0);
-}
+const SUB_STORE = 'nowPlaying';
+export const nowPlayingSelectors = {
+  loading: state => state[SUB_STORE].status !== 0,
+  isReady: state => state[SUB_STORE].status === 2,
+  on: state => state[SUB_STORE].current !== -1,
+  idTracks: state => state[SUB_STORE].idTracks,
+  currentIdTrack: state => state[SUB_STORE].idTracks[state[SUB_STORE].current],
+  current: state => state[SUB_STORE].current,
+  hasNext: state =>
+    state[SUB_STORE].idTracks.length > ((state[SUB_STORE].current + 1) || 0),
+};
 
 export default (
   state = {
@@ -52,9 +51,6 @@ export default (
           return update(state, { status: { $set: 1 } });
         default: return state;
       }
-    case '@@selectors':
-      initSelectors(action.key);
-      return state;
     default:
       return state;
   }

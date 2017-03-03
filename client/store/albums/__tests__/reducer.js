@@ -79,7 +79,6 @@ describe('Albums reducer', () => {
       expect(
         reducer(undefined, {})
       ).toEqual(initialState);
-      expect(albumSelectors).toEqual({});
     });
     describe('should initialize the selectors', isSelector(
       reducer,
@@ -200,15 +199,9 @@ describe('Albums reducer', () => {
     });
   });
   describe('selectors', () => {
-    beforeAll(() => {
-      reducer(undefined, {
-        type: '@@selectors',
-        key: 'xyz',
-      });
-    });
     describe('empty state', () => {
       const state = {
-        xyz: initialState,
+        albums: initialState,
       };
       it('albumSelectors.list should return empty array', () => {
         expect(albumSelectors.list(state)).toEqual([]);
@@ -231,7 +224,7 @@ describe('Albums reducer', () => {
     });
     describe('non-empty state', () => {
       const state = {
-        xyz: {
+        albums: {
           search: 'abc',
           nextOffset: 3,
           list: firstList,

@@ -12,17 +12,7 @@ import requests from './requests';
 import config from './config';
 import sync from './sync';
 
-function prepareSelectors(reducers) {
-  Object.keys(reducers).forEach((key) => {
-    reducers[key](undefined, {
-      type: '@@selectors',
-      key,
-    });
-  });
-  return reducers;
-}
-
-const reducers = combineReducers(prepareSelectors({
+const reducers = combineReducers({
   albums,
   tracks,
   artists,
@@ -33,7 +23,7 @@ const reducers = combineReducers(prepareSelectors({
   config,
   sync,
   routing: routerReducer,
-}));
+});
 
 export default (history, initialState) => {
   let enhancer = applyMiddleware(reduxThunk, routerMiddleware(history));

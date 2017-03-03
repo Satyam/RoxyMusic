@@ -9,20 +9,16 @@ import {
 
 export * from './actions';
 
-export const requestSelectors = {};
-
-function initSelectors(key) {
-  requestSelectors.isLoading = state => !!state[key].pending;
-  requestSelectors.errors = state => state[key].errors;
-}
+const SUB_STORE = 'requests';
+export const requestSelectors = {
+  isLoading: state => !!state[SUB_STORE].pending,
+  errors: state => state[SUB_STORE].errors,
+};
 
 export default (state = { pending: 0, errors: [] }, action) => {
   switch (action.type) {
     case CLEAR_HTTP_ERRORS:
       return update(state, { errors: { $set: [] } });
-    case '@@selectors':
-      initSelectors(action.key);
-      return state;
     default:
       switch (action.stage) {
         case REQUEST_SENT:

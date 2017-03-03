@@ -67,7 +67,6 @@ describe('Artists reducer', () => {
       expect(
         reducer(undefined, {})
       ).toEqual(initialState);
-      expect(artistSelectors).toEqual({});
     });
     describe('should initialize the selectors', isSelector(
       reducer,
@@ -188,15 +187,9 @@ describe('Artists reducer', () => {
     });
   });
   describe('selectors', () => {
-    beforeAll(() => {
-      reducer(undefined, {
-        type: '@@selectors',
-        key: 'xyz',
-      });
-    });
     describe('empty state', () => {
       const state = {
-        xyz: initialState,
+        artists: initialState,
       };
       it('artistSelectors.list should return empty array', () => {
         expect(artistSelectors.list(state)).toEqual([]);
@@ -219,7 +212,7 @@ describe('Artists reducer', () => {
     });
     describe('non-empty state', () => {
       const state = {
-        xyz: {
+        artists: {
           search: 'abc',
           nextOffset: 3,
           list: firstList,

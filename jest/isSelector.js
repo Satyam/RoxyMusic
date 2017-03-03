@@ -1,7 +1,7 @@
 export default function (reducer, selectors, methods, initialState) {
   return () => {
     beforeAll(() => {
-      const state = reducer(undefined, { type: '@@selectors' });
+      const state = reducer(undefined, {});
       if (initialState) {
         expect(state).toEqual(initialState);
       }

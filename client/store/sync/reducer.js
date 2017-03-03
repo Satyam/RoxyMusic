@@ -58,21 +58,21 @@ export function getAction(client, server) {
   }
   return TRANSFER_ACTION.DO_NOTHING;
 }
-export const syncSelectors = {};
 
-function initSelectors(key) {
-  syncSelectors.catalogImportStage = state => state[key].catalogImportStage;
-  syncSelectors.sideBySideItem = (state, idPlayList) => state[key].hash[idPlayList];
-  syncSelectors.sideBySideHash = state => state[key].hash;
-  syncSelectors.isEmpty = state => Object.keys(state[key].hash).length === 0;
-  syncSelectors.mp3TransferPending = state => state[key].mp3TransferPending;
-  syncSelectors.idDevice = state => state[key].idDevice;
-  syncSelectors.musicDir = state => state[key].musicDir;
-  syncSelectors.idTracksForPlayList = (state, idPlayList) => {
-    const pls = state[key].hash[idPlayList];
+const SUB_STORE = 'sync';
+export const syncSelectors = {
+  catalogImportStage: state => state[SUB_STORE].catalogImportStage,
+  sideBySideItem: (state, idPlayList) => state[SUB_STORE].hash[idPlayList],
+  sideBySideHash: state => state[SUB_STORE].hash,
+  isEmpty: state => Object.KEYs(state[SUB_STORE].hash).length === 0,
+  mp3TransferPending: state => state[SUB_STORE].mp3TransferPending,
+  idDevice: state => state[SUB_STORE].idDevice,
+  musicDir: state => state[SUB_STORE].musicDir,
+  idTracksForPlayList: (state, idPlayList) => {
+    const pls = state[SUB_STORE].hash[idPlayList];
     return unique(pls.client.idTracks.concat(pls.server.idTracks));
-  };
-}
+  },
+};
 
 export default (
   state = {
@@ -234,9 +234,6 @@ export default (
         },
       });
     }
-    case '@@selectors':
-      initSelectors(action.key);
-      return state;
     default:
       return state;
   }
