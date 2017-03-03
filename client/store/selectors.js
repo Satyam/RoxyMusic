@@ -5,5 +5,5 @@ export * from './nowPlaying/reducer';
 export * from './playLists/reducer';
 export * from './requests';
 export * from './songs/reducer';
-export * from './sync/reducer';
+export * from './sync';
 export * from './tracks/reducer';
