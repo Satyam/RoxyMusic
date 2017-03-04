@@ -12,16 +12,6 @@ jest.mock('_store/selectors.js', () => ({
   },
 }));
 
-jest.mock('react-redux', () => ({
-  connect: (s, d) => (c) => {
-    it('Connect should receive proper parameters', () => {
-      expect(s).toEqual(mapStateToProps);
-      expect(d).toEqual(mapDispatchToProps);
-      expect(c).toEqual(ErrorsComponent);
-    });
-  },
-}));
-
 describe('ErrorsComponent', () => {
   describe('snapshot testing', () => {
     it('with no properties', () => {
