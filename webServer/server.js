@@ -15,6 +15,19 @@ import dataServers from '_server';
 import openDatabase from '_server/utils/openSqlite';
 import DB from '_server/utils/sqliteP';
 
+import uwa from './universalWebApp';
+
+if (process.env.NODE_ENV !== 'production') {
+  /* eslint-disable import/no-extraneous-dependencies, global-require */
+  global.Promise = require('bluebird');
+  /* eslint-enable import/no-extraneous-dependencies, global-require */
+
+  Promise.config({
+    longStackTraces: true,
+    warnings: true, // note, run node with --trace-warnings to see full stack traces for warnings
+  });
+}
+
 const absPath = relPath => join(ROOT_DIR, relPath);
 
 const unlink = denodeify(fs.unlink);
@@ -74,6 +87,9 @@ app.get('/kill', (req, res) => {
   close();
   process.exit();
 });
+
+app.use(uwa);
+
 app.get('*', (req, res) => res.sendFile(absPath('webServer/index.html')));
 
 const handleRequest = actions => (req, res) => {

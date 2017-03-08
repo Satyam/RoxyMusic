@@ -20,7 +20,7 @@ module.exports = version => [
     _components: absPath('client/components'),
     _utils: absPath('client/utils'),
     _test: absPath('test'),
-    _platform: absPath(bundle),
+    _platform: absPath(bundle === 'webServer' ? 'webClient' : bundle),
     _jest: absPath('jest'),
   };
   return {

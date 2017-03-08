@@ -1,3 +1,8 @@
 import client from '_client';
 
-client();
+const initialStateEl = document.getElementById('initialState');
+let initialState = {};
+if (initialStateEl) {
+  initialState = JSON.parse(initialStateEl.innerHTML);
+}
+client(initialState);
