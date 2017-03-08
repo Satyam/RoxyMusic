@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node bundles/webServer.js",
-    "debug": "node-debug -p 8888 bundles/webServer.js",
+    "debug": "node --inspect --debug-brk bundles/webServer.js",
     "lint": "eslint --ext .jsx,.js . || exit 0",
     "test": "jest --config jest/config.json",
     "build": "webpack -d --config webpack.config/development.js",
