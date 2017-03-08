@@ -33,7 +33,8 @@ export default function (db, routeAdd) {
       /* eslint-disable global-require */
       const refreshDb = require('./refreshDb').default;
       /* eslint-enable global-require */
-      refreshDb(db).then(routes => addToDataRouter('/refreshDb', routes));
+      return refreshDb(db).then(routes => addToDataRouter('/refreshDb', routes));
     }
+    return null;
   });
 }
