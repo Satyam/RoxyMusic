@@ -70,12 +70,8 @@ ArtistListComponent.propTypes = {
 };
 
 
-export const storeInitializer = (dispatch, state) => {
-  if (artistSelectors.isEmpty(state)) {
-    return dispatch(getArtists());
-  }
-  return undefined;
-};
+export const storeInitializer = (dispatch, getState) =>
+  artistSelectors.isEmpty(getState()) && dispatch(getArtists());
 
 export const mapStateToProps = state => ({
   list: artistSelectors.list(state),

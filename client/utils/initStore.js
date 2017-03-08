@@ -12,7 +12,7 @@ const initStore = initializer => (BaseComponent) => {
     }
     componentWillMount() {
       const store = this.store;
-      this.isInitialized(initializer(store.dispatch, store.getState(), this.props));
+      this.isInitialized(initializer(store.dispatch, store.getState, this.props));
     }
     componentDidMount() {
       this.mounted = true;
@@ -26,14 +26,20 @@ const initStore = initializer => (BaseComponent) => {
       this.isInitialized(initializer(store.dispatch, store.getState(), nextProps, this.props));
     }
 
+    static storeInitializer(...args) {
+      return initializer(...args);
+    }
+
     isInitialized(initRet) {
       this.shouldUpdate = initRet !== false;
-      if (initRet instanceof Promise) {
-        this.shouldUpdate = false;
-        initRet.then(() => {
-          this.shouldUpdate = true;
-          if (this.mounted) this.forceUpdate();
-        });
+      if (initRet.then) {
+        if (typeof window !== 'undefined') {
+          this.shouldUpdate = false;
+          initRet.then(() => {
+            this.shouldUpdate = true;
+            if (this.mounted) this.forceUpdate();
+          });
+        }
       }
     }
     shouldComponentUpdate() {

@@ -57,8 +57,8 @@ PlayListCompareComponent.propTypes = {
   onDone: PropTypes.func,
 };
 
-export const storeInitializer = (dispatch, state) =>
-  !syncSelectors.isEmpty(state) || dispatch(populateSideBySideHash());
+export const storeInitializer = (dispatch, getState) =>
+  !syncSelectors.isEmpty(getState()) || dispatch(populateSideBySideHash());
 
 export const mapStateToProps = state => ({
   hash: syncSelectors.sideBySideHash(state),

@@ -152,8 +152,9 @@ AudioComponent.propTypes = {
   onEnded: PropTypes.func,
 };
 
-export function storeInitializer(dispatch, state) {
+export function storeInitializer(dispatch, getState) {
   let trackP = false;
+  const state = getState();
   if (nowPlayingSelectors.isReady(state)) {
     if (nowPlayingSelectors.on(state)) {
       const idTrack = nowPlayingSelectors.currentIdTrack(state);

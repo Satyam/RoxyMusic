@@ -58,7 +58,7 @@ SongListComponent.propTypes = {
 
 
 export const storeInitializer =
-  (dispatch, state) => !songSelectors.isEmpty(state) || dispatch(getSongs());
+  (dispatch, getState) => !songSelectors.isEmpty(getState()) || dispatch(getSongs());
 
 export const mapStateToProps = state => ({
   list: songSelectors.list(state),

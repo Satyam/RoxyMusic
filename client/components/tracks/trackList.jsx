@@ -62,7 +62,7 @@ TrackListComponent.propTypes = {
   onMoreClick: PropTypes.func,
 };
 
-export const storeInitializer = (dispatch, state, { idTracks }) => dispatch(getTracks(idTracks));
+export const storeInitializer = (dispatch, getState, { idTracks }) => dispatch(getTracks(idTracks));
 
 export const mapStateToProps = (state, { idTracks, sorted }) => ({
   idTracks: trackSelectors.idTracks(state, idTracks, sorted),

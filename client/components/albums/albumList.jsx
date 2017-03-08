@@ -71,12 +71,8 @@ AlbumListComponent.propTypes = {
 };
 
 
-export const storeInitializer = (dispatch, state) => {
-  if (albumSelectors.isEmpty(state)) {
-    return dispatch(getAlbums());
-  }
-  return undefined;
-};
+export const storeInitializer = (dispatch, getState) =>
+  albumSelectors.isEmpty(getState()) && dispatch(getAlbums());
 
 export const mapStateToProps = state => ({
   list: albumSelectors.list(state),

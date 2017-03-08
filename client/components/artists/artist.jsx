@@ -48,9 +48,9 @@ ArtistComponent.propTypes = {
   error: PropTypes.number,
 };
 
-export const storeInitializer = (dispatch, state, props) => {
+export const storeInitializer = (dispatch, getState, props) => {
   const idArtist = parseInt(props.params.idArtist, 10);
-  return artistSelectors.exists(state, idArtist) || dispatch(getArtist(idArtist));
+  return artistSelectors.exists(getState(), idArtist) || dispatch(getArtist(idArtist));
 };
 
 export const mapStateToProps =

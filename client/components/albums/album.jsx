@@ -50,9 +50,9 @@ AlbumComponent.propTypes = {
   error: PropTypes.number,
 };
 
-export const storeInitializer = (dispatch, state, props) => {
+export const storeInitializer = (dispatch, getState, props) => {
   const idAlbum = parseInt(props.params.idAlbum, 10);
-  return albumSelectors.exists(state, idAlbum) || dispatch(getAlbum(idAlbum));
+  return albumSelectors.exists(getState(), idAlbum) || dispatch(getAlbum(idAlbum));
 };
 
 export const mapStateToProps = (state, props) =>

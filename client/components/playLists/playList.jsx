@@ -53,7 +53,7 @@ PlayListComponent.propTypes = {
   onDragEnd: PropTypes.func,
 };
 
-export const storeInitializer = (dispatch, state, props) =>
+export const storeInitializer = (dispatch, getState, props) =>
   dispatch(getPlayList(props.params.idPlayList));
 
 export const mapStateToProps =

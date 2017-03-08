@@ -77,6 +77,6 @@ DraggableTrackListComponent.propTypes = {
   ]),
 };
 
-export const storeInitializer = (dispatch, state, { idTracks }) => dispatch(getTracks(idTracks));
+export const storeInitializer = (dispatch, getState, { idTracks }) => dispatch(getTracks(idTracks));
 
 export default initStore(storeInitializer)(DraggableTrackListComponent);

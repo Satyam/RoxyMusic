@@ -131,7 +131,7 @@ PlayListDiffComponent.propTypes = {
   tracks: PropTypes.object,
   onDone: PropTypes.func,
 };
-export const storeInitializer = (dispatch, state, props) =>
+export const storeInitializer = (dispatch, getState, props) =>
   dispatch(getTracksToDiff(props.params.idPlayList));
 
 export const mapStateToProps = (state, props) =>
