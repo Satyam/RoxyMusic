@@ -11,12 +11,16 @@ import { addRoute } from './restAPI';
 
 require('isomorphic-fetch');
 
-global.Promise = require('bluebird');
+if (process.env.NODE_ENV !== 'production') {
+  /* eslint-disable import/no-extraneous-dependencies, global-require */
+  global.Promise = require('bluebird');
+  /* eslint-enable import/no-extraneous-dependencies, global-require */
 
-Promise.config({
-  longStackTraces: true,
-  warnings: true, // note, run node with --trace-warnings to see full stack traces for warnings
-});
+  Promise.config({
+    longStackTraces: true,
+    warnings: true, // note, run node with --trace-warnings to see full stack traces for warnings
+  });
+}
 
 const resolveLocalFileSystemURL = path => new Promise((resolve, reject) =>
   window.resolveLocalFileSystemURL(
