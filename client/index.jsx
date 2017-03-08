@@ -7,7 +7,6 @@ import { Provider } from 'react-redux';
 import createStore from '_store/createStore';
 
 import routes from '_components/routes';
-import { getAllConfig } from '_store/actions';
 
 export default function (initialState) {
   if (process.env.NODE_ENV !== 'production' && BUNDLE !== 'cordova') {
@@ -26,8 +25,9 @@ export default function (initialState) {
 
   const history = syncHistoryWithStore(baseHistory, store);
 
-  store.dispatch(getAllConfig())
-  .then(() => render(
+  const dest = document.getElementById('contents');
+
+  render(
     (
       <Provider store={store}>
         <Router history={history}>
@@ -35,8 +35,18 @@ export default function (initialState) {
         </Router>
       </Provider>
     ),
-    document.getElementById('contents')
-  ));
+    dest
+  );
+  if (BUNDLE === 'webClient' && process.env.NODE_ENV !== 'production') {
+    if (
+      !dest ||
+      !dest.firstChild ||
+      !dest.firstChild.attributes ||
+      !dest.firstChild.attributes['data-react-checksum']
+    ) {
+      console.error('Server-side React render was discarded. Make sure that your initial render does not contain any client-side code.'); // eslint-disable-line
+    }
+  }
 
   return store;
 }

@@ -4,6 +4,7 @@ import compose from 'recompose/compose';
 import Navbar from 'react-bootstrap/lib/Navbar';
 import Icon from '_components/misc/icon';
 import FoldingToolbar from '_components/misc/foldingToolbar';
+import initStore from '_utils/initStore';
 
 import Errors from '_components/misc/errors';
 import Loading from '_components/misc/loading';
@@ -12,6 +13,7 @@ import SelectPlayList from '_components/playLists/selectPlayList';
 import NowPlaying from '_components/nowPlaying';
 
 import { configSelectors } from '_store/selectors';
+import { getAllConfig } from '_store/actions';
 
 // import { remote } from 'electron';
 // const db = remote.getGlobal('db');
@@ -140,9 +142,12 @@ AppComponent.propTypes = {
   children: PropTypes.node,
 };
 
+export const storeInitializer = dispatch => dispatch(getAllConfig());
+
 export const mapStateToProps = state => ({ wide: configSelectors.get(state, 'wide') });
 
 export default compose(
+  initStore(storeInitializer),
   connect(
     mapStateToProps
   )
