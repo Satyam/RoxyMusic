@@ -28,7 +28,7 @@ const reducers = combineReducers({
 export default (history, initialState) => {
   let enhancer = applyMiddleware(reduxThunk, routerMiddleware(history));
   if (process.env.NODE_ENV !== 'production') {
-    if (BUNDLE === 'cordova') {
+    if (BUNDLE === 'cordova' || BUNDLE === 'webServer') {
       enhancer = applyMiddleware(
         reduxThunk,
         routerMiddleware(history),
@@ -36,6 +36,12 @@ export default (history, initialState) => {
         require('_utils/reduxLogger').default
         /* eslint-enable global-require */
       );
+      /* eslint-disable no-console */
+      if (!console.group) {
+        console.group = console.log;
+        console.groupEnd = console.log;
+      }
+      /* eslint-enable no-console */
     } else if (typeof window !== 'undefined' && window.devToolsExtension) {
       enhancer = compose(enhancer, window.devToolsExtension());
     }
