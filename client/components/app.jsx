@@ -142,7 +142,14 @@ AppComponent.propTypes = {
   children: PropTypes.node,
 };
 
-export const storeInitializer = dispatch => dispatch(getAllConfig());
+export const storeInitializer = [
+  dispatch => dispatch(getAllConfig()),
+  Errors,
+  Loading,
+  Audio,
+  SelectPlayList,
+  NowPlaying,
+];
 
 export const mapStateToProps = state => ({ wide: configSelectors.get(state, 'wide') });
 

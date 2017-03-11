@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { renderToString } from 'react-dom/server';
 import { createMemoryHistory, match, RouterContext } from 'react-router';
 import { Provider } from 'react-redux';
@@ -28,22 +28,22 @@ export default function universalWebApp(req, res, next) {
           next();
         } else {
           const initializeComponent = (component) => {
+            let storeInitializer;
             if (component) {
-              const storeInitializer = component.storeInitializer;
+              if (component.getStoreInitializer) {
+                storeInitializer = component.getStoreInitializer();
+              } else if (typeof component === 'function' && !(component.prototype instanceof Component)) {
+                storeInitializer = component;
+              }
               if (typeof storeInitializer === 'function') {
                 return storeInitializer(store.dispatch, store.getState, renderProps);
+              } else if (Array.isArray(storeInitializer)) {
+                return Promise.all(storeInitializer.map(initializeComponent));
               }
             }
             return null;
           };
-          Promise.all(renderProps.routes.map((route) => {
-            if (route.component) {
-              return initializeComponent(route.component);
-            } else if (route.childRoutes) {
-              return Promise.all(route.childRoutes.map(r => initializeComponent(r.component)));
-            }
-            return null;
-          }))
+          Promise.all(renderProps.components.map(initializeComponent))
           .then(() => {
             const finalState = JSON.stringify(store.getState());
             const initialView = renderToString(

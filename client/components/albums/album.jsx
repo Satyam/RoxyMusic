@@ -6,7 +6,7 @@ import compose from 'recompose/compose';
 import { getAlbum } from '_store/actions';
 import { albumSelectors } from '_store/selectors';
 import initStore from '_utils/initStore';
-import TrackList from '_components/tracks/trackList';
+import TrackList, { storeInitializer as trackListInitializer } from '_components/tracks/trackList';
 import styles from './styles.css';
 
 export const AlbumComponent = ({ idAlbum, album, artists, numTracks, idTracks, error }) =>
@@ -52,7 +52,10 @@ AlbumComponent.propTypes = {
 
 export const storeInitializer = (dispatch, getState, props) => {
   const idAlbum = parseInt(props.params.idAlbum, 10);
-  return albumSelectors.exists(getState(), idAlbum) || dispatch(getAlbum(idAlbum));
+  return albumSelectors.exists(getState(), idAlbum) || dispatch(getAlbum(idAlbum))
+  .then(() =>
+    trackListInitializer(dispatch, getState, albumSelectors.item(getState(), idAlbum))
+  );
 };
 
 export const mapStateToProps = (state, props) =>

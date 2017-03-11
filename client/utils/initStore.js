@@ -3,6 +3,7 @@ import createHelper from 'recompose/createHelper';
 import createEagerFactory from 'recompose/createEagerFactory';
 
 const initStore = initializer => (BaseComponent) => {
+  const init = Array.isArray(initializer) ? initializer[0] : initializer;
   const factory = createEagerFactory(BaseComponent);
 
   const StoreInitializer = class extends Component {
@@ -12,7 +13,7 @@ const initStore = initializer => (BaseComponent) => {
     }
     componentWillMount() {
       const store = this.store;
-      this.isInitialized(initializer(store.dispatch, store.getState, this.props));
+      this.isInitialized(init(store.dispatch, store.getState, this.props));
     }
     componentDidMount() {
       this.mounted = true;
@@ -23,11 +24,11 @@ const initStore = initializer => (BaseComponent) => {
 
     componentWillReceiveProps(nextProps) {
       const store = this.store;
-      this.isInitialized(initializer(store.dispatch, store.getState(), nextProps, this.props));
+      this.isInitialized(init(store.dispatch, store.getState(), nextProps, this.props));
     }
 
-    static storeInitializer(...args) {
-      return initializer(...args);
+    static getStoreInitializer() {
+      return initializer;
     }
 
     isInitialized(initRet) {

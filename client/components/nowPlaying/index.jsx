@@ -5,7 +5,7 @@ import initStore from '_utils/initStore';
 
 import Navbar from 'react-bootstrap/lib/Navbar';
 import Icon from '_components/misc/icon';
-import TrackList from '_components/tracks/draggableTrackList';
+import TrackList, { storeInitializer as trackListInitializer } from '_components/tracks/draggableTrackList';
 
 import {
   loadNowPlayingList,
@@ -46,7 +46,11 @@ NowPlayingComponent.propTypes = {
   onDragEnd: PropTypes.func,
 };
 
-export const storeInitializer = dispatch => dispatch(loadNowPlayingList());
+export const storeInitializer = (dispatch, getState) => dispatch(loadNowPlayingList())
+.then(() =>
+  trackListInitializer(dispatch, getState, { idTracks: nowPlayingSelectors.idTracks(getState()) })
+);
+
 
 export const mapStateToProps = state => ({
   on: nowPlayingSelectors.on(state),
