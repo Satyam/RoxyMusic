@@ -28,7 +28,7 @@ const reducers = combineReducers({
 export default (history, initialState) => {
   let enhancer = applyMiddleware(reduxThunk, routerMiddleware(history));
   if (process.env.NODE_ENV !== 'production') {
-    if (BUNDLE === 'cordova' || BUNDLE === 'webServer') {
+    if (BUNDLE === 'cordova' /* || BUNDLE === 'webServer' */) {
       enhancer = applyMiddleware(
         reduxThunk,
         routerMiddleware(history),
