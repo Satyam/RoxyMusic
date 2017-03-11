@@ -101,7 +101,7 @@ export class ConfigComponent extends Component {
     </div>);
   }
 }
-
+/* eslint-disable react/no-unused-prop-types*/
 ConfigComponent.propTypes = {
   wide: PropTypes.bool,
   musicDir: PropTypes.string,

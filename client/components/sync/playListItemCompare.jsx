@@ -190,7 +190,7 @@ export class PlayListItemCompareComponent extends Component {
     );
   }
 }
-
+/* eslint-disable react/no-unused-prop-types*/
 PlayListItemCompareComponent.propTypes = {
   server: PropTypes.shape({
     name: PropTypes.string,
