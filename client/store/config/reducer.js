@@ -15,6 +15,7 @@ const SUB_STORE = 'config';
 export const configSelectors = {
   all: state => state[SUB_STORE],
   get: (state, name) => state[SUB_STORE][name],
+  loaded: state => !!Object.keys(state[SUB_STORE]).length,
 };
 
 export default (

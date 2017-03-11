@@ -75,15 +75,23 @@ export function playNextTrack() {
   };
 }
 
+let loadingRequest;
+
 export function loadNowPlayingList() {
   return (dispatch, getState) => {
-    if (!nowPlayingSelectors.loading(getState())) {
-      return dispatch(asyncActionCreator(
+    if (nowPlayingSelectors.loaded(getState())) {
+      return Promise.resolve();
+    }
+    if (!loadingRequest) {
+      loadingRequest = dispatch(asyncActionCreator(
         LOAD_NOW_PLAYING,
         api.read('nowPlaying')
-      ));
+      ))
+      .then(() => {
+        loadingRequest = null;
+      });
     }
-    return Promise.resolve(null);
+    return loadingRequest;
   };
 }
 

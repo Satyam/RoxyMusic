@@ -1,6 +1,8 @@
 import restAPI from '_platform/restAPI';
 import asyncActionCreator from '_utils/asyncActionCreator';
 
+import { configSelectors } from './reducer';
+
 const NAME = 'config';
 const api = restAPI(NAME);
 
@@ -16,11 +18,24 @@ export function getConfig(key) {
   );
 }
 
+let loadingRequest;
+
 export function getAllConfig() {
-  return asyncActionCreator(
-    GET_ALL_CONFIG,
-    api.read('/')
-  );
+  return (dispatch, getState) => {
+    if (configSelectors.loaded(getState())) {
+      return Promise.resolve();
+    }
+    if (!loadingRequest) {
+      loadingRequest = dispatch(asyncActionCreator(
+        GET_ALL_CONFIG,
+        api.read('/')
+      ))
+      .then(() => {
+        loadingRequest = null;
+      });
+    }
+    return loadingRequest;
+  };
 }
 
 export function setConfig(key, value) {

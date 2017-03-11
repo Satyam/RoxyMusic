@@ -12,6 +12,7 @@ import bindHandlers from '_utils/bindHandlers';
 import {
   playNextTrack,
   getTrack,
+  loadNowPlayingList,
 } from '_store/actions';
 
 import {
@@ -153,35 +154,32 @@ AudioComponent.propTypes = {
 };
 
 export function storeInitializer(dispatch, getState) {
-  let trackP = false;
-  const state = getState();
-  if (nowPlayingSelectors.isReady(state)) {
+  return dispatch(loadNowPlayingList()).then(() => {
+    const state = getState();
     if (nowPlayingSelectors.on(state)) {
       const idTrack = nowPlayingSelectors.currentIdTrack(state);
       if (idTrack) {
-        trackP = trackSelectors.exists(state, idTrack) || dispatch(getTrack(idTrack));
+        return trackSelectors.exists(state, idTrack) || dispatch(getTrack(idTrack));
       }
     }
-  }
-  return trackP;
+    return null;
+  });
 }
 
 export function mapStateToProps(state) {
-  if (nowPlayingSelectors.isReady(state)) {
-    if (nowPlayingSelectors.on(state)) {
-      const idTrack = nowPlayingSelectors.currentIdTrack(state);
-      if (trackSelectors.exists(state, idTrack) && configSelectors.get(state, 'musicDir')) {
-        return {
-          hasNext: nowPlayingSelectors.hasNext(state),
-          src: plainJoin(
-              BUNDLE === 'webClient'
-              ? '/music'
-              : configSelectors.get(state, 'musicDir')
-            ,
-            trackSelectors.item(state, idTrack).location
-          ),
-        };
-      }
+  if (nowPlayingSelectors.on(state)) {
+    const idTrack = nowPlayingSelectors.currentIdTrack(state);
+    if (trackSelectors.exists(state, idTrack) && configSelectors.get(state, 'musicDir')) {
+      return {
+        hasNext: nowPlayingSelectors.hasNext(state),
+        src: plainJoin(
+            BUNDLE === 'webClient'
+            ? '/music'
+            : configSelectors.get(state, 'musicDir')
+          ,
+          trackSelectors.item(state, idTrack).location
+        ),
+      };
     }
   }
   return {
