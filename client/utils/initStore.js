@@ -24,7 +24,7 @@ const initStore = initializer => (BaseComponent) => {
 
     componentWillReceiveProps(nextProps) {
       const store = this.store;
-      this.isInitialized(init(store.dispatch, store.getState(), nextProps, this.props));
+      this.isInitialized(init(store.dispatch, store.getState, nextProps, this.props));
     }
 
     static getStoreInitializer() {
