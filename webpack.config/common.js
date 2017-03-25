@@ -40,20 +40,23 @@ module.exports = version => [
     target: {
       webClient: 'web',
       webServer: 'node',
-      electronServer: 'electron',
-      electronClient: 'electron',
+      electronServer: 'electron-main',
+      electronClient: 'electron-renderer',
       cordova: 'web',
     }[bundle],
     module: {
-      loaders: [
+      rules: [
         {
           test: /\.jsx?$/,
           exclude: /(node_modules|bower_components)/,
-          loader: 'babel',
+          loader: 'babel-loader',
         },
         {
           test: /\.css$/,
-          loader: ExtractTextPlugin.extract('style-loader', 'css-loader?modules&camelCase'),
+          use: ExtractTextPlugin.extract({
+            fallback: 'style-loader',
+            use: 'css-loader?modules&camelCase',
+          }),
         },
       ],
       noParse: (
@@ -81,7 +84,7 @@ module.exports = version => [
     ],
     resolve: {
       alias: aliases,
-      extensions: ['', '.js', '.jsx'],
+      extensions: ['.js', '.jsx'],
     },
     externals: [
       (context, request, callback) => {
